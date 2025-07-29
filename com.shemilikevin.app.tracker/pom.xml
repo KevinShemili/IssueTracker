@@ -25,4 +25,75 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+
+        <plugin>
+          <groupId>org.pitest</groupId>
+          <artifactId>pitest-maven</artifactId>
+          <version>1.5.2</version>
+          <configuration>
+
+            <targetClasses>
+              <param>com.shemilikevin.app.tracker.repository.*</param>   <!-- PLACEHOLDER - CHANGEME -->
+            </targetClasses>
+
+            <targetTests>
+              <param>com.shemilikevin.app.tracker.repository.*</param>   <!-- PLACEHOLDER - CHANGEME -->
+            </targetTests>
+
+            <mutators>
+              <mutator>DEFAULTS</mutator>
+            </mutators>
+            <mutationThreshold>100</mutationThreshold>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.12</version>
+          <configuration>
+            <excludes>
+              <exclude></exclude> <!-- PLACEHOLDER - CHANGEME -->
+            </excludes>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>prepare-agent</goal>
+                <goal>report</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>jacoco-check</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <rule>
+                    <element>PACKAGE</element>
+                    <limit>
+                      <limit>
+                        <counter>LINE</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>1</minimum>
+                      </limit>
+                    </limit>
+                  </rule>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+  </build>
+
+
+
 </project>
