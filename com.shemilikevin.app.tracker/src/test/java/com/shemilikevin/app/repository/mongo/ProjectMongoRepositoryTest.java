@@ -5,6 +5,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -139,8 +140,13 @@ public class ProjectMongoRepositoryTest {
 
 		// Arrange
 		Project project1 = new Project("1", "Desktop Application", "Desktop Application");
+		ArrayList<Project> databaseProjects = new ArrayList<Project>();
 
 		// Act
 		projectRepository.save(project1);
+
+		// Assert
+		projectCollection.find().into(databaseProjects);
+		assertThat(databaseProjects).containsExactly(project1);
 	}
 }

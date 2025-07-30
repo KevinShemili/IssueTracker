@@ -42,8 +42,8 @@ public class ProjectMongoRepository {
 		return project;
 	}
 
-	public void save(Project project1) {
-		// TODO Auto-generated method stub
+	public void save(Project project) {
 
+		projectCollection.insertOne(project);
 	}
 }
