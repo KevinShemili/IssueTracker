@@ -1,4 +1,4 @@
-package com.shemilikevin.app.repository.mongo;
+package com.shemilikevin.app.tracker.repository.mongo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
@@ -21,7 +21,7 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.shemilikevin.app.model.Project;
+import com.shemilikevin.app.tracker.model.Project;
 
 import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;

@@ -1,4 +1,4 @@
-package com.shemilikevin.app.repository.mongo;
+package com.shemilikevin.app.tracker.repository.mongo;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -12,7 +12,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import com.shemilikevin.app.model.Project;
+import com.shemilikevin.app.tracker.model.Project;
 
 public class ProjectMongoRepository {
 
