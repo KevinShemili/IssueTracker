@@ -89,6 +89,8 @@ public class ProjectMongoRepositoryTest {
 
 		// Assert
 		assertThat(projectList).hasSize(2);
+		assertThat(projectList).containsExactly(new Project("1", "Desktop Application", "Desktop Application"),
+				new Project("2", "Web Application", "Web Application"));
 	}
 
 	@Test
