@@ -156,8 +156,13 @@ public class ProjectMongoRepositoryTest {
 		// Arrange
 		Project project1 = new Project("1", "Desktop Application", "Desktop Application");
 		projectCollection.insertOne(project1);
+		ArrayList<Project> databaseProjects = new ArrayList<Project>();
 
 		// Act
-		projectRepository.delete(project1);
+		projectRepository.delete("1");
+
+		// Assert
+		projectCollection.find().into(databaseProjects);
+		assertThat(databaseProjects).isEmpty();
 	}
 }
