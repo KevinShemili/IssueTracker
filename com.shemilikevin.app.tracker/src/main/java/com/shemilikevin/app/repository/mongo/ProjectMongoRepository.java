@@ -11,6 +11,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.shemilikevin.app.model.Project;
 
 public class ProjectMongoRepository {
@@ -35,6 +36,9 @@ public class ProjectMongoRepository {
 	}
 
 	public Project findById(String id) {
-		return null;
+
+		Project project = projectCollection.find(Filters.eq("id", id)).first();
+
+		return project;
 	}
 }

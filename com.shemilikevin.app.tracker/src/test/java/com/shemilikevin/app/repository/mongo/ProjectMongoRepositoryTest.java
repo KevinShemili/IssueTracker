@@ -100,4 +100,19 @@ public class ProjectMongoRepositoryTest {
 		// Assert
 		assertThat(project).isNull();
 	}
+
+	@Test
+	public void testFindById_OnlyOneDatabaseEntry_EntryHasMatchingId_ReturnsProject() {
+
+		// Arrange
+		Project project1 = new Project("1", "Desktop Application", "Desktop Application");
+		projectCollection.insertOne(project1);
+
+		// Act
+		Project project = projectRepository.findById("1");
+
+		// Assert
+		assertThat(project).isNotNull();
+		assertThat(project).isEqualTo(new Project("1", "Desktop Application", "Desktop Application"));
+	}
 }
