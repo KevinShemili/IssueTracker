@@ -55,7 +55,7 @@ public class ProjectMongoRepositoryTest {
 		MongoClientOptions mongoClientOptions = MongoClientOptions.builder().codecRegistry(codecRegistry).build();
 
 		mongoClient = new MongoClient(new ServerAddress(inetSocketAddress), mongoClientOptions);
-		projectRepository = new ProjectMongoRepository();
+		projectRepository = new ProjectMongoRepository(mongoClient, databaseName, collectionName);
 		MongoDatabase database = mongoClient.getDatabase(databaseName);
 		database.drop();
 		projectCollection = database.getCollection(collectionName, Project.class);
