@@ -1,4 +1,4 @@
-package com.shemilikevin.app.model;
+package com.shemilikevin.app.tracker.model;
 
 import java.util.Objects;
 

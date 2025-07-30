@@ -1,4 +1,4 @@
-package com.shemilikevin.app.tracker;
+package com.shemilikevin.app.tracker.app.swing;
 
 /**
  * Hello world!
