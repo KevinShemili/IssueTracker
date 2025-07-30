@@ -149,4 +149,15 @@ public class ProjectMongoRepositoryTest {
 		projectCollection.find().into(databaseProjects);
 		assertThat(databaseProjects).containsExactly(project1);
 	}
+
+	@Test
+	public void testDelete_DeletesProjectFromTheDatabase() {
+
+		// Arrange
+		Project project1 = new Project("1", "Desktop Application", "Desktop Application");
+		projectCollection.insertOne(project1);
+
+		// Act
+		projectRepository.delete(project1);
+	}
 }
