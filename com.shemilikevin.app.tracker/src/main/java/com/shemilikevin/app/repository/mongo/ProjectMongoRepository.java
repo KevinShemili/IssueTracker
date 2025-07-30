@@ -47,8 +47,8 @@ public class ProjectMongoRepository {
 		projectCollection.insertOne(project);
 	}
 
-	public void delete(Project project1) {
-		// TODO Auto-generated method stub
+	public void delete(String id) {
 
+		projectCollection.deleteOne(Filters.eq("id", id));
 	}
 }
