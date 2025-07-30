@@ -5,6 +5,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bson.codecs.configuration.CodecRegistry;
@@ -73,5 +74,21 @@ public class ProjectMongoRepositoryTest {
 
 		// Assert
 		assertThat(projectList).isEmpty();
+	}
+
+	@Test
+	public void testGetAll_DatabaseHasProjects_ReturnsProjects() {
+
+		// Arrange
+		Project project1 = new Project("1", "Desktop Application", "Desktop Application");
+		Project project2 = new Project("2", "Web Application", "Web Application");
+		projectCollection.insertMany(Arrays.asList(project1, project2));
+
+		// Act
+		List<Project> projectList = projectRepository.getAll();
+
+		// Assert
+		assertThat(projectList).hasSize(2);
+
 	}
 }
