@@ -1,15 +1,73 @@
 package com.shemilikevin.app.repository.mongo;
 
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+
 import java.net.InetSocketAddress;
+import java.util.List;
+
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.shemilikevin.app.model.Project;
 
 import de.bwaldvogel.mongo.MongoServer;
+import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 
 public class ProjectMongoRepositoryTest {
-	private MongoServer mongoServer;
-	private InetSocketAddress inetSocketAddress;
+	private static MongoServer mongoServer;
+	private static InetSocketAddress inetSocketAddress;
+
 	private MongoClient mongoClient;
 	private ProjectMongoRepository projectRepository;
+	private MongoCollection<Project> projectCollection;
+	private String databaseName = "db";
+	private String collectionName = "collection";
 
+	@BeforeClass
+	public static void setUpInMemoryServer() {
+		mongoServer = new MongoServer(new MemoryBackend());
+		inetSocketAddress = mongoServer.bind();
+	}
+
+	@AfterClass
+	public static void shutDownInMemoryServer() {
+		mongoServer.shutdown();
+	}
+
+	@Before
+	public void setUp() {
+		CodecRegistry codecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
+				fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+
+		MongoClientOptions mongoClientOptions = MongoClientOptions.builder().codecRegistry(codecRegistry).build();
+
+		mongoClient = new MongoClient(new ServerAddress(inetSocketAddress), mongoClientOptions);
+		projectRepository = new ProjectMongoRepository();
+		MongoDatabase database = mongoClient.getDatabase(databaseName);
+		database.drop();
+		projectCollection = database.getCollection(collectionName, Project.class);
+	}
+
+	@After
+	public void tearDown() {
+		mongoClient.close();
+	}
+
+	@Test
+	public void testGetAll_EmptyDatabase_ReturnsEmpty() {
+		
+		// Act
+		List<Project> projectList = projectRepository.getAll();
+	}
 }
