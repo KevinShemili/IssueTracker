@@ -97,5 +97,7 @@ public class ProjectMongoRepositoryTest {
 		// Act
 		Project project = projectRepository.findById("1");
 
+		// Assert
+		assertThat(project).isNull();
 	}
 }

@@ -34,8 +34,7 @@ public class ProjectMongoRepository {
 		return projectList;
 	}
 
-	public Project findById(String string) {
-		// TODO Auto-generated method stub
+	public Project findById(String id) {
 		return null;
 	}
 }
