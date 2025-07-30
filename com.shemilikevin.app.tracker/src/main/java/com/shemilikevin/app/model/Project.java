@@ -16,6 +16,10 @@ public class Project {
 		this.description = description;
 	}
 
+	// Needed for automatic MongoDB deserialization
+	public Project() {
+	}
+
 	public String getId() {
 		return id;
 	}
