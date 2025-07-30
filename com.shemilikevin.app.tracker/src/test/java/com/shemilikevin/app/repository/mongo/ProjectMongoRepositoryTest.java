@@ -133,4 +133,14 @@ public class ProjectMongoRepositoryTest {
 		assertThat(project).isNotNull();
 		assertThat(project).isEqualTo(new Project("2", "Web Application", "Web Application"));
 	}
+
+	@Test
+	public void testSave_SavesProjectInTheDatabase() {
+
+		// Arrange
+		Project project1 = new Project("1", "Desktop Application", "Desktop Application");
+
+		// Act
+		projectRepository.save(project1);
+	}
 }
