@@ -46,4 +46,9 @@ public class ProjectMongoRepository {
 
 		projectCollection.insertOne(project);
 	}
+
+	public void delete(Project project1) {
+		// TODO Auto-generated method stub
+
+	}
 }
