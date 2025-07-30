@@ -29,17 +29,12 @@ public class ProjectMongoRepository {
 
 	public List<Project> getAll() {
 
-		List<Project> projectList = new ArrayList<Project>();
-		projectCollection.find().into(projectList);
-
-		return projectList;
+		return projectCollection.find().into(new ArrayList<Project>());
 	}
 
 	public Project findById(String id) {
 
-		Project project = projectCollection.find(Filters.eq("id", id)).first();
-
-		return project;
+		return projectCollection.find(Filters.eq("id", id)).first();
 	}
 
 	public void save(Project project) {
