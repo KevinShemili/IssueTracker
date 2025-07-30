@@ -1,5 +1,6 @@
 package com.shemilikevin.app.repository.mongo;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -66,8 +67,11 @@ public class ProjectMongoRepositoryTest {
 
 	@Test
 	public void testGetAll_EmptyDatabase_ReturnsEmpty() {
-		
+
 		// Act
 		List<Project> projectList = projectRepository.getAll();
+
+		// Assert
+		assertThat(projectList).isEmpty();
 	}
 }
