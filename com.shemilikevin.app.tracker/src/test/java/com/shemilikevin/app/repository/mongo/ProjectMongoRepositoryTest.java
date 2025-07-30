@@ -89,6 +89,13 @@ public class ProjectMongoRepositoryTest {
 
 		// Assert
 		assertThat(projectList).hasSize(2);
+	}
+
+	@Test
+	public void testFindById_NoMatchingIdInDatabase_ReturnsNull() {
+
+		// Act
+		Project project = projectRepository.findById("1");
 
 	}
 }
