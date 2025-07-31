@@ -229,4 +229,10 @@ public class IssueMongoRepositoryTest {
 		assertThat(issueList)
 				.containsExactly(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
 	}
+
+	public void testDelete_DeletesIssueFromTheDatabase() {
+
+		// Act
+		issueRepository.delete("1");
+	}
 }
