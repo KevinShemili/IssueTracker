@@ -230,9 +230,18 @@ public class IssueMongoRepositoryTest {
 				.containsExactly(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
 	}
 
+	@Test
 	public void testDelete_DeletesIssueFromTheDatabase() {
+
+		// Arrange
+		issueCollection.insertOne(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+		List<Issue> issueList = new ArrayList<Issue>();
 
 		// Act
 		issueRepository.delete("1");
+		issueCollection.find().into(issueList);
+
+		// Assert
+		assertThat(issueList).isEmpty();
 	}
 }
