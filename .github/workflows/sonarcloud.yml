@@ -36,7 +36,7 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2-
 
-    - name: External PR
+    - name: Enable SonarCloud (Internal PR or Push)
       if: ${{ env.SONAR_TOKEN }}
       run: echo "SONARGOAL=sonar:sonar" >> $GITHUB_ENV
 
