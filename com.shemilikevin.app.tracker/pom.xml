@@ -30,6 +30,7 @@
   </properties>
 
   <dependencies>
+
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongo-java-driver</artifactId>
@@ -62,6 +63,7 @@
       <version>${mongo.java.server}</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -73,15 +75,12 @@
           <artifactId>pitest-maven</artifactId>
           <version>${pitest.maven.version}</version>
           <configuration>
-
             <targetClasses>
               <param>com.shemilikevin.app.tracker.repository.*</param>
             </targetClasses>
-
             <targetTests>
               <param>com.shemilikevin.app.tracker.repository.*</param>
             </targetTests>
-
             <mutators>
               <mutator>STRONGER</mutator>
             </mutators>
@@ -146,7 +145,7 @@
         <plugin>
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
-          <version>5.0.0.4389</version>
+          <version>${sonar.maven.plugin}</version>
         </plugin>
 
       </plugins>

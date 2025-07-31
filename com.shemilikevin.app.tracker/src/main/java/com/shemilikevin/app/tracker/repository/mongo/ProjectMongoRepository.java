@@ -27,7 +27,7 @@ public class ProjectMongoRepository {
 				.getCollection(collectionName, Project.class);
 	}
 
-	public List<Project> getAll() {
+	public List<Project> findAll() {
 
 		return projectCollection.find().into(new ArrayList<Project>());
 	}
