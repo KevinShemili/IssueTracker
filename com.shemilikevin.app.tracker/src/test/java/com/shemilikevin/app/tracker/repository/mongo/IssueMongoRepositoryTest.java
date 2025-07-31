@@ -68,7 +68,7 @@ public class IssueMongoRepositoryTest {
 	}
 
 	@Test
-	public void testFindAll_EmptyDatabase_Returnsempty() {
+	public void testFindAll_EmptyDatabase_ReturnsEmpty() {
 
 		// Act
 		List<Issue> issueList = issueRepository.findAll();
@@ -103,5 +103,18 @@ public class IssueMongoRepositoryTest {
 
 		// Assert
 		assertThat(issue).isNull();
+	}
+
+	@Test
+	public void testFindById_OnlyOneDatabaseEntry_EntryHasMatchingId_ReturnsEntry() {
+
+		// Arrange
+		issueCollection.insertOne(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+
+		// Act
+		Issue issue = issueRepository.findById("1");
+
+		// Assert
+		assertThat(issue).isNotNull();
 	}
 }
