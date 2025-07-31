@@ -160,4 +160,17 @@ public class IssueMongoRepositoryTest {
 		// Assert
 		assertThat(issueList).isEmpty();
 	}
+
+	@Test
+	public void testFindByProjectId_OnlyOneMatchingIssueForGivenProjectId_ReturnsIssue() {
+
+		// Arrange
+		issueCollection.insertOne(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+
+		// Act
+		List<Issue> issueList = issueRepository.findByProjectId("1");
+
+		// Assert
+		assertThat(issueList).hasSize(1);
+	}
 }
