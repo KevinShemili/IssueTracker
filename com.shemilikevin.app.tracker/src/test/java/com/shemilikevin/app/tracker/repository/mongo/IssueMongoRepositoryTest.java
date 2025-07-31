@@ -193,4 +193,24 @@ public class IssueMongoRepositoryTest {
 				new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"),
 				new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1"));
 	}
+
+	@Test
+	public void testFindByProjectId_MultipleIssuesInDatabase_ReturnsOnlyIssuesWithMatchingProjectId() {
+
+		// Arrange
+		Issue issue1 = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
+		Issue issue2 = new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "2");
+		Issue issue3 = new Issue("3", "3rd Party integration error", "Error in retrieving data from...", "Low", "2");
+
+		issueCollection.insertMany(Arrays.asList(issue1, issue2, issue3));
+
+		// Act
+		List<Issue> issueList = issueRepository.findByProjectId("2");
+
+		// Assert
+		assertThat(issueList).hasSize(2);
+		assertThat(issueList).containsExactly(
+				new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "2"),
+				new Issue("3", "3rd Party integration error", "Error in retrieving data from...", "Low", "2"));
+	}
 }
