@@ -2,9 +2,12 @@ package com.shemilikevin.app.tracker.model;
 
 import java.util.Objects;
 
+import org.bson.codecs.pojo.annotations.BsonProperty;
+
 public class Issue {
 
 	// Fields
+	@BsonProperty("id")
 	private String id;
 	private String title;
 	private String description;
@@ -20,6 +23,10 @@ public class Issue {
 		this.description = description;
 		this.priority = priority;
 		this.projectId = projectId;
+	}
+
+	// Needed for automatic MongoDB deserialization
+	public Issue() {
 	}
 
 	public String getId() {
@@ -40,6 +47,26 @@ public class Issue {
 
 	public String getProjectId() {
 		return projectId;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
 	}
 
 	@Override
