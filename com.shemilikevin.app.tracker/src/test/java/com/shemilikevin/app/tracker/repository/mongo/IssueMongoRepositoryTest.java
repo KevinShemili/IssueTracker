@@ -141,5 +141,8 @@ public class IssueMongoRepositoryTest {
 
 		// Act
 		List<Issue> issueList = issueRepository.findByProjectId("1");
+
+		// Assert
+		assertThat(issueList).isEmpty();
 	}
 }
