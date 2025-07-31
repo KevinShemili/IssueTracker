@@ -40,7 +40,6 @@ public class IssueMongoRepository {
 	}
 
 	public void save(Issue issue) {
-		// TODO Auto-generated method stub
-
+		issueCollection.insertOne(issue);
 	}
 }
