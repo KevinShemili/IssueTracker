@@ -43,8 +43,7 @@ public class IssueMongoRepository {
 		issueCollection.insertOne(issue);
 	}
 
-	public void delete(String string) {
-		// TODO Auto-generated method stub
-
+	public void delete(String id) {
+		issueCollection.deleteOne(Filters.eq("id", id));
 	}
 }
