@@ -213,4 +213,11 @@ public class IssueMongoRepositoryTest {
 				new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "2"),
 				new Issue("3", "3rd Party integration error", "Error in retrieving data from...", "Low", "2"));
 	}
+
+	@Test
+	public void testSave_SavesIssueInTheDatabase() {
+
+		// Act
+		issueRepository.save(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+	}
 }

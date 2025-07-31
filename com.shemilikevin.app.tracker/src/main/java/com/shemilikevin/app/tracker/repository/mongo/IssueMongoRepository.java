@@ -39,4 +39,8 @@ public class IssueMongoRepository {
 		return issueCollection.find(Filters.eq("projectId", projectId)).into(new ArrayList<Issue>());
 	}
 
+	public void save(Issue issue) {
+		// TODO Auto-generated method stub
+
+	}
 }
