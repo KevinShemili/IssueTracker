@@ -31,4 +31,9 @@ public class IssueMongoRepository {
 		return issueCollection.find().into(new ArrayList<Issue>());
 	}
 
+	public Issue findById(String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

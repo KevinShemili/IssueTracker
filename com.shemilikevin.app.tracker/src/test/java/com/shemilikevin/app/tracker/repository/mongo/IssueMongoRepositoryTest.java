@@ -94,4 +94,10 @@ public class IssueMongoRepositoryTest {
 				new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"),
 				new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1"));
 	}
+
+	public void testFindById_NoMatchingIdInDatabase_ReturnsNull() {
+
+		// Act
+		Issue issue = issueRepository.findById("1");
+	}
 }
