@@ -172,5 +172,7 @@ public class IssueMongoRepositoryTest {
 
 		// Assert
 		assertThat(issueList).hasSize(1);
+		assertThat(issueList)
+				.containsExactly(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
 	}
 }

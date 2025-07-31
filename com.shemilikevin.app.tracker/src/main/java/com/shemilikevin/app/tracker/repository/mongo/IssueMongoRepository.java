@@ -28,17 +28,15 @@ public class IssueMongoRepository {
 	}
 
 	public List<Issue> findAll() {
-
 		return issueCollection.find().into(new ArrayList<Issue>());
 	}
 
 	public Issue findById(String id) {
-
 		return issueCollection.find(Filters.eq("id", id)).first();
 	}
 
-	public List<Issue> findByProjectId(String string) {
-		return new ArrayList<Issue>();
+	public List<Issue> findByProjectId(String projectId) {
+		return issueCollection.find(Filters.eq("projectId", projectId)).into(new ArrayList<Issue>());
 	}
 
 }
