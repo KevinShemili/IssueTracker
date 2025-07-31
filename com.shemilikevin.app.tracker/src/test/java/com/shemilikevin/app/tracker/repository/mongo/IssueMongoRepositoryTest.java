@@ -116,5 +116,6 @@ public class IssueMongoRepositoryTest {
 
 		// Assert
 		assertThat(issue).isNotNull();
+		assertThat(issue).isEqualTo(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
 	}
 }
