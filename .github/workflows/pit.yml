@@ -1,7 +1,6 @@
-name: CI Build & Test
+name: Mutation Testing
 
 on:
-  push:
   pull_request:
   workflow_dispatch:
 
@@ -9,7 +8,6 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     env:
-      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       workdir: com.shemilikevin.app.tracker
 
     steps:
@@ -28,20 +26,12 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2-
 
-    - name: Enable Coveralls (Internal PR or Push)
-      if: ${{ env.COVERALLS_REPO_TOKEN }}
-      run: echo "PROFILE=-Pcoveralls" >> $GITHUB_ENV
-
     - name: Maven Build & Test
-      run: mvn verify $PROFILE
+      run: mvn verify -Ppit-tests
       working-directory: ${{ env.workdir }}
 
-    - name: Generate JUnit Report
-      run: mvn surefire-report:report-only
-      working-directory: ${{ env.workdir }}
-
-    - name: Archive JUnit Report
+    - name: Archive PIT Report
       uses: actions/upload-artifact@v4
       with:
-        name: surefire-report
-        path: '**/target/reports'
+        name: pit-reports
+        path: '**/target/pit-reports'
