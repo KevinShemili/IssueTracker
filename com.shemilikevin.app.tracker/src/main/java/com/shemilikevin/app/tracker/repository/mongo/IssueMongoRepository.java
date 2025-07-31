@@ -37,4 +37,9 @@ public class IssueMongoRepository {
 		return issueCollection.find(Filters.eq("id", id)).first();
 	}
 
+	public List<Issue> findByProjectId(String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
