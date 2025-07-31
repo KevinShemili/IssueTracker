@@ -32,7 +32,6 @@ public class IssueMongoRepository {
 	}
 
 	public Issue findById(String string) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
