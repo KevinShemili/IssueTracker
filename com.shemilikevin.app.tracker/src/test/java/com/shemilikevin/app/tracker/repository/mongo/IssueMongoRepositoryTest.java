@@ -95,9 +95,13 @@ public class IssueMongoRepositoryTest {
 				new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1"));
 	}
 
+	@Test
 	public void testFindById_NoMatchingIdInDatabase_ReturnsNull() {
 
 		// Act
 		Issue issue = issueRepository.findById("1");
+
+		// Assert
+		assertThat(issue).isNull();
 	}
 }
