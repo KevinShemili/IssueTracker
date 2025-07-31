@@ -6,7 +6,6 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bson.codecs.configuration.CodecRegistry;
@@ -31,6 +30,22 @@ public class IssueMongoRepositoryTest {
 
 	private static final String DATABASE_NAME = "db";
 	private static final String COLLECTION_NAME = "collection";
+
+	private static final String ID_1 = "1";
+	private static final String ID_2 = "2";
+	private static final String ID_3 = "3";
+	private static final String NAME_1 = "Broken Button";
+	private static final String NAME_2 = "Performance Issue";
+	private static final String NAME_3 = "3rd Party Integration Error";
+	private static final String DESCRIPTION_1 = "Button is not clickable when...";
+	private static final String DESCRIPTION_2 = "Retrieval of data is very slow in...";
+	private static final String DESCRIPTION_3 = "Error while communicating with...";
+	private static final String PRIORITY_LOW = "Low";
+	private static final String PRIORITY_MEDIUM = "Medium";
+	private static final String PRIORITY_HIGH = "High";
+	private static final String PROJECT_ID_1 = "1";
+	private static final String PROJECT_ID_2 = "2";
+
 	private static MongoServer mongoServer;
 	private static InetSocketAddress inetSocketAddress;
 
@@ -69,7 +84,7 @@ public class IssueMongoRepositoryTest {
 	}
 
 	@Test
-	public void testFindAll_EmptyDatabase_ReturnsEmpty() {
+	public void testFindAll_EmptyDatabase_ReturnsEmptyList() {
 
 		// Act
 		List<Issue> issueList = issueRepository.findAll();
@@ -79,169 +94,160 @@ public class IssueMongoRepositoryTest {
 	}
 
 	@Test
-	public void testFindAll_DatabaseHasEntries_ReturnsEntries() {
+	public void testFindAll_ManyIssuesInTheDatabase_ReturnsAllIssues() {
 
 		// Arrange
-		Issue issue1 = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
-		Issue issue2 = new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1");
-		issueCollection.insertMany(Arrays.asList(issue1, issue2));
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
 
 		// Act
 		List<Issue> issueList = issueRepository.findAll();
 
 		// Assert
 		assertThat(issueList).hasSize(2);
-		assertThat(issueList).containsExactly(
-				new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"),
-				new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1"));
+		assertThat(issueList).containsExactly(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1),
+				new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
 	}
 
 	@Test
 	public void testFindById_NoMatchingIdInDatabase_ReturnsNull() {
 
 		// Act
-		Issue issue = issueRepository.findById("1");
+		Issue issue = issueRepository.findById(ID_1);
 
 		// Assert
 		assertThat(issue).isNull();
 	}
 
 	@Test
-	public void testFindById_OnlyOneDatabaseEntry_EntryHasMatchingId_ReturnsEntry() {
+	public void testFindById_OnlyOneIssueInTheDatabase_ReturnsTheIssue() {
 
 		// Arrange
-		issueCollection.insertOne(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
 
 		// Act
-		Issue issue = issueRepository.findById("1");
+		Issue issue = issueRepository.findById(ID_1);
 
 		// Assert
 		assertThat(issue).isNotNull();
-		assertThat(issue).isEqualTo(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+		assertThat(issue).isEqualTo(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
 	}
 
 	@Test
-	public void testFindById_ManyDatabaseEntries_OneOfThemHasMatchingId_ReturnsEntry() {
+	public void testFindById_ManyIssuesInTheDatabase_ReturnsTheIssue() {
 
 		// Arrange
-		Issue issue1 = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
-		Issue issue2 = new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1");
-		issueCollection.insertMany(Arrays.asList(issue1, issue2));
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
 
 		// Act
-		Issue issue = issueRepository.findById("2");
+		Issue issue = issueRepository.findById(ID_2);
 
 		// Assert
 		assertThat(issue).isNotNull();
-		assertThat(issue)
-				.isEqualTo(new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1"));
+		assertThat(issue).isEqualTo(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
 	}
 
 	@Test
 	public void testFindByProjectId_NoMatchingIdInDatabase_ReturnsEmptyList() {
 
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId("1");
+		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_1);
 
 		// Assert
 		assertThat(issueList).isEmpty();
 	}
 
 	@Test
-	public void testFindByProjectId_IssuesExistForDifferentProject_ReturnsEmptyList() {
+	public void testFindByProjectId_IssuesExistButForDifferentProject_ReturnsEmptyList() {
 
 		// Arrange
-		Issue issue1 = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
-		Issue issue2 = new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1");
-		issueCollection.insertMany(Arrays.asList(issue1, issue2));
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
 
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId("99");
+		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_2);
 
 		// Assert
 		assertThat(issueList).isEmpty();
 	}
 
 	@Test
-	public void testFindByProjectId_OnlyOneMatchingIssueForGivenProjectId_ReturnsIssue() {
+	public void testFindByProjectId_OnlyOneMatchingIssue_ReturnsOneIssue() {
 
 		// Arrange
-		issueCollection.insertOne(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
 
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId("1");
+		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_1);
 
 		// Assert
 		assertThat(issueList).hasSize(1);
-		assertThat(issueList)
-				.containsExactly(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+		assertThat(issueList).containsExactly(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
 	}
 
 	@Test
-	public void testFindByProjectId_MultipleIssuesForGivenProjectId_ReturnsIssues() {
+	public void testFindByProjectId_ManyMatchingIssues_ReturnsTheIssues() {
 
 		// Arrange
-		Issue issue1 = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
-		Issue issue2 = new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1");
-		issueCollection.insertMany(Arrays.asList(issue1, issue2));
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
 
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId("1");
+		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_1);
 
 		// Assert
 		assertThat(issueList).hasSize(2);
-		assertThat(issueList).containsExactly(
-				new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"),
-				new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1"));
+		assertThat(issueList).containsExactly(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1),
+				new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
 	}
 
 	@Test
-	public void testFindByProjectId_MultipleIssuesInDatabase_ReturnsOnlyIssuesWithMatchingProjectId() {
+	public void testFindByProjectId_ManyIssuesFromDifferentProjects_ReturnsOnlyMatchingIssues() {
 
 		// Arrange
-		Issue issue1 = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
-		Issue issue2 = new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "2");
-		Issue issue3 = new Issue("3", "3rd Party integration error", "Error in retrieving data from...", "Low", "2");
-
-		issueCollection.insertMany(Arrays.asList(issue1, issue2, issue3));
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_2));
+		AddIssueToDb(new Issue(ID_3, NAME_3, DESCRIPTION_3, PRIORITY_LOW, PROJECT_ID_2));
 
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId("2");
+		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_2);
 
 		// Assert
 		assertThat(issueList).hasSize(2);
-		assertThat(issueList).containsExactly(
-				new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "2"),
-				new Issue("3", "3rd Party integration error", "Error in retrieving data from...", "Low", "2"));
+		assertThat(issueList).containsExactly(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_2),
+				new Issue(ID_3, NAME_3, DESCRIPTION_3, PRIORITY_LOW, PROJECT_ID_2));
 	}
 
 	@Test
 	public void testSave_SavesIssueInTheDatabase() {
 
-		// Arrange
-		List<Issue> issueList = new ArrayList<Issue>();
-
 		// Act
-		issueRepository.save(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
-		issueCollection.find().into(issueList);
+		issueRepository.save(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
 
 		// Assert
-		assertThat(issueList)
-				.containsExactly(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+		assertThat(queryAllIssuesFromDb())
+				.containsExactly(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
 	}
 
 	@Test
 	public void testDelete_DeletesIssueFromTheDatabase() {
 
 		// Arrange
-		issueCollection.insertOne(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
-		List<Issue> issueList = new ArrayList<Issue>();
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
 
 		// Act
-		issueRepository.delete("1");
-		issueCollection.find().into(issueList);
+		issueRepository.delete(ID_1);
 
 		// Assert
-		assertThat(issueList).isEmpty();
+		assertThat(queryAllIssuesFromDb()).isEmpty();
+	}
+
+	private void AddIssueToDb(Issue issue) {
+		issueCollection.insertOne(issue);
+	}
+
+	private List<Issue> queryAllIssuesFromDb() {
+		return issueCollection.find().into(new ArrayList<Issue>());
 	}
 }
