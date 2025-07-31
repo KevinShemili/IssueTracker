@@ -22,6 +22,10 @@ public class Issue {
 		this.projectId = projectId;
 	}
 
+	// Needed for automatic MongoDB deserialization
+	public Issue() {
+	}
+
 	public String getId() {
 		return id;
 	}
