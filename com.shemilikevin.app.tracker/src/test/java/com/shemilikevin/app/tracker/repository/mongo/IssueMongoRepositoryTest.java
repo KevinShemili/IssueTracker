@@ -137,10 +137,25 @@ public class IssueMongoRepositoryTest {
 	}
 
 	@Test
-	public void testFindByProjectId_NoMatchingIdInDatabase_ReturnsEmpty() {
+	public void testFindByProjectId_NoMatchingIdInDatabase_ReturnsEmptyList() {
 
 		// Act
 		List<Issue> issueList = issueRepository.findByProjectId("1");
+
+		// Assert
+		assertThat(issueList).isEmpty();
+	}
+
+	@Test
+	public void testFindByProjectId_IssuesExistForDifferentProject_ReturnsEmptyList() {
+
+		// Arrange
+		Issue issue1 = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
+		Issue issue2 = new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1");
+		issueCollection.insertMany(Arrays.asList(issue1, issue2));
+
+		// Act
+		List<Issue> issueList = issueRepository.findByProjectId("99");
 
 		// Assert
 		assertThat(issueList).isEmpty();
