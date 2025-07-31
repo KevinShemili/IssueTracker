@@ -38,8 +38,7 @@ public class IssueMongoRepository {
 	}
 
 	public List<Issue> findByProjectId(String string) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<Issue>();
 	}
 
 }
