@@ -118,4 +118,21 @@ public class IssueMongoRepositoryTest {
 		assertThat(issue).isNotNull();
 		assertThat(issue).isEqualTo(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
 	}
+
+	@Test
+	public void testFindById_ManyDatabaseEntries_OneOfThemHasMatchingId_ReturnsEntry() {
+
+		// Arrange
+		Issue issue1 = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
+		Issue issue2 = new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1");
+		issueCollection.insertMany(Arrays.asList(issue1, issue2));
+
+		// Act
+		Issue issue = issueRepository.findById("2");
+
+		// Assert
+		assertThat(issue).isNotNull();
+		assertThat(issue)
+				.isEqualTo(new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1"));
+	}
 }
