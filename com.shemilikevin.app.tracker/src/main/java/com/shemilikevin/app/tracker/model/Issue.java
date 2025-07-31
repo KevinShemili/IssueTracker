@@ -46,6 +46,26 @@ public class Issue {
 		return projectId;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(description, id, priority, projectId, title);
