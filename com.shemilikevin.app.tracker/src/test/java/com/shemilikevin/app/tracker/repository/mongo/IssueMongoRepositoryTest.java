@@ -5,6 +5,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -217,7 +218,15 @@ public class IssueMongoRepositoryTest {
 	@Test
 	public void testSave_SavesIssueInTheDatabase() {
 
+		// Arrange
+		List<Issue> issueList = new ArrayList<Issue>();
+
 		// Act
 		issueRepository.save(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+		issueCollection.find().into(issueList);
+
+		// Assert
+		assertThat(issueList)
+				.containsExactly(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
 	}
 }
