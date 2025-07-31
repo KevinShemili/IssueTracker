@@ -1,9 +1,11 @@
 package com.shemilikevin.app.tracker.repository.mongo;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bson.codecs.configuration.CodecRegistry;
@@ -70,5 +72,23 @@ public class IssueMongoRepositoryTest {
 
 		// Act
 		List<Issue> issueList = issueRepository.findAll();
+
+		// Assert
+		assertThat(issueList).isEmpty();
+	}
+
+	@Test
+	public void testFindAll_DatabaseHasEntries_ReturnsEntries() {
+
+		// Arrange
+		Issue issue1 = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
+		Issue issue2 = new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1");
+		issueCollection.insertMany(Arrays.asList(issue1, issue2));
+
+		// Act
+		List<Issue> issueList = issueRepository.findAll();
+
+		// Assert
+		assertThat(issueList).hasSize(2);
 	}
 }
