@@ -135,4 +135,11 @@ public class IssueMongoRepositoryTest {
 		assertThat(issue)
 				.isEqualTo(new Issue("2", "Performance Issue", "Retrieval of data is very slow in...", "High", "1"));
 	}
+
+	@Test
+	public void testFindByProjectId_NoMatchingIdInDatabase_ReturnsEmpty() {
+
+		// Act
+		List<Issue> issueList = issueRepository.findByProjectId("1");
+	}
 }
