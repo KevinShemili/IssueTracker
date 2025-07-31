@@ -42,4 +42,9 @@ public class IssueMongoRepository {
 	public void save(Issue issue) {
 		issueCollection.insertOne(issue);
 	}
+
+	public void delete(String string) {
+		// TODO Auto-generated method stub
+
+	}
 }
