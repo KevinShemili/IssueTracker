@@ -26,6 +26,7 @@
     <jacoco.maven.plugin.version>0.8.12</jacoco.maven.plugin.version>
     <maven.surefire.report.plugin.version>3.5.2</maven.surefire.report.plugin.version>
     <coveralls.maven.plugin>4.5.0-M6</coveralls.maven.plugin>
+    <sonar.maven.plugin>5.0.0.4389</sonar.maven.plugin>
   </properties>
 
   <dependencies>
@@ -140,6 +141,12 @@
           <configuration>
             <repoToken>${env.COVERALLS_REPO_TOKEN}</repoToken>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.sonarsource.scanner.maven</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>5.0.0.4389</version>
         </plugin>
 
       </plugins>
