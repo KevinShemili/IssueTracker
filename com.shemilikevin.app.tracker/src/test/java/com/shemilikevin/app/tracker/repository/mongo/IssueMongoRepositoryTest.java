@@ -56,7 +56,7 @@ public class IssueMongoRepositoryTest {
 		MongoClientOptions mongoClientOptions = MongoClientOptions.builder().codecRegistry(codecRegistry).build();
 
 		mongoClient = new MongoClient(new ServerAddress(inetSocketAddress), mongoClientOptions);
-		issueRepository = new IssueMongoRepository();
+		issueRepository = new IssueMongoRepository(mongoClient, DATABASE_NAME, COLLECTION_NAME);
 		MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
 		database.drop();
 		issueCollection = database.getCollection(COLLECTION_NAME, Issue.class);
