@@ -30,6 +30,7 @@ public class ProjectMongoRepositoryTest {
 
 	private static final String DATABASE_NAME = "db";
 	private static final String COLLECTION_NAME = "collection";
+
 	private static final String ID_1 = "1";
 	private static final String ID_2 = "2";
 	private static final String NAME_1 = "Desktop Application";
@@ -75,24 +76,24 @@ public class ProjectMongoRepositoryTest {
 	}
 
 	@Test
-	public void testGetAll_EmptyDatabase_ReturnsEmpty() {
+	public void testFindAll_EmptyDatabase_ReturnsEmptyList() {
 
 		// Act
-		List<Project> projectList = projectRepository.getAll();
+		List<Project> projectList = projectRepository.findAll();
 
 		// Assert
 		assertThat(projectList).isEmpty();
 	}
 
 	@Test
-	public void testGetAll_DatabaseHasProjects_ReturnsProjects() {
+	public void testFindAll_ManyProjectsInTheDatabase_ReturnsAllProjects() {
 
 		// Arrange
 		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
 		addProjectToDb(new Project(ID_2, NAME_2, DESCRIPTION_2));
 
 		// Act
-		List<Project> projectList = projectRepository.getAll();
+		List<Project> projectList = projectRepository.findAll();
 
 		// Assert
 		assertThat(projectList).hasSize(2);
@@ -111,7 +112,7 @@ public class ProjectMongoRepositoryTest {
 	}
 
 	@Test
-	public void testFindById_OnlyOneDatabaseEntry_EntryHasMatchingId_ReturnsProject() {
+	public void testFindById_OnlyOneProjectInTheDatabase_ReturnsTheProject() {
 
 		// Arrange
 		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
@@ -125,7 +126,7 @@ public class ProjectMongoRepositoryTest {
 	}
 
 	@Test
-	public void testFindById_ManyDatabaseEntries_OneOfThemHasMatchingId_ReturnsProject() {
+	public void testFindById_ManyProjectsInTheDatabase_ReturnsTheProject() {
 
 		// Arrange
 		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
