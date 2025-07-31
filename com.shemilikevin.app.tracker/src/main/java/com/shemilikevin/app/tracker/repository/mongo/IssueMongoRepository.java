@@ -11,6 +11,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.shemilikevin.app.tracker.model.Issue;
 
 public class IssueMongoRepository {
@@ -31,8 +32,9 @@ public class IssueMongoRepository {
 		return issueCollection.find().into(new ArrayList<Issue>());
 	}
 
-	public Issue findById(String string) {
-		return null;
+	public Issue findById(String id) {
+
+		return issueCollection.find(Filters.eq("id", id)).first();
 	}
 
 }

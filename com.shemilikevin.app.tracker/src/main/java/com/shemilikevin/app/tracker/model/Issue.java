@@ -2,9 +2,12 @@ package com.shemilikevin.app.tracker.model;
 
 import java.util.Objects;
 
+import org.bson.codecs.pojo.annotations.BsonProperty;
+
 public class Issue {
 
 	// Fields
+	@BsonProperty("id")
 	private String id;
 	private String title;
 	private String description;
