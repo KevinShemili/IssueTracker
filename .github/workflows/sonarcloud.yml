@@ -22,18 +22,13 @@ jobs:
         java-version: 17
         distribution: 'temurin'
 
-    - name: Cache SonarQube Packages
+    - name: Cache Maven & SonarQube Packages
       uses: actions/cache@v4
       with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar
-        restore-keys: ${{ runner.os }}-sonar
-
-    - name: Cache Maven Dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        path: |
+          ~/.m2
+          ~/.sonar/cache
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
         restore-keys: ${{ runner.os }}-m2-
 
     - name: Enable SonarCloud (Internal PR or Push)
