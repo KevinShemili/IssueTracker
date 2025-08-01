@@ -23,7 +23,7 @@ public class IssueController {
 
 	public void listIssues(String projectId) {
 
-		if (projectId == null) {
+		if ((projectId == null) || (projectId.trim().isEmpty()) == true) {
 			throw new IllegalArgumentException("Project ID must not be null or empty.");
 		}
 
