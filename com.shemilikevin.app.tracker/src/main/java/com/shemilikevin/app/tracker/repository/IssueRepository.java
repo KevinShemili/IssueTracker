@@ -8,4 +8,7 @@ public interface IssueRepository {
 
 	List<Issue> findByProjectId(String projectId);
 
+	boolean exists(String issueId);
+
+	void save(Issue issue);
 }
