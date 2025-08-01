@@ -1,7 +1,9 @@
 package com.shemilikevin.app.tracker.controller;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -102,5 +104,16 @@ public class IssueControllerTest {
 		assertThatThrownBy(() -> issueController.listIssues("X")).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Project ID must be numerical.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testListIssues_WhenProvidedProjectIdDoesNotExistInDatabase_ThrowsIllegalArgumentException() {
+		// Arrange
+		when(projectRepository.exists("1")).thenReturn(false);
+
+		// Act & Assert
+		assertThatThrownBy(() -> issueController.listIssues("1")).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Project ID does not exist in the database.");
+		verifyNoMoreInteractions(ignoreStubs(projectRepository, issueRepository, issueTrackerView));
 	}
 }

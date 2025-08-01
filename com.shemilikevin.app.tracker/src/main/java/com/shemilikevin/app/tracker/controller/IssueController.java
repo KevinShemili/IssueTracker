@@ -35,10 +35,12 @@ public class IssueController {
 
 		boolean flag = projectRepository.exists(projectId);
 
-		if (flag == true) {
-			List<Issue> issueList = issueRepository.findByProjectId(projectId);
-			issueTrackerView.showIssues(issueList);
+		if (flag == false) {
+			throw new IllegalArgumentException("Project ID does not exist in the database.");
 		}
+
+		List<Issue> issueList = issueRepository.findByProjectId(projectId);
+		issueTrackerView.showIssues(issueList);
 	}
 
 }
