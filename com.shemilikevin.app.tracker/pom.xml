@@ -8,7 +8,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>tracker</name>
+  <name>Issue Tracker</name>
   <url>http://maven.apache.org</url>
 
   <properties>
@@ -27,6 +27,23 @@
     <maven.surefire.report.plugin.version>3.5.2</maven.surefire.report.plugin.version>
     <coveralls.maven.plugin>4.5.0-M6</coveralls.maven.plugin>
     <sonar.maven.plugin>5.0.0.4389</sonar.maven.plugin>
+
+    <!-- SonarCloud -->
+    <sonar.tests>
+      ${project.basedir}/src/test/java
+      <!-- TBA - IT & E2E -->
+    </sonar.tests>
+
+    <sonar.junit.reportPaths>
+      ${project.build.directory}/surefire-reports
+      <!-- TBA - IT -->
+    </sonar.junit.reportPaths>
+
+    <sonar.coverage.exclusions>
+      **/model/*.*
+      **/App.*
+    </sonar.coverage.exclusions>
+
   </properties>
 
   <dependencies>
