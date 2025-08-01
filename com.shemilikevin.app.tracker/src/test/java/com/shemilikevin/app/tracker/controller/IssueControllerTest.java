@@ -158,6 +158,24 @@ public class IssueControllerTest {
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
+	@Test
+	public void testAddIssue_WhenProvidedIssueNameIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(randomString(), null, randomString(), randomString(), randomString()))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue name must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedIssueNameIsEmpty_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(randomString(), " ", randomString(), randomString(), randomString()))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue name must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
 	private static String randomString() {
 		return UUID.randomUUID().toString();
 	}
