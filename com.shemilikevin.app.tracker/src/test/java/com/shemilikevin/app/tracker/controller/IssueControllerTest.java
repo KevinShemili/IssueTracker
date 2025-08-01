@@ -196,6 +196,24 @@ public class IssueControllerTest {
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
+	@Test
+	public void testAddIssue_WhenProvidedIssuePriorityIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(randomString(), randomString(), randomString(), null, randomString()))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue priority must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedIssuePriorityIsEmpty_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(randomString(), randomString(), randomString(), " ", randomString()))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue priority must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
 	private static String randomString() {
 		return UUID.randomUUID().toString();
 	}
