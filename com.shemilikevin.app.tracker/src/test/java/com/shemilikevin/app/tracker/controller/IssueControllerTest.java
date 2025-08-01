@@ -3,6 +3,7 @@ package com.shemilikevin.app.tracker.controller;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Before;
@@ -59,5 +60,21 @@ public class IssueControllerTest {
 		inOrder.verify(projectRepository).exists("1");
 		inOrder.verify(issueRepository).findByProjectId("1");
 		inOrder.verify(issueTrackerView).showIssues(Arrays.asList(issue));
+	}
+
+	@Test
+	public void testListIssues_WhenProjectHasNoIssues_ShowsEmptyList() {
+		// Arrange
+		when(projectRepository.exists("1")).thenReturn(true);
+		when(issueRepository.findByProjectId("1")).thenReturn(Collections.emptyList());
+
+		// Act
+		issueController.listIssues("1");
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
+		inOrder.verify(projectRepository).exists("1");
+		inOrder.verify(issueRepository).findByProjectId("1");
+		inOrder.verify(issueTrackerView).showIssues(Collections.emptyList());
 	}
 }
