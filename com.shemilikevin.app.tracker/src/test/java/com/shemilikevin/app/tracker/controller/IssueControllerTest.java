@@ -1,5 +1,7 @@
 package com.shemilikevin.app.tracker.controller;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -76,5 +78,13 @@ public class IssueControllerTest {
 		inOrder.verify(projectRepository).exists("1");
 		inOrder.verify(issueRepository).findByProjectId("1");
 		inOrder.verify(issueTrackerView).showIssues(Collections.emptyList());
+	}
+
+	@Test
+	public void testListIssues_WhenProvidedProjectIdIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> issueController.listIssues(null)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Project ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 }
