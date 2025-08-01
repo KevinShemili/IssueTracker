@@ -95,4 +95,12 @@ public class IssueControllerTest {
 				.hasMessage("Project ID must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
+
+	@Test
+	public void testListIssues_WhenProvidedProjectIdIsNonNumeric_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> issueController.listIssues("X")).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Project ID must be numerical.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
 }
