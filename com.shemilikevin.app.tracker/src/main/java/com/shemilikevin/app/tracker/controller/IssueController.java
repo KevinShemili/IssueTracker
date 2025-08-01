@@ -1,5 +1,6 @@
 package com.shemilikevin.app.tracker.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.shemilikevin.app.tracker.model.Issue;
@@ -8,6 +9,8 @@ import com.shemilikevin.app.tracker.repository.ProjectRepository;
 import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class IssueController {
+
+	private List<String> PRIORITIES = Arrays.asList("Low", "Medium", "High");
 
 	private ProjectRepository projectRepository;
 	private IssueRepository issueRepository;
@@ -65,6 +68,10 @@ public class IssueController {
 
 		if ((issuePriority == null) || (issuePriority.trim().isEmpty() == true)) {
 			throw new IllegalArgumentException("Issue priority must not be null or empty.");
+		}
+
+		if (PRIORITIES.contains(issuePriority) == false) {
+			throw new IllegalArgumentException("Issue priority must be either Low, Medium or High.");
 		}
 
 		if ((projectRepository.exists(projectId) == true && (issueRepository.exists(issueId)) == false)) {
