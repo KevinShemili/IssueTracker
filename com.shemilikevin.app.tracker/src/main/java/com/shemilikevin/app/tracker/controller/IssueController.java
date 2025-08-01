@@ -63,6 +63,10 @@ public class IssueController {
 			throw new IllegalArgumentException("Issue description must not be null or empty.");
 		}
 
+		if ((issuePriority == null) || (issuePriority.trim().isEmpty() == true)) {
+			throw new IllegalArgumentException("Issue priority must not be null or empty.");
+		}
+
 		if ((projectRepository.exists(projectId) == true && (issueRepository.exists(issueId)) == false)) {
 			Issue issue = new Issue(issueId, issueName, issueDescription, issuePriority, projectId);
 			issueRepository.save(issue);
