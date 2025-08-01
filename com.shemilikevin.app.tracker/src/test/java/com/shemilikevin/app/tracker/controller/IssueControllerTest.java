@@ -176,6 +176,26 @@ public class IssueControllerTest {
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
+	@Test
+	public void testAddIssue_WhenProvidedIssueDescriptionIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(randomString(), randomString(), null, randomString(), randomString()))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Issue description must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedIssueDescriptionIsEmpty_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(randomString(), randomString(), " ", randomString(), randomString()))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Issue description must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
 	private static String randomString() {
 		return UUID.randomUUID().toString();
 	}
