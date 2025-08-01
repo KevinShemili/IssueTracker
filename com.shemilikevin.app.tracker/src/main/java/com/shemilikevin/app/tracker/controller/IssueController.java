@@ -48,4 +48,15 @@ public class IssueController {
 		}
 	}
 
+	public void addIssue(String issueId, String issueName, String issueDescription, String issuePriority,
+			String projectId) {
+
+		if ((projectRepository.exists(projectId) == true && (issueRepository.exists(issueId)) == false)) {
+			Issue issue = new Issue(issueId, issueName, issueDescription, issuePriority, projectId);
+			issueRepository.save(issue);
+			List<Issue> issueList = issueRepository.findByProjectId(projectId);
+			issueTrackerView.showIssues(issueList);
+		}
+	}
+
 }

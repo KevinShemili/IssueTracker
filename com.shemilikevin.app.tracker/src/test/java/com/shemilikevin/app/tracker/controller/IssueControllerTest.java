@@ -116,4 +116,26 @@ public class IssueControllerTest {
 				.hasMessage("Project ID does not exist in the database.");
 		verifyNoMoreInteractions(ignoreStubs(projectRepository, issueRepository, issueTrackerView));
 	}
+
+	@Test
+	public void testAddIssue_WhenProvidedFieldsAreValid_CreatesNewIssue() {
+		// Arrange
+		when(projectRepository.exists("1")).thenReturn(true);
+		when(issueRepository.exists("1")).thenReturn(false);
+		when(issueRepository.findByProjectId("1")).thenReturn(
+				Arrays.asList(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1")));
+
+		// Act
+		issueController.addIssue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
+		inOrder.verify(projectRepository).exists("1");
+		inOrder.verify(issueRepository).exists("1");
+		inOrder.verify(issueRepository)
+				.save(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1"));
+		inOrder.verify(issueRepository).findByProjectId("1");
+		inOrder.verify(issueTrackerView).showIssues(
+				Arrays.asList(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1")));
+	}
 }
