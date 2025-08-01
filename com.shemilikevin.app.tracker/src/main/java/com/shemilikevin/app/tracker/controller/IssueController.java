@@ -31,7 +31,7 @@ public class IssueController {
 	}
 
 	private void validateProjectId(String projectId) {
-		if ((projectId == null) || (projectId.trim().isEmpty()) == true) {
+		if ((projectId == null) || (projectId.trim().isEmpty() == true)) {
 			throw new IllegalArgumentException("Project ID must not be null or empty.");
 		}
 
@@ -51,7 +51,7 @@ public class IssueController {
 	public void addIssue(String issueId, String issueName, String issueDescription, String issuePriority,
 			String projectId) {
 
-		if (issueId == null) {
+		if ((issueId == null) || (issueId.trim().isEmpty() == true)) {
 			throw new IllegalArgumentException("Issue ID must not be null or empty.");
 		}
 
