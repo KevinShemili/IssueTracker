@@ -27,6 +27,12 @@ public class IssueController {
 			throw new IllegalArgumentException("Project ID must not be null or empty.");
 		}
 
+		try {
+			Integer.parseInt(projectId);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Project ID must be numerical.");
+		}
+
 		boolean flag = projectRepository.exists(projectId);
 
 		if (flag == true) {
