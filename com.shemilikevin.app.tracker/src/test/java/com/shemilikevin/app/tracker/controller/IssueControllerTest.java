@@ -1,5 +1,63 @@
 package com.shemilikevin.app.tracker.controller;
 
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+
+import com.shemilikevin.app.tracker.model.Issue;
+import com.shemilikevin.app.tracker.repository.IssueRepository;
+import com.shemilikevin.app.tracker.repository.ProjectRepository;
+import com.shemilikevin.app.tracker.view.IssueTrackerView;
+
 public class IssueControllerTest {
 
+	@Mock
+	private IssueRepository issueRepository;
+
+	@Mock
+	private ProjectRepository projectRepository;
+
+	@Mock
+	private IssueTrackerView issueTrackerView;
+
+	@InjectMocks
+	private IssueController issueController;
+
+	private AutoCloseable autoCloseable;
+
+	@Before
+	public void setUp() {
+		autoCloseable = MockitoAnnotations.openMocks(this);
+	}
+
+	@After
+	public void releaseMocks() throws Exception {
+		autoCloseable.close();
+	}
+
+	@Test
+	public void testListIssues_WhenProjectHasIssues_ShowsAllIssues() {
+		// Arrange
+		Issue issue = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
+		when(projectRepository.exists("1")).thenReturn(true);
+		when(issueRepository.findByProjectId("1")).thenReturn(Arrays.asList(issue));
+
+		// Act
+		issueController.listIssues("1");
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
+		inOrder.verify(projectRepository).exists("1");
+		inOrder.verify(issueRepository).findByProjectId("1");
+		inOrder.verify(issueTrackerView).showIssues(Arrays.asList(issue));
+	}
 }
