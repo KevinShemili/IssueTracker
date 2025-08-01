@@ -214,6 +214,15 @@ public class IssueControllerTest {
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
+	@Test
+	public void testAddIssue_WhenProvidedIssuePriorityDoesNotHaveExpectedValue_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> issueController.addIssue(randomString(), randomString(), randomString(),
+				"DOES NOT EXIST", randomString())).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Issue priority must be either Low, Medium or High.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
 	private static String randomString() {
 		return UUID.randomUUID().toString();
 	}
