@@ -51,6 +51,10 @@ public class IssueController {
 	public void addIssue(String issueId, String issueName, String issueDescription, String issuePriority,
 			String projectId) {
 
+		if (issueId == null) {
+			throw new IllegalArgumentException("Issue ID must not be null or empty.");
+		}
+
 		if ((projectRepository.exists(projectId) == true && (issueRepository.exists(issueId)) == false)) {
 			Issue issue = new Issue(issueId, issueName, issueDescription, issuePriority, projectId);
 			issueRepository.save(issue);

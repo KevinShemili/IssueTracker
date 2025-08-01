@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
@@ -137,5 +138,18 @@ public class IssueControllerTest {
 		inOrder.verify(issueRepository).findByProjectId("1");
 		inOrder.verify(issueTrackerView).showIssues(
 				Arrays.asList(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1")));
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedIssueIdIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(null, randomString(), randomString(), randomString(), randomString()))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	private static String randomString() {
+		return UUID.randomUUID().toString();
 	}
 }
