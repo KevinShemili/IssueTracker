@@ -23,6 +23,14 @@ public class IssueController {
 
 	public void listIssues(String projectId) {
 
+		validateProjectId(projectId);
+		checkProjectExists(projectId);
+
+		List<Issue> issueList = issueRepository.findByProjectId(projectId);
+		issueTrackerView.showIssues(issueList);
+	}
+
+	private void validateProjectId(String projectId) {
 		if ((projectId == null) || (projectId.trim().isEmpty()) == true) {
 			throw new IllegalArgumentException("Project ID must not be null or empty.");
 		}
@@ -32,15 +40,12 @@ public class IssueController {
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Project ID must be numerical.");
 		}
+	}
 
-		boolean flag = projectRepository.exists(projectId);
-
-		if (flag == false) {
+	private void checkProjectExists(String projectId) {
+		if (projectRepository.exists(projectId) == false) {
 			throw new IllegalArgumentException("Project ID does not exist in the database.");
 		}
-
-		List<Issue> issueList = issueRepository.findByProjectId(projectId);
-		issueTrackerView.showIssues(issueList);
 	}
 
 }
