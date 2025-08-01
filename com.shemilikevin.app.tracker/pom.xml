@@ -29,6 +29,11 @@
     <sonar.maven.plugin>5.0.0.4389</sonar.maven.plugin>
 
     <!-- SonarCloud -->
+    <sonar.coverage.exclusions>
+      **/model/*.*,
+      **/App.*
+    </sonar.coverage.exclusions>
+
     <sonar.tests>
       ${project.basedir}/src/test/java
       <!-- TBA - IT & E2E -->
@@ -38,12 +43,6 @@
       ${project.build.directory}/surefire-reports
       <!-- TBA - IT -->
     </sonar.junit.reportPaths>
-
-    <sonar.coverage.exclusions>
-      **/model/*.*
-      **/App.*
-    </sonar.coverage.exclusions>
-
   </properties>
 
   <dependencies>
