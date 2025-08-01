@@ -23,6 +23,10 @@ public class IssueController {
 
 	public void listIssues(String projectId) {
 
+		if (projectId == null) {
+			throw new IllegalArgumentException("Project ID must not be null or empty.");
+		}
+
 		boolean flag = projectRepository.exists(projectId);
 
 		if (flag == true) {
