@@ -87,4 +87,12 @@ public class IssueControllerTest {
 				.hasMessage("Project ID must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
+
+	@Test
+	public void testListIssues_WhenProvidedProjectIdIsEmpty_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> issueController.listIssues(" ")).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Project ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
 }
