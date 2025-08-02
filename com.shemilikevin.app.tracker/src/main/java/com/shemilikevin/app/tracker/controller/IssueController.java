@@ -10,7 +10,7 @@ import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class IssueController {
 
-	private List<String> PRIORITIES = Arrays.asList("Low", "Medium", "High");
+	private List<String> ALLOWED_PRIORITIES = Arrays.asList("Low", "Medium", "High");
 
 	private ProjectRepository projectRepository;
 	private IssueRepository issueRepository;
@@ -26,73 +26,22 @@ public class IssueController {
 
 	public void listIssues(String projectId) {
 
-		validateProjectId(projectId);
+		validateId(projectId, "Project ID");
 		checkProjectExists(projectId);
 
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 		issueTrackerView.showIssues(issueList);
 	}
 
-	private void validateProjectId(String projectId) {
-		if ((projectId == null) || (projectId.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Project ID must not be null or empty.");
-		}
-
-		try {
-			Integer.parseInt(projectId);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Project ID must be numerical.");
-		}
-	}
-
-	private void checkProjectExists(String projectId) {
-		if (projectRepository.exists(projectId) == false) {
-			throw new IllegalArgumentException("Project ID does not exist in the database.");
-		}
-	}
-
 	public void addIssue(String issueId, String issueName, String issueDescription, String issuePriority,
 			String projectId) {
 
-		if ((issueId == null) || (issueId.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Issue ID must not be null or empty.");
-		}
-
-		if ((issueName == null) || (issueName.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Issue name must not be null or empty.");
-		}
-
-		if ((issueDescription == null) || (issueDescription.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Issue description must not be null or empty.");
-		}
-
-		if ((issuePriority == null) || (issuePriority.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Issue priority must not be null or empty.");
-		}
-
-		if (PRIORITIES.contains(issuePriority) == false) {
-			throw new IllegalArgumentException("Issue priority must be either Low, Medium or High.");
-		}
-
-		if ((projectId == null) || (projectId.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Project ID must not be null or empty.");
-		}
-
-		try {
-			Integer.parseInt(issueId);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Issue ID must be numerical.");
-		}
-
-		try {
-			Integer.parseInt(projectId);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Project ID must be numerical.");
-		}
-
-		if (projectRepository.exists(projectId) == false) {
-			throw new IllegalArgumentException("Project ID does not exist in the database.");
-		}
+		validateId(issueId, "Issue ID");
+		validateId(projectId, "Project ID");
+		validateIsNullOrEmpty(issueName, "Issue name");
+		validateIsNullOrEmpty(issueDescription, "Issue description");
+		validatePriorityIsAllowed(issuePriority, "Issue priority");
+		checkProjectExists(projectId);
 
 		if (issueRepository.exists(issueId) == true) {
 			issueTrackerView.showError("Issue with ID: " + issueId + ", already exists.");
@@ -103,7 +52,39 @@ public class IssueController {
 		issueRepository.save(issue);
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 		issueTrackerView.showIssues(issueList);
+	}
 
+	private void validateIsNullOrEmpty(String string, String fieldName) {
+		if ((string == null) || (string.trim().isEmpty() == true)) {
+			throw new IllegalArgumentException(fieldName + " must not be null or empty.");
+		}
+	}
+
+	private void validateIsNumeric(String string, String fieldName) {
+		try {
+			Integer.parseInt(string);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException(fieldName + " must be numerical.");
+		}
+	}
+
+	private void validatePriorityIsAllowed(String priority, String fieldName) {
+		validateIsNullOrEmpty(priority, fieldName);
+
+		if (ALLOWED_PRIORITIES.contains(priority) == false) {
+			throw new IllegalArgumentException(fieldName + " must be either Low, Medium or High.");
+		}
+	}
+
+	private void validateId(String projectId, String fieldName) {
+		validateIsNullOrEmpty(projectId, fieldName);
+		validateIsNumeric(projectId, fieldName);
+	}
+
+	private void checkProjectExists(String projectId) {
+		if (projectRepository.exists(projectId) == false) {
+			throw new IllegalArgumentException("Project ID does not exist in the database.");
+		}
 	}
 
 }

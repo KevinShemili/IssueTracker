@@ -1,7 +1,6 @@
 package com.shemilikevin.app.tracker.controller;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -70,6 +69,7 @@ public class IssueControllerTest {
 		inOrder.verify(projectRepository).exists("1");
 		inOrder.verify(issueRepository).findByProjectId("1");
 		inOrder.verify(issueTrackerView).showIssues(Arrays.asList(issue));
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	@Test
@@ -86,6 +86,7 @@ public class IssueControllerTest {
 		inOrder.verify(projectRepository).exists("1");
 		inOrder.verify(issueRepository).findByProjectId("1");
 		inOrder.verify(issueTrackerView).showIssues(Collections.emptyList());
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	@Test
@@ -120,7 +121,8 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.listIssues("1")).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Project ID does not exist in the database.");
-		verifyNoMoreInteractions(ignoreStubs(projectRepository, issueRepository, issueTrackerView));
+		verify(projectRepository).exists("1");
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	@Test
@@ -143,6 +145,7 @@ public class IssueControllerTest {
 		inOrder.verify(issueRepository).findByProjectId("1");
 		inOrder.verify(issueTrackerView).showIssues(
 				Arrays.asList(new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1")));
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	@Test
