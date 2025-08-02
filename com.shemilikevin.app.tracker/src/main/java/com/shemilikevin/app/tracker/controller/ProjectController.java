@@ -3,16 +3,20 @@ package com.shemilikevin.app.tracker.controller;
 import java.util.List;
 
 import com.shemilikevin.app.tracker.model.Project;
+import com.shemilikevin.app.tracker.repository.IssueRepository;
 import com.shemilikevin.app.tracker.repository.ProjectRepository;
 import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class ProjectController {
 
 	private ProjectRepository projectRepository;
+	private IssueRepository issueRepository;
 	private IssueTrackerView issueTrackerView;
 
-	public ProjectController(ProjectRepository projectRepository, IssueTrackerView issueTrackerView) {
+	public ProjectController(ProjectRepository projectRepository, IssueRepository issueRepository,
+			IssueTrackerView issueTrackerView) {
 		this.projectRepository = projectRepository;
+		this.issueRepository = issueRepository;
 		this.issueTrackerView = issueTrackerView;
 	}
 
@@ -56,5 +60,14 @@ public class ProjectController {
 	private void validateId(String projectId, String fieldName) {
 		validateIsNullOrEmpty(projectId, fieldName);
 		validateIsNumeric(projectId, fieldName);
+	}
+
+	public void deleteProject(String id) {
+		if ((projectRepository.exists(id) == true) && (issueRepository.hasAssociatedIssues(id) == false)) {
+			projectRepository.delete(id);
+			List<Project> projectList = projectRepository.findAll();
+			issueTrackerView.showProjects(projectList);
+		}
+
 	}
 }
