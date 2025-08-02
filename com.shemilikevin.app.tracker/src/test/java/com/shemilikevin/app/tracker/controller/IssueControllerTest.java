@@ -308,6 +308,30 @@ public class IssueControllerTest {
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
+	@Test
+	public void testDeleteIssue_WhenProvidedIssueIdIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> issueController.deleteIssue(null)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Issue ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testDeleteIssue_WhenProvidedIssueIdIsEmpty_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> issueController.deleteIssue(" ")).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Issue ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testDeleteIssue_WhenProvidedIssueIdIsNonNumeric_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> issueController.deleteIssue(NON_NUMERIC_ID))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must be numerical.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
 	private static String randomString() {
 		return UUID.randomUUID().toString();
 	}

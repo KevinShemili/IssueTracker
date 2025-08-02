@@ -55,6 +55,17 @@ public class IssueController {
 	}
 
 	public void deleteIssue(String issueId) {
+
+		if ((issueId == null) || (issueId.trim().isEmpty() == true)) {
+			throw new IllegalArgumentException("Issue ID must not be null or empty.");
+		}
+
+		try {
+			Integer.parseInt(issueId);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Issue ID must be numerical.");
+		}
+
 		if (issueRepository.exists(issueId) == true) {
 			Issue issue = issueRepository.findById(issueId);
 			issueRepository.delete(issueId);
