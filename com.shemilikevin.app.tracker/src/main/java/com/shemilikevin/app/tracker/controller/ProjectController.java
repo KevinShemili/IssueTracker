@@ -37,6 +37,10 @@ public class ProjectController {
 			throw new IllegalArgumentException("Project name must not be null or empty.");
 		}
 
+		if ((description == null) || (description.trim().isEmpty() == true)) {
+			throw new IllegalArgumentException("Project description must not be null or empty.");
+		}
+
 		if (projectRepository.exists(id) == false) {
 			Project project = new Project(id, name, description);
 			projectRepository.save(project);
