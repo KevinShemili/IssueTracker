@@ -196,4 +196,21 @@ public class ProjectControllerTest {
 		inOrder.verify(issueTrackerView).showProjects(Collections.emptyList());
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
+
+	@Test
+	public void testDeleteProject_WhenProvidedProjectHasAssociatedIssues_ShowsHasIssuesError() {
+		// Arrange
+		when(projectRepository.exists(ID)).thenReturn(true);
+		when(issueRepository.hasAssociatedIssues(ID)).thenReturn(true);
+
+		// Act
+		projectController.deleteProject(ID);
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
+		inOrder.verify(projectRepository).exists(ID);
+		inOrder.verify(issueRepository).hasAssociatedIssues(ID);
+		inOrder.verify(issueTrackerView).showError("Selected project has associated issues.");
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
 }
