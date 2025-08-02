@@ -23,23 +23,9 @@ public class ProjectController {
 
 	public void addProject(String id, String name, String description) {
 
-		if ((id == null) || (id.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Project ID must not be null or empty.");
-		}
-
-		try {
-			Integer.parseInt(id);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Project ID must be numerical.");
-		}
-
-		if ((name == null) || (name.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Project name must not be null or empty.");
-		}
-
-		if ((description == null) || (description.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Project description must not be null or empty.");
-		}
+		validateId(id, "Project ID");
+		validateIsNullOrEmpty(name, "Project name");
+		validateIsNullOrEmpty(description, "Project description");
 
 		if (projectRepository.exists(id) == true) {
 			issueTrackerView.showError("Project with ID: " + id + ", already exists.");
@@ -51,5 +37,24 @@ public class ProjectController {
 
 		List<Project> projectList = projectRepository.findAll();
 		issueTrackerView.showProjects(projectList);
+	}
+
+	private void validateIsNullOrEmpty(String string, String fieldName) {
+		if ((string == null) || (string.trim().isEmpty() == true)) {
+			throw new IllegalArgumentException(fieldName + " must not be null or empty.");
+		}
+	}
+
+	private void validateIsNumeric(String string, String fieldName) {
+		try {
+			Integer.parseInt(string);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException(fieldName + " must be numerical.");
+		}
+	}
+
+	private void validateId(String projectId, String fieldName) {
+		validateIsNullOrEmpty(projectId, fieldName);
+		validateIsNumeric(projectId, fieldName);
 	}
 }
