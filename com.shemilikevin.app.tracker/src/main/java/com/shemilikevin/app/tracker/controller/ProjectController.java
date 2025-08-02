@@ -63,6 +63,9 @@ public class ProjectController {
 	}
 
 	public void deleteProject(String id) {
+
+		validateId(id, "Project ID");
+
 		if (projectRepository.exists(id) == false) {
 			throw new IllegalArgumentException("Project ID does not exist in the database.");
 		}

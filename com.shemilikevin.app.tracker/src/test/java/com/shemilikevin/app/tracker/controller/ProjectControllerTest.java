@@ -226,4 +226,28 @@ public class ProjectControllerTest {
 		verify(projectRepository).exists(ID);
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
+
+	@Test
+	public void testDeleteProject_WhenProvidedProjectIdIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> projectController.deleteProject(null)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Project ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testDeleteProject_WhenProvidedProjectIdIsEmpty_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> projectController.deleteProject(EMPTY_STRING))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testDeleteProject_WhenProvidedProjectIdIsNonNumeric_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> projectController.deleteProject(NON_NUMERIC_ID))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must be numerical.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
 }
