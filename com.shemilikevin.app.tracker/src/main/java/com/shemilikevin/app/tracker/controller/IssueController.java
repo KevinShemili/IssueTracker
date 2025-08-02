@@ -54,6 +54,15 @@ public class IssueController {
 		issueTrackerView.showIssues(issueList);
 	}
 
+	public void deleteIssue(String issueId) {
+		if (issueRepository.exists(issueId) == true) {
+			Issue issue = issueRepository.findById(issueId);
+			issueRepository.delete(issueId);
+			List<Issue> issueList = issueRepository.findByProjectId(issue.getProjectId());
+			issueTrackerView.showIssues(issueList);
+		}
+	}
+
 	private void validateIsNullOrEmpty(String string, String fieldName) {
 		if ((string == null) || (string.trim().isEmpty() == true)) {
 			throw new IllegalArgumentException(fieldName + " must not be null or empty.");
@@ -86,5 +95,4 @@ public class IssueController {
 			throw new IllegalArgumentException("Project ID does not exist in the database.");
 		}
 	}
-
 }
