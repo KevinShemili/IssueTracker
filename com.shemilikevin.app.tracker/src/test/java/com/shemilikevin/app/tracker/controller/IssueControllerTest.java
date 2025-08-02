@@ -253,6 +253,18 @@ public class IssueControllerTest {
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
+	@Test
+	public void testAddIssue_WhenProvidedProjectIdDoesNotExistInDatabase_ThrowsIllegalArgumentException() {
+		// Arrange
+		when(projectRepository.exists("1")).thenReturn(false);
+
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(NUMERIC_ID, randomString(), randomString(), PRIORITY, NUMERIC_ID))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID does not exist in the database.");
+		verifyNoMoreInteractions(ignoreStubs(projectRepository, issueRepository, issueTrackerView));
+	}
+
 	private static String randomString() {
 		return UUID.randomUUID().toString();
 	}

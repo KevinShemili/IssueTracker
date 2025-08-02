@@ -90,7 +90,11 @@ public class IssueController {
 			throw new IllegalArgumentException("Project ID must be numerical.");
 		}
 
-		if ((projectRepository.exists(projectId) == true && (issueRepository.exists(issueId)) == false)) {
+		if (projectRepository.exists(projectId) == false) {
+			throw new IllegalArgumentException("Project ID does not exist in the database.");
+		}
+
+		if (issueRepository.exists(issueId) == false) {
 			Issue issue = new Issue(issueId, issueName, issueDescription, issuePriority, projectId);
 			issueRepository.save(issue);
 			List<Issue> issueList = issueRepository.findByProjectId(projectId);
