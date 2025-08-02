@@ -101,9 +101,11 @@
           <configuration>
             <targetClasses>
               <param>com.shemilikevin.app.tracker.repository.*</param>
+              <param>com.shemilikevin.app.tracker.controller.*</param>
             </targetClasses>
             <targetTests>
               <param>com.shemilikevin.app.tracker.repository.*</param>
+              <param>com.shemilikevin.app.tracker.controller.*</param>
             </targetTests>
             <mutators>
               <mutator>STRONGER</mutator>
