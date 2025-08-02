@@ -139,4 +139,22 @@ public class ProjectControllerTest {
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project name must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueTrackerView);
 	}
+
+	@Test
+	public void testAddProject_WhenProvidedProjectDescriptionIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> projectController.addProject(ID, NAME, null))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Project description must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddProject_WhenProvidedProjectDescriptionIsEmpty_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> projectController.addProject(ID, NAME, EMPTY_STRING))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Project description must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueTrackerView);
+	}
 }
