@@ -27,7 +27,7 @@ public class IssueController {
 	public void listIssues(String projectId) {
 
 		validateId(projectId, "Project ID");
-		checkProjectExists(projectId);
+		validateProjectExists(projectId);
 
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 		issueTrackerView.showIssues(issueList);
@@ -41,7 +41,7 @@ public class IssueController {
 		validateIsNullOrEmpty(issueName, "Issue name");
 		validateIsNullOrEmpty(issueDescription, "Issue description");
 		validatePriorityIsAllowed(issuePriority, "Issue priority");
-		checkProjectExists(projectId);
+		validateProjectExists(projectId);
 
 		if (issueRepository.exists(issueId) == true) {
 			issueTrackerView.showError("Issue with ID: " + issueId + ", already exists.");
@@ -50,29 +50,20 @@ public class IssueController {
 
 		Issue issue = new Issue(issueId, issueName, issueDescription, issuePriority, projectId);
 		issueRepository.save(issue);
+
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 		issueTrackerView.showIssues(issueList);
 	}
 
 	public void deleteIssue(String issueId) {
 
-		if ((issueId == null) || (issueId.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException("Issue ID must not be null or empty.");
-		}
+		validateId(issueId, "Issue ID");
+		validateIssueExists(issueId);
 
-		try {
-			Integer.parseInt(issueId);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Issue ID must be numerical.");
-		}
-
-		if (issueRepository.exists(issueId) == false) {
-			throw new IllegalArgumentException("Issue ID does not exist in the database.");
-		}
-
-		Issue issue = issueRepository.findById(issueId);
+		Issue toBeDeleted = issueRepository.findById(issueId);
 		issueRepository.delete(issueId);
-		List<Issue> issueList = issueRepository.findByProjectId(issue.getProjectId());
+
+		List<Issue> issueList = issueRepository.findByProjectId(toBeDeleted.getProjectId());
 		issueTrackerView.showIssues(issueList);
 	}
 
@@ -103,9 +94,15 @@ public class IssueController {
 		validateIsNumeric(projectId, fieldName);
 	}
 
-	private void checkProjectExists(String projectId) {
+	private void validateProjectExists(String projectId) {
 		if (projectRepository.exists(projectId) == false) {
 			throw new IllegalArgumentException("Project ID does not exist in the database.");
+		}
+	}
+
+	private void validateIssueExists(String issueId) {
+		if (issueRepository.exists(issueId) == false) {
+			throw new IllegalArgumentException("Issue ID does not exist in the database.");
 		}
 	}
 }
