@@ -76,4 +76,23 @@ public class ProjectControllerTest {
 		inOrder.verify(issueTrackerView).showProjects(Collections.emptyList());
 		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
+
+	@Test
+	public void testAddProject_WhenProvidedFieldsAreValid_CreatesNewProject() {
+		// Arrange
+		Project project = new Project(ID, NAME, DESCRIPTION);
+		when(projectRepository.exists(ID)).thenReturn(false);
+		when(projectRepository.findAll()).thenReturn(Arrays.asList(project));
+
+		// Act
+		projectController.addProject(ID, NAME, DESCRIPTION);
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
+		inOrder.verify(projectRepository).exists(ID);
+		inOrder.verify(projectRepository).save(new Project(ID, NAME, DESCRIPTION));
+		inOrder.verify(projectRepository).findAll();
+		inOrder.verify(issueTrackerView).showProjects(Arrays.asList(new Project(ID, NAME, DESCRIPTION)));
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
+	}
 }
