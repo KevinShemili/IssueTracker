@@ -27,6 +27,7 @@
     <maven.surefire.report.plugin.version>3.5.2</maven.surefire.report.plugin.version>
     <coveralls.maven.plugin>4.5.0-M6</coveralls.maven.plugin>
     <sonar.maven.plugin>5.0.0.4389</sonar.maven.plugin>
+    <mockito.core.version>4.11.0</mockito.core.version>
 
     <!-- SonarCloud -->
     <sonar.coverage.exclusions>
@@ -77,6 +78,13 @@
       <groupId>de.bwaldvogel</groupId>
       <artifactId>mongo-java-server</artifactId>
       <version>${mongo.java.server}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.core.version}</version>
       <scope>test</scope>
     </dependency>
 
