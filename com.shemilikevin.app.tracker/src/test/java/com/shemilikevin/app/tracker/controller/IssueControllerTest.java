@@ -287,6 +287,27 @@ public class IssueControllerTest {
 		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
 	}
 
+	@Test
+	public void testDeleteIssue_WhenProvidedIssueIdIsValid_DeletesIssue() {
+		// Arrange
+		Issue issue = new Issue("1", "Broken Button", "Button is not clickable when...", "Medium", "1");
+		when(issueRepository.exists("1")).thenReturn(true);
+		when(issueRepository.findById("1")).thenReturn(issue);
+		when(issueRepository.findByProjectId("1")).thenReturn(Collections.emptyList());
+
+		// Act
+		issueController.deleteIssue("1");
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(issueRepository, issueTrackerView);
+		inOrder.verify(issueRepository).exists("1");
+		inOrder.verify(issueRepository).findById("1");
+		inOrder.verify(issueRepository).delete("1");
+		inOrder.verify(issueRepository).findByProjectId("1");
+		inOrder.verify(issueTrackerView).showIssues(Collections.emptyList());
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
 	private static String randomString() {
 		return UUID.randomUUID().toString();
 	}
