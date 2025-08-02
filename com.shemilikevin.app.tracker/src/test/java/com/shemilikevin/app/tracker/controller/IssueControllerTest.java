@@ -27,6 +27,8 @@ import com.shemilikevin.app.tracker.view.IssueTrackerView;
 public class IssueControllerTest {
 
 	private static final String PRIORITY = "Low";
+	private static final String NON_NUMERIC_ID = "XYZ";
+	private static final String NUMERIC_ID = "1";
 
 	@Mock
 	private IssueRepository issueRepository;
@@ -145,8 +147,7 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedIssueIdIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(null, randomString(), randomString(), PRIORITY, randomString()))
+		assertThatThrownBy(() -> issueController.addIssue(null, randomString(), randomString(), PRIORITY, NUMERIC_ID))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -154,8 +155,7 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedIssueIdIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(" ", randomString(), randomString(), PRIORITY, randomString()))
+		assertThatThrownBy(() -> issueController.addIssue(" ", randomString(), randomString(), PRIORITY, NUMERIC_ID))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -163,8 +163,7 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedIssueNameIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), null, randomString(), PRIORITY, randomString()))
+		assertThatThrownBy(() -> issueController.addIssue(NUMERIC_ID, null, randomString(), PRIORITY, NUMERIC_ID))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue name must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -172,8 +171,7 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedIssueNameIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), " ", randomString(), PRIORITY, randomString()))
+		assertThatThrownBy(() -> issueController.addIssue(NUMERIC_ID, " ", randomString(), PRIORITY, NUMERIC_ID))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue name must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -181,8 +179,7 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedIssueDescriptionIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), randomString(), null, PRIORITY, randomString()))
+		assertThatThrownBy(() -> issueController.addIssue(NUMERIC_ID, randomString(), null, PRIORITY, NUMERIC_ID))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Issue description must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
@@ -191,8 +188,7 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedIssueDescriptionIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), randomString(), " ", PRIORITY, randomString()))
+		assertThatThrownBy(() -> issueController.addIssue(NUMERIC_ID, randomString(), " ", PRIORITY, NUMERIC_ID))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Issue description must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
@@ -201,8 +197,7 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedIssuePriorityIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), randomString(), randomString(), null, randomString()))
+		assertThatThrownBy(() -> issueController.addIssue(NUMERIC_ID, randomString(), randomString(), null, NUMERIC_ID))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue priority must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -210,8 +205,7 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedIssuePriorityIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), randomString(), randomString(), " ", randomString()))
+		assertThatThrownBy(() -> issueController.addIssue(NUMERIC_ID, randomString(), randomString(), " ", NUMERIC_ID))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue priority must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -219,8 +213,8 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedIssuePriorityDoesNotHaveExpectedValue_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(() -> issueController.addIssue(randomString(), randomString(), randomString(),
-				"DOES NOT EXIST", randomString())).isInstanceOf(IllegalArgumentException.class)
+		assertThatThrownBy(() -> issueController.addIssue(NUMERIC_ID, randomString(), randomString(), "DOES NOT EXIST",
+				NUMERIC_ID)).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Issue priority must be either Low, Medium or High.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -228,8 +222,7 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedProjectIdIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), randomString(), randomString(), PRIORITY, null))
+		assertThatThrownBy(() -> issueController.addIssue(NUMERIC_ID, randomString(), randomString(), PRIORITY, null))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -237,9 +230,26 @@ public class IssueControllerTest {
 	@Test
 	public void testAddIssue_WhenProvidedProjectIdIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), randomString(), randomString(), PRIORITY, " "))
+		assertThatThrownBy(() -> issueController.addIssue(NUMERIC_ID, randomString(), randomString(), PRIORITY, " "))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedProjectIdIsNonNumeric_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(NUMERIC_ID, randomString(), randomString(), PRIORITY, NON_NUMERIC_ID))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must be numerical.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedIssueIdIsNonNumeric_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(NON_NUMERIC_ID, randomString(), randomString(), PRIORITY, NUMERIC_ID))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must be numerical.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
