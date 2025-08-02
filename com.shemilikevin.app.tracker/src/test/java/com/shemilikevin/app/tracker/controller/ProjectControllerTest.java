@@ -157,4 +157,19 @@ public class ProjectControllerTest {
 				.hasMessage("Project description must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueTrackerView);
 	}
+
+	@Test
+	public void testAddProject_WhenProvidedProjectIdAlreadyExistsInDatabase_ShowsDuplicationError() {
+		// Arrange
+		when(projectRepository.exists(ID)).thenReturn(true);
+
+		// Act
+		projectController.addProject(ID, NAME, DESCRIPTION);
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
+		inOrder.verify(projectRepository).exists(ID);
+		inOrder.verify(issueTrackerView).showError("Project with ID: " + ID + ", already exists.");
+		verifyNoMoreInteractions(issueTrackerView, projectRepository);
+	}
 }
