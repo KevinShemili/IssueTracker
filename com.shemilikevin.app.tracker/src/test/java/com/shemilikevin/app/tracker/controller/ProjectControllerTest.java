@@ -4,6 +4,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Before;
@@ -58,6 +59,21 @@ public class ProjectControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).findAll();
 		inOrder.verify(issueTrackerView).showProjects(Arrays.asList(project));
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testListProjects_WhenThereNoProjectsInTheDatabase_ShowsEmptyList() {
+		// Arrange
+		when(projectRepository.findAll()).thenReturn(Collections.emptyList());
+
+		// Act
+		projectController.listProjects();
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
+		inOrder.verify(projectRepository).findAll();
+		inOrder.verify(issueTrackerView).showProjects(Collections.emptyList());
 		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 }
