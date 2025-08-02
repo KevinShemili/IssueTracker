@@ -332,6 +332,18 @@ public class IssueControllerTest {
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
+	@Test
+	public void testDeleteIssue_WhenProvidedIssueIdDoesNotExistInDatabase_ThrowsIllegalArgumentException() {
+		// Arrange
+		when(issueRepository.exists("1")).thenReturn(false);
+
+		// Act & Assert
+		assertThatThrownBy(() -> issueController.deleteIssue("1")).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Issue ID does not exist in the database.");
+		verify(issueRepository).exists("1");
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
 	private static String randomString() {
 		return UUID.randomUUID().toString();
 	}

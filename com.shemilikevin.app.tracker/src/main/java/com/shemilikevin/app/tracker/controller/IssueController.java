@@ -66,12 +66,14 @@ public class IssueController {
 			throw new IllegalArgumentException("Issue ID must be numerical.");
 		}
 
-		if (issueRepository.exists(issueId) == true) {
-			Issue issue = issueRepository.findById(issueId);
-			issueRepository.delete(issueId);
-			List<Issue> issueList = issueRepository.findByProjectId(issue.getProjectId());
-			issueTrackerView.showIssues(issueList);
+		if (issueRepository.exists(issueId) == false) {
+			throw new IllegalArgumentException("Issue ID does not exist in the database.");
 		}
+
+		Issue issue = issueRepository.findById(issueId);
+		issueRepository.delete(issueId);
+		List<Issue> issueList = issueRepository.findByProjectId(issue.getProjectId());
+		issueTrackerView.showIssues(issueList);
 	}
 
 	private void validateIsNullOrEmpty(String string, String fieldName) {
