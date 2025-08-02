@@ -63,16 +63,17 @@ public class ProjectController {
 	}
 
 	public void deleteProject(String id) {
-		if (projectRepository.exists(id) == true) {
-
-			if (issueRepository.hasAssociatedIssues(id) == true) {
-				issueTrackerView.showError("Selected project has associated issues.");
-				return;
-			}
-
-			projectRepository.delete(id);
-			List<Project> projectList = projectRepository.findAll();
-			issueTrackerView.showProjects(projectList);
+		if (projectRepository.exists(id) == false) {
+			throw new IllegalArgumentException("Project ID does not exist in the database.");
 		}
+
+		if (issueRepository.hasAssociatedIssues(id) == true) {
+			issueTrackerView.showError("Selected project has associated issues.");
+			return;
+		}
+
+		projectRepository.delete(id);
+		List<Project> projectList = projectRepository.findAll();
+		issueTrackerView.showProjects(projectList);
 	}
 }
