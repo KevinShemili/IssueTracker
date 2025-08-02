@@ -2,6 +2,7 @@ package com.shemilikevin.app.tracker.controller;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.ignoreStubs;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -262,7 +263,25 @@ public class IssueControllerTest {
 		assertThatThrownBy(
 				() -> issueController.addIssue(NUMERIC_ID, randomString(), randomString(), PRIORITY, NUMERIC_ID))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID does not exist in the database.");
-		verifyNoMoreInteractions(ignoreStubs(projectRepository, issueRepository, issueTrackerView));
+		verify(projectRepository).exists("1");
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedIssueIdAlreadyExistInDatabase_ShowsDuplicationError() {
+		// Arrange
+		when(projectRepository.exists(NUMERIC_ID)).thenReturn(true);
+		when(issueRepository.exists(NUMERIC_ID)).thenReturn(true);
+
+		// Act
+		issueController.addIssue(NUMERIC_ID, randomString(), randomString(), PRIORITY, NUMERIC_ID);
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
+		inOrder.verify(projectRepository).exists(NUMERIC_ID);
+		inOrder.verify(issueRepository).exists(NUMERIC_ID);
+		inOrder.verify(issueTrackerView).showError("Issue with ID: " + 1 + ", already exists.");
+		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
 	}
 
 	private static String randomString() {

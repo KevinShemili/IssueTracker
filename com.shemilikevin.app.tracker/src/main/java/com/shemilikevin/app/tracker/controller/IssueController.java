@@ -94,12 +94,16 @@ public class IssueController {
 			throw new IllegalArgumentException("Project ID does not exist in the database.");
 		}
 
-		if (issueRepository.exists(issueId) == false) {
-			Issue issue = new Issue(issueId, issueName, issueDescription, issuePriority, projectId);
-			issueRepository.save(issue);
-			List<Issue> issueList = issueRepository.findByProjectId(projectId);
-			issueTrackerView.showIssues(issueList);
+		if (issueRepository.exists(issueId) == true) {
+			issueTrackerView.showError("Issue with ID: " + issueId + ", already exists.");
+			return;
 		}
+
+		Issue issue = new Issue(issueId, issueName, issueDescription, issuePriority, projectId);
+		issueRepository.save(issue);
+		List<Issue> issueList = issueRepository.findByProjectId(projectId);
+		issueTrackerView.showIssues(issueList);
+
 	}
 
 }
