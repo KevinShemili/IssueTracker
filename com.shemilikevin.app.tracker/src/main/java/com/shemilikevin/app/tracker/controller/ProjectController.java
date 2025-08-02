@@ -63,11 +63,16 @@ public class ProjectController {
 	}
 
 	public void deleteProject(String id) {
-		if ((projectRepository.exists(id) == true) && (issueRepository.hasAssociatedIssues(id) == false)) {
+		if (projectRepository.exists(id) == true) {
+
+			if (issueRepository.hasAssociatedIssues(id) == true) {
+				issueTrackerView.showError("Selected project has associated issues.");
+				return;
+			}
+
 			projectRepository.delete(id);
 			List<Project> projectList = projectRepository.findAll();
 			issueTrackerView.showProjects(projectList);
 		}
-
 	}
 }
