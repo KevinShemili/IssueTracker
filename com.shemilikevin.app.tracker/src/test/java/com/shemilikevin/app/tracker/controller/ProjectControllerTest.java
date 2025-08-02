@@ -1,6 +1,7 @@
 package com.shemilikevin.app.tracker.controller;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -211,6 +212,18 @@ public class ProjectControllerTest {
 		inOrder.verify(projectRepository).exists(ID);
 		inOrder.verify(issueRepository).hasAssociatedIssues(ID);
 		inOrder.verify(issueTrackerView).showError("Selected project has associated issues.");
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testDeleteProject_WhenProvidedProjectIdDoesNotExistInDatabase_ThrowsIllegalArgumentException() {
+		// Arrange
+		when(projectRepository.exists(ID)).thenReturn(false);
+
+		// Act & Assert
+		assertThatThrownBy(() -> projectController.deleteProject(ID)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Project ID does not exist in the database.");
+		verify(projectRepository).exists(ID);
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 }
