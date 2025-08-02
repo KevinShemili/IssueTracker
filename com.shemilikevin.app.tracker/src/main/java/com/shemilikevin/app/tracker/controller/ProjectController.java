@@ -20,4 +20,14 @@ public class ProjectController {
 		List<Project> projectList = projectRepository.findAll();
 		issueTrackerView.showProjects(projectList);
 	}
+
+	public void addProject(String id, String name, String description) {
+		if (projectRepository.exists(id) == false) {
+			Project project = new Project(id, name, description);
+			projectRepository.save(project);
+
+			List<Project> projectList = projectRepository.findAll();
+			issueTrackerView.showProjects(projectList);
+		}
+	}
 }

@@ -10,4 +10,5 @@ public interface ProjectRepository {
 
 	List<Project> findAll();
 
+	void save(Project project);
 }
