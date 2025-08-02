@@ -123,4 +123,20 @@ public class ProjectControllerTest {
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must be numerical.");
 		verifyNoInteractions(projectRepository, issueTrackerView);
 	}
+
+	@Test
+	public void testAddProject_WhenProvidedProjectNameIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> projectController.addProject(ID, null, DESCRIPTION))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project name must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddProject_WhenProvidedProjectNameIsEmpty_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> projectController.addProject(ID, EMPTY_STRING, DESCRIPTION))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project name must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueTrackerView);
+	}
 }
