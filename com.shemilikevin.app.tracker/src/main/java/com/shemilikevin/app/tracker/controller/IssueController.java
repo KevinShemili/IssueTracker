@@ -78,6 +78,18 @@ public class IssueController {
 			throw new IllegalArgumentException("Project ID must not be null or empty.");
 		}
 
+		try {
+			Integer.parseInt(issueId);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Issue ID must be numerical.");
+		}
+
+		try {
+			Integer.parseInt(projectId);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Project ID must be numerical.");
+		}
+
 		if ((projectRepository.exists(projectId) == true && (issueRepository.exists(issueId)) == false)) {
 			Issue issue = new Issue(issueId, issueName, issueDescription, issuePriority, projectId);
 			issueRepository.save(issue);
