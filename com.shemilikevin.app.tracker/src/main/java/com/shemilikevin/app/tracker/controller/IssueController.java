@@ -74,6 +74,10 @@ public class IssueController {
 			throw new IllegalArgumentException("Issue priority must be either Low, Medium or High.");
 		}
 
+		if ((projectId == null) || (projectId.trim().isEmpty() == true)) {
+			throw new IllegalArgumentException("Project ID must not be null or empty.");
+		}
+
 		if ((projectRepository.exists(projectId) == true && (issueRepository.exists(issueId)) == false)) {
 			Issue issue = new Issue(issueId, issueName, issueDescription, issuePriority, projectId);
 			issueRepository.save(issue);

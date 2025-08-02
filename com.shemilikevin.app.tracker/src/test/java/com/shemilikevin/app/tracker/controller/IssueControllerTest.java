@@ -26,6 +26,8 @@ import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class IssueControllerTest {
 
+	private static final String PRIORITY = "Low";
+
 	@Mock
 	private IssueRepository issueRepository;
 
@@ -144,7 +146,7 @@ public class IssueControllerTest {
 	public void testAddIssue_WhenProvidedIssueIdIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(
-				() -> issueController.addIssue(null, randomString(), randomString(), randomString(), randomString()))
+				() -> issueController.addIssue(null, randomString(), randomString(), PRIORITY, randomString()))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -153,7 +155,7 @@ public class IssueControllerTest {
 	public void testAddIssue_WhenProvidedIssueIdIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(
-				() -> issueController.addIssue(" ", randomString(), randomString(), randomString(), randomString()))
+				() -> issueController.addIssue(" ", randomString(), randomString(), PRIORITY, randomString()))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -162,7 +164,7 @@ public class IssueControllerTest {
 	public void testAddIssue_WhenProvidedIssueNameIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), null, randomString(), randomString(), randomString()))
+				() -> issueController.addIssue(randomString(), null, randomString(), PRIORITY, randomString()))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue name must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -171,7 +173,7 @@ public class IssueControllerTest {
 	public void testAddIssue_WhenProvidedIssueNameIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), " ", randomString(), randomString(), randomString()))
+				() -> issueController.addIssue(randomString(), " ", randomString(), PRIORITY, randomString()))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue name must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -180,7 +182,7 @@ public class IssueControllerTest {
 	public void testAddIssue_WhenProvidedIssueDescriptionIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), randomString(), null, randomString(), randomString()))
+				() -> issueController.addIssue(randomString(), randomString(), null, PRIORITY, randomString()))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Issue description must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
@@ -190,7 +192,7 @@ public class IssueControllerTest {
 	public void testAddIssue_WhenProvidedIssueDescriptionIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(
-				() -> issueController.addIssue(randomString(), randomString(), " ", randomString(), randomString()))
+				() -> issueController.addIssue(randomString(), randomString(), " ", PRIORITY, randomString()))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Issue description must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
@@ -220,6 +222,24 @@ public class IssueControllerTest {
 		assertThatThrownBy(() -> issueController.addIssue(randomString(), randomString(), randomString(),
 				"DOES NOT EXIST", randomString())).isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("Issue priority must be either Low, Medium or High.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedProjectIdIsNull_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(randomString(), randomString(), randomString(), PRIORITY, null))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedProjectIdIsEmpty_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(randomString(), randomString(), randomString(), PRIORITY, " "))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must not be null or empty.");
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
