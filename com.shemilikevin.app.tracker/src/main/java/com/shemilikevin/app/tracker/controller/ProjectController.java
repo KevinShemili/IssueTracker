@@ -27,6 +27,12 @@ public class ProjectController {
 			throw new IllegalArgumentException("Project ID must not be null or empty.");
 		}
 
+		try {
+			Integer.parseInt(id);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Project ID must be numerical.");
+		}
+
 		if (projectRepository.exists(id) == false) {
 			Project project = new Project(id, name, description);
 			projectRepository.save(project);

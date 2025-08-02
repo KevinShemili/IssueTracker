@@ -23,6 +23,7 @@ import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class ProjectControllerTest {
 
+	private static final String NON_NUMERIC_ID = "XX";
 	private static final String EMPTY_STRING = " ";
 	private static final String ID = "1";
 	private static final String NAME = "Desktop Application";
@@ -112,6 +113,14 @@ public class ProjectControllerTest {
 		// Act & Assert
 		assertThatThrownBy(() -> projectController.addProject(EMPTY_STRING, NAME, DESCRIPTION))
 				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must not be null or empty.");
+		verifyNoInteractions(projectRepository, issueTrackerView);
+	}
+
+	@Test
+	public void testAddProject_WhenProvidedProjectIdIsNonNumeric_ThrowsIllegalArgumentException() {
+		// Act & Assert
+		assertThatThrownBy(() -> projectController.addProject(NON_NUMERIC_ID, NAME, DESCRIPTION))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must be numerical.");
 		verifyNoInteractions(projectRepository, issueTrackerView);
 	}
 }
