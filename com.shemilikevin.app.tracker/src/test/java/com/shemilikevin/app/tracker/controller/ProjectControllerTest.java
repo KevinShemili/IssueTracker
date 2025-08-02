@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.shemilikevin.app.tracker.model.Project;
+import com.shemilikevin.app.tracker.repository.IssueRepository;
 import com.shemilikevin.app.tracker.repository.ProjectRepository;
 import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
@@ -31,6 +32,9 @@ public class ProjectControllerTest {
 
 	@Mock
 	private ProjectRepository projectRepository;
+
+	@Mock
+	private IssueRepository issueRepository;
 
 	@Mock
 	private IssueTrackerView issueTrackerView;
@@ -171,5 +175,25 @@ public class ProjectControllerTest {
 		inOrder.verify(projectRepository).exists(ID);
 		inOrder.verify(issueTrackerView).showError("Project with ID: " + ID + ", already exists.");
 		verifyNoMoreInteractions(issueTrackerView, projectRepository);
+	}
+
+	@Test
+	public void testDeleteProject_WhenProvidedProjectHasNoAssociatedIssues_DeletesProject() {
+		// Arrange
+		when(projectRepository.exists(ID)).thenReturn(true);
+		when(issueRepository.hasAssociatedIssues(ID)).thenReturn(false);
+		when(projectRepository.findAll()).thenReturn(Collections.emptyList());
+
+		// Act
+		projectController.deleteProject(ID);
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
+		inOrder.verify(projectRepository).exists(ID);
+		inOrder.verify(issueRepository).hasAssociatedIssues(ID);
+		inOrder.verify(projectRepository).delete(ID);
+		inOrder.verify(projectRepository).findAll();
+		inOrder.verify(issueTrackerView).showProjects(Collections.emptyList());
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 }
