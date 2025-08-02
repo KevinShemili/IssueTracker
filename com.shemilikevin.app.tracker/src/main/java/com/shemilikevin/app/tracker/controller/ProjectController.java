@@ -22,6 +22,11 @@ public class ProjectController {
 	}
 
 	public void addProject(String id, String name, String description) {
+
+		if ((id == null) || (id.trim().isEmpty() == true)) {
+			throw new IllegalArgumentException("Project ID must not be null or empty.");
+		}
+
 		if (projectRepository.exists(id) == false) {
 			Project project = new Project(id, name, description);
 			projectRepository.save(project);
