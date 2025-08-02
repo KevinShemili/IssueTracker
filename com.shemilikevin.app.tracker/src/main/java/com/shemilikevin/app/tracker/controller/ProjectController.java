@@ -41,12 +41,15 @@ public class ProjectController {
 			throw new IllegalArgumentException("Project description must not be null or empty.");
 		}
 
-		if (projectRepository.exists(id) == false) {
-			Project project = new Project(id, name, description);
-			projectRepository.save(project);
-
-			List<Project> projectList = projectRepository.findAll();
-			issueTrackerView.showProjects(projectList);
+		if (projectRepository.exists(id) == true) {
+			issueTrackerView.showError("Project with ID: " + id + ", already exists.");
+			return;
 		}
+
+		Project project = new Project(id, name, description);
+		projectRepository.save(project);
+
+		List<Project> projectList = projectRepository.findAll();
+		issueTrackerView.showProjects(projectList);
 	}
 }
