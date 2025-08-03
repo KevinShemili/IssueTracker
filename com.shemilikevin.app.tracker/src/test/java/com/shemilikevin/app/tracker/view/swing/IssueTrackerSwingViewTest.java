@@ -383,6 +383,38 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		assertThat(listContents).isEmpty();
 	}
 
+	@Test
+	public void testShowIssues_WhenProvidedWithIssues_AddsAllIssuesToTheList() {
+		// Arrange
+		switchToIssueTab();
+		Issue issue1 = new Issue("1", "Issue1", "Description1", "Low", "1");
+		Issue issue2 = new Issue("2", "Issue2", "Description2", "Low", "1");
+
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.showIssues(Arrays.asList(issue1, issue2));
+		});
+
+		// Assert
+		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
+		assertThat(listContents).containsExactly(issue1.toString(), issue2.toString());
+	}
+
+	@Test
+	public void testShowIssues_WhenProvidedWithEmptyList_ShowsEmptyList() {
+		// Arrange
+		switchToIssueTab();
+
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.showIssues(Collections.emptyList());
+		});
+
+		// Assert
+		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
+		assertThat(listContents).isEmpty();
+	}
+
 	private void clearProjectInput() {
 		frameFixture.textBox(PROJECT_ID_FIELD).setText("");
 		frameFixture.textBox(PROJECT_NAME_FIELD).setText("");

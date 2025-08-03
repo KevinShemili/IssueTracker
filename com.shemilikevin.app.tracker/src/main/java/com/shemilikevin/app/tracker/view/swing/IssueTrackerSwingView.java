@@ -384,8 +384,11 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 
 	@Override
 	public void showIssues(List<Issue> issueList) {
-		// TODO Auto-generated method stub
+		issueListModel.clear();
 
+		for (Issue issue : issueList) {
+			issueListModel.addElement(issue);
+		}
 	}
 
 	@Override
