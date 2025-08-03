@@ -7,6 +7,8 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -33,6 +35,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private JTextField projectIdField;
 	private JTextField projectNameField;
 	private JTextField projectDescriptionField;
+	private JButton addProjectButton;
 
 	/**
 	 * Launch the application.
@@ -79,6 +82,15 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbl_projectPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		projectPanel.setLayout(gbl_projectPanel);
 
+		KeyAdapter addButtonEnabler = new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				addProjectButton.setEnabled(
+						!projectIdField.getText().trim().isEmpty() && !projectNameField.getText().trim().isEmpty()
+								&& !projectDescriptionField.getText().trim().isEmpty());
+			}
+		};
+
 		JLabel projectIdLabel = new JLabel("ID");
 		projectIdLabel.setName("projectIdLabel");
 		GridBagConstraints gbc_projectIdLabel = new GridBagConstraints();
@@ -88,6 +100,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectPanel.add(projectIdLabel, gbc_projectIdLabel);
 
 		projectIdField = new JTextField();
+		projectIdField.addKeyListener(addButtonEnabler);
 		projectIdField.setName("projectIdField");
 		GridBagConstraints gbc_projectIdField = new GridBagConstraints();
 		gbc_projectIdField.insets = new Insets(0, 0, 5, 0);
@@ -106,6 +119,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectPanel.add(projectNameLabel, gbc_projectNameLabel);
 
 		projectNameField = new JTextField();
+		projectNameField.addKeyListener(addButtonEnabler);
 		projectNameField.setName("projectNameField");
 		GridBagConstraints gbc_projectNameField = new GridBagConstraints();
 		gbc_projectNameField.insets = new Insets(0, 0, 5, 0);
@@ -124,6 +138,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectPanel.add(projectDescriptionLabel, gbc_projectDescriptionLabel);
 
 		projectDescriptionField = new JTextField();
+		projectDescriptionField.addKeyListener(addButtonEnabler);
 		projectDescriptionField.setName("projectDescriptionField");
 		GridBagConstraints gbc_projectDescriptionField = new GridBagConstraints();
 		gbc_projectDescriptionField.insets = new Insets(0, 0, 5, 0);
@@ -167,7 +182,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbc_projectButtonsPanel.gridy = 7;
 		projectPanel.add(projectButtonsPanel, gbc_projectButtonsPanel);
 
-		JButton addProjectButton = new JButton("ADD");
+		addProjectButton = new JButton("ADD");
 		addProjectButton.setEnabled(false);
 		addProjectButton.setName("addProjectButton");
 		projectButtonsPanel.add(addProjectButton);
