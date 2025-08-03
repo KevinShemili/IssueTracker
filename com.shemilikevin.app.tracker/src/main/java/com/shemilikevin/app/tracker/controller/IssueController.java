@@ -1,6 +1,5 @@
 package com.shemilikevin.app.tracker.controller;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.shemilikevin.app.tracker.model.Issue;
@@ -9,8 +8,6 @@ import com.shemilikevin.app.tracker.repository.ProjectRepository;
 import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class IssueController {
-
-	private List<String> ALLOWED_PRIORITIES = Arrays.asList("Low", "Medium", "High");
 
 	private ProjectRepository projectRepository;
 	private IssueRepository issueRepository;
@@ -26,7 +23,7 @@ public class IssueController {
 
 	public void listIssues(String projectId) {
 
-		validateId(projectId, "Project ID");
+		Validators.validateProjectId(projectId);
 		validateProjectExists(projectId);
 
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
@@ -36,11 +33,11 @@ public class IssueController {
 	public void addIssue(String issueId, String issueName, String issueDescription, String issuePriority,
 			String projectId) {
 
-		validateId(issueId, "Issue ID");
-		validateId(projectId, "Project ID");
-		validateIsNullOrEmpty(issueName, "Issue name");
-		validateIsNullOrEmpty(issueDescription, "Issue description");
-		validatePriorityIsAllowed(issuePriority, "Issue priority");
+		Validators.validateIssueId(issueId);
+		Validators.validateIssueName(issueName);
+		Validators.validateIssueDescription(issueDescription);
+		Validators.validatePriority(issuePriority);
+		Validators.validateProjectId(projectId);
 		validateProjectExists(projectId);
 
 		if (issueRepository.exists(issueId) == true) {
@@ -57,7 +54,7 @@ public class IssueController {
 
 	public void deleteIssue(String issueId) {
 
-		validateId(issueId, "Issue ID");
+		Validators.validateIssueId(issueId);
 		validateIssueExists(issueId);
 
 		Issue toBeDeleted = issueRepository.findById(issueId);
@@ -65,33 +62,6 @@ public class IssueController {
 
 		List<Issue> issueList = issueRepository.findByProjectId(toBeDeleted.getProjectId());
 		issueTrackerView.showIssues(issueList);
-	}
-
-	private void validateIsNullOrEmpty(String string, String fieldName) {
-		if ((string == null) || (string.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException(fieldName + " must not be null or empty.");
-		}
-	}
-
-	private void validateIsNumeric(String string, String fieldName) {
-		try {
-			Integer.parseInt(string);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException(fieldName + " must be numerical.");
-		}
-	}
-
-	private void validatePriorityIsAllowed(String priority, String fieldName) {
-		validateIsNullOrEmpty(priority, fieldName);
-
-		if (ALLOWED_PRIORITIES.contains(priority) == false) {
-			throw new IllegalArgumentException(fieldName + " must be either Low, Medium or High.");
-		}
-	}
-
-	private void validateId(String projectId, String fieldName) {
-		validateIsNullOrEmpty(projectId, fieldName);
-		validateIsNumeric(projectId, fieldName);
 	}
 
 	private void validateProjectExists(String projectId) {
