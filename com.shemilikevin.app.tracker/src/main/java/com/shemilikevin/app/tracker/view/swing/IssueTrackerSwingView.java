@@ -11,6 +11,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -36,6 +37,9 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private JTextField projectNameField;
 	private JTextField projectDescriptionField;
 	private JButton addProjectButton;
+	private JButton deleteProjectButton;
+	private DefaultListModel<Project> projectListModel;
+	private JList<Project> projectJList;
 
 	/**
 	 * Launch the application.
@@ -169,9 +173,14 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbc_projectScrollPane.gridy = 4;
 		projectPanel.add(projectScrollPane, gbc_projectScrollPane);
 
-		JList projectList = new JList();
-		projectList.setName("projectList");
-		projectScrollPane.setViewportView(projectList);
+		projectListModel = new DefaultListModel<Project>();
+		projectJList = new JList<Project>(projectListModel);
+		projectJList.addListSelectionListener(e -> {
+			boolean isSelectionEmpty = projectJList.isSelectionEmpty();
+			deleteProjectButton.setEnabled(!isSelectionEmpty);
+		});
+		projectJList.setName("projectList");
+		projectScrollPane.setViewportView(projectJList);
 
 		JPanel projectButtonsPanel = new JPanel();
 		projectButtonsPanel.setName("projectButtonsPanel");
@@ -187,7 +196,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		addProjectButton.setName("addProjectButton");
 		projectButtonsPanel.add(addProjectButton);
 
-		JButton deleteProjectButton = new JButton("DELETE");
+		deleteProjectButton = new JButton("DELETE");
 		deleteProjectButton.setEnabled(false);
 		deleteProjectButton.setName("deleteProjectButton");
 		projectButtonsPanel.add(deleteProjectButton);
@@ -224,4 +233,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 
 	}
 
+	public DefaultListModel<Project> getProjectListModel() {
+		return projectListModel;
+	}
 }

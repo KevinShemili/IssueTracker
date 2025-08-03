@@ -9,6 +9,8 @@ import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.shemilikevin.app.tracker.model.Project;
+
 @RunWith(GUITestRunner.class)
 public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 
@@ -19,6 +21,8 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	private static final String PROJECT_NAME_FIELD = "projectNameField";
 	private static final String PROJECT_DESCRIPTION_FIELD = "projectDescriptionField";
 	private static final String ADD_BUTTON = "addProjectButton";
+	private static final String DELETE_BUTTON = "deleteProjectButton";
+	private static final String PROJECT_LIST = "projectList";
 
 	private FrameFixture frameFixture;
 	private IssueTrackerSwingView issueTrackerView;
@@ -48,9 +52,9 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.label("projectDescriptionLabel");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).requireEnabled();
 		frameFixture.label("errorLabel").requireText(" ");
-		frameFixture.list("projectList");
+		frameFixture.list(PROJECT_LIST);
 		frameFixture.button(ADD_BUTTON).requireDisabled();
-		frameFixture.button("deleteProjectButton").requireDisabled();
+		frameFixture.button(DELETE_BUTTON).requireDisabled();
 	}
 
 	@Test
@@ -72,49 +76,65 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(" ");
 
 		frameFixture.button(ADD_BUTTON).requireDisabled();
-		cleanFields();
+		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText("1");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
 		frameFixture.button(ADD_BUTTON).requireDisabled();
-		cleanFields();
+		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
 		frameFixture.button(ADD_BUTTON).requireDisabled();
-		cleanFields();
+		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
 		frameFixture.button(ADD_BUTTON).requireDisabled();
-		cleanFields();
+		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(" ");
 
 		frameFixture.button(ADD_BUTTON).requireDisabled();
-		cleanFields();
+		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText("1");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(" ");
-		cleanFields();
+		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(" ");
 	}
 
-	private void cleanFields() {
+	@Test
+	@GUITest
+	public void testProjectTab_WhenProjectIsSelectedFromList_DeleteButtonIsEnabled() {
+
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(new Project("1", "Project Name", "Project Description"));
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.button(DELETE_BUTTON).requireEnabled();
+
+		clearInput();
+		frameFixture.button(DELETE_BUTTON).requireDisabled();
+	}
+
+	private void clearInput() {
 		frameFixture.textBox(PROJECT_ID_FIELD).setText("");
 		frameFixture.textBox(PROJECT_NAME_FIELD).setText("");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).setText("");
+		frameFixture.list(PROJECT_LIST).clearSelection();
 	}
 }
