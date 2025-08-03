@@ -308,6 +308,48 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.button(PROJECT_DELETE_BUTTON).requireDisabled();
 	}
 
+	@Test
+	@GUITest
+	public void testProjectTab_WhenFieldsAreFilledAndIssueTabIsSelected_ReturningAgainToProjectTabSeeClearFields() {
+
+		frameFixture.textBox(PROJECT_ID_FIELD).enterText("1");
+		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
+
+		switchToIssueTab();
+		switchBackToProjectTab();
+
+		frameFixture.textBox(PROJECT_ID_FIELD).requireEmpty();
+		frameFixture.textBox(PROJECT_NAME_FIELD).requireEmpty();
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).requireEmpty();
+		frameFixture.list(PROJECT_LIST).requireNoSelection();
+		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_DELETE_BUTTON).requireDisabled();
+	}
+
+	@Test
+	@GUITest
+	public void testIssueTab_WhenFieldsAreFilledAndProjectTabIsSelected_ReturningAgainToIssueTabSeeClearFields() {
+
+		switchToIssueTab();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+
+		switchBackToProjectTab();
+		switchBackToIssueTab();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).requireEmpty();
+		frameFixture.textBox(ISSUE_NAME_FIELD).requireEmpty();
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).requireEmpty();
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).requireNoSelection();
+		frameFixture.list(ISSUE_LIST).requireNoSelection();
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		frameFixture.button(ISSUE_DELETE_BUTTON).requireDisabled();
+	}
+
 	private void clearProjectInput() {
 		frameFixture.textBox(PROJECT_ID_FIELD).setText("");
 		frameFixture.textBox(PROJECT_NAME_FIELD).setText("");
@@ -332,4 +374,12 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 	}
 
+	private void switchBackToProjectTab() {
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_PROJECTS);
+	}
+
+	private void switchBackToIssueTab() {
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+	}
 }

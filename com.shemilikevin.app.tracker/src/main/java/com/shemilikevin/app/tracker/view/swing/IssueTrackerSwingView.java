@@ -418,5 +418,10 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		issuePriorityComboBox.setSelectedItem(null);
 		issueListModel.clear();
 		projectJList.clearSelection();
+
+		addProjectButton.setEnabled(false);
+		deleteProjectButton.setEnabled(false);
+		addIssueButton.setEnabled(false);
+		deleteIssueButton.setEnabled(false);
 	}
 }
