@@ -32,6 +32,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private static final int TAB_PROJECTS = 0;
 	private static final int TAB_ISSUES = 1;
 
+	private JTabbedPane tabbedPane;
 	private JPanel mainPane;
 	private JTextField projectIdField;
 	private JTextField projectNameField;
@@ -71,7 +72,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		setContentPane(mainPane);
 		mainPane.setLayout(new BorderLayout(0, 0));
 
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setName("tabbedPane");
 		mainPane.add(tabbedPane);
 
@@ -177,6 +178,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectJList = new JList<Project>(projectListModel);
 		projectJList.addListSelectionListener(e -> {
 			boolean isSelectionEmpty = projectJList.isSelectionEmpty();
+			tabbedPane.setEnabledAt(TAB_ISSUES, !isSelectionEmpty);
 			deleteProjectButton.setEnabled(!isSelectionEmpty);
 		});
 		projectJList.setName("projectList");

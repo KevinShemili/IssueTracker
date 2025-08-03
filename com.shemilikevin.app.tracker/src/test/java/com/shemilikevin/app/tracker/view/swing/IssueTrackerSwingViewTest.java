@@ -131,6 +131,21 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.button(DELETE_BUTTON).requireDisabled();
 	}
 
+	@Test
+	@GUITest
+	public void testProjectTab_WhenProjectIsSelectedFromList_IssuesTabIsEnabled() {
+
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(new Project("1", "Project Name", "Project Description"));
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).requireEnabled(Index.atIndex(TAB_ISSUES));
+
+		clearInput();
+		frameFixture.tabbedPane(TABBED_PANE).requireDisabled(Index.atIndex(TAB_ISSUES));
+	}
+
 	private void clearInput() {
 		frameFixture.textBox(PROJECT_ID_FIELD).setText("");
 		frameFixture.textBox(PROJECT_NAME_FIELD).setText("");
