@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -41,6 +42,20 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private JButton deleteProjectButton;
 	private DefaultListModel<Project> projectListModel;
 	private JList<Project> projectJList;
+	private JLabel issueIdLabel;
+	private JTextField issueIdField;
+	private JLabel issueNameLabel;
+	private JTextField issueNameField;
+	private JLabel issueDescriptionLabel;
+	private JTextField issueDescriptionField;
+	private JLabel issuePriorityLabel;
+	private JComboBox issuePriorityComboBox;
+	private JLabel issueErrorLabel;
+	private JScrollPane issueScrollPane;
+	private JPanel issueButtonsPanel;
+	private JButton addIssueButton;
+	private JButton deleteIssueButton;
+	private JList issueList;
 
 	/**
 	 * Launch the application.
@@ -153,15 +168,15 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectPanel.add(projectDescriptionField, gbc_projectDescriptionField);
 		projectDescriptionField.setColumns(10);
 
-		JLabel errorLabel = new JLabel(" ");
-		errorLabel.setForeground(new Color(255, 0, 0));
-		errorLabel.setName("errorLabel");
-		GridBagConstraints gbc_errorLabel = new GridBagConstraints();
-		gbc_errorLabel.insets = new Insets(0, 0, 5, 0);
-		gbc_errorLabel.gridwidth = 2;
-		gbc_errorLabel.gridx = 0;
-		gbc_errorLabel.gridy = 3;
-		projectPanel.add(errorLabel, gbc_errorLabel);
+		JLabel projectErrorLabel = new JLabel(" ");
+		projectErrorLabel.setForeground(new Color(255, 0, 0));
+		projectErrorLabel.setName("projectErrorLabel");
+		GridBagConstraints gbc_projectErrorLabel = new GridBagConstraints();
+		gbc_projectErrorLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_projectErrorLabel.gridwidth = 2;
+		gbc_projectErrorLabel.gridx = 0;
+		gbc_projectErrorLabel.gridy = 3;
+		projectPanel.add(projectErrorLabel, gbc_projectErrorLabel);
 
 		JScrollPane projectScrollPane = new JScrollPane();
 		projectScrollPane.setName("projectScrollPane");
@@ -214,6 +229,121 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbl_issuePanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 				0.0, 0.0, Double.MIN_VALUE };
 		issuePanel.setLayout(gbl_issuePanel);
+
+		issueIdLabel = new JLabel("ID");
+		issueIdLabel.setName("issueIdLabel");
+		GridBagConstraints gbc_issueIdLabel = new GridBagConstraints();
+		gbc_issueIdLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_issueIdLabel.gridx = 0;
+		gbc_issueIdLabel.gridy = 0;
+		issuePanel.add(issueIdLabel, gbc_issueIdLabel);
+
+		issueIdField = new JTextField();
+		issueIdField.setName("issueIdField");
+		GridBagConstraints gbc_issueIdField = new GridBagConstraints();
+		gbc_issueIdField.insets = new Insets(0, 0, 5, 0);
+		gbc_issueIdField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_issueIdField.gridx = 1;
+		gbc_issueIdField.gridy = 0;
+		issuePanel.add(issueIdField, gbc_issueIdField);
+		issueIdField.setColumns(10);
+
+		issueNameLabel = new JLabel("NAME");
+		issueNameLabel.setName("issueNameLabel");
+		GridBagConstraints gbc_issueNameLabel = new GridBagConstraints();
+		gbc_issueNameLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_issueNameLabel.gridx = 0;
+		gbc_issueNameLabel.gridy = 1;
+		issuePanel.add(issueNameLabel, gbc_issueNameLabel);
+
+		issueNameField = new JTextField();
+		issueNameField.setName("issueNameField");
+		GridBagConstraints gbc_issueNameField = new GridBagConstraints();
+		gbc_issueNameField.insets = new Insets(0, 0, 5, 0);
+		gbc_issueNameField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_issueNameField.gridx = 1;
+		gbc_issueNameField.gridy = 1;
+		issuePanel.add(issueNameField, gbc_issueNameField);
+		issueNameField.setColumns(10);
+
+		issueDescriptionLabel = new JLabel("DESCRIPTION");
+		issueDescriptionLabel.setName("issueDescriptionLabel");
+		GridBagConstraints gbc_issueDescriptionLabel = new GridBagConstraints();
+		gbc_issueDescriptionLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_issueDescriptionLabel.gridx = 0;
+		gbc_issueDescriptionLabel.gridy = 2;
+		issuePanel.add(issueDescriptionLabel, gbc_issueDescriptionLabel);
+
+		issueDescriptionField = new JTextField();
+		issueDescriptionField.setName("issueDescriptionField");
+		GridBagConstraints gbc_issueDescriptionField = new GridBagConstraints();
+		gbc_issueDescriptionField.insets = new Insets(0, 0, 5, 0);
+		gbc_issueDescriptionField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_issueDescriptionField.gridx = 1;
+		gbc_issueDescriptionField.gridy = 2;
+		issuePanel.add(issueDescriptionField, gbc_issueDescriptionField);
+		issueDescriptionField.setColumns(10);
+
+		issuePriorityLabel = new JLabel("PRIORITY");
+		issuePriorityLabel.setName("issuePriorityLabel");
+		GridBagConstraints gbc_issuePriorityLabel = new GridBagConstraints();
+		gbc_issuePriorityLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_issuePriorityLabel.gridx = 0;
+		gbc_issuePriorityLabel.gridy = 3;
+		issuePanel.add(issuePriorityLabel, gbc_issuePriorityLabel);
+
+		issuePriorityComboBox = new JComboBox();
+		issuePriorityComboBox.setName("issuePriorityComboBox");
+		GridBagConstraints gbc_issuePriorityComboBox = new GridBagConstraints();
+		gbc_issuePriorityComboBox.insets = new Insets(0, 0, 5, 0);
+		gbc_issuePriorityComboBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_issuePriorityComboBox.gridx = 1;
+		gbc_issuePriorityComboBox.gridy = 3;
+		issuePanel.add(issuePriorityComboBox, gbc_issuePriorityComboBox);
+
+		issueErrorLabel = new JLabel(" ");
+		issueErrorLabel.setForeground(new Color(255, 0, 0));
+		issueErrorLabel.setName("issueErrorLabel");
+		GridBagConstraints gbc_issueErrorLabel = new GridBagConstraints();
+		gbc_issueErrorLabel.gridwidth = 2;
+		gbc_issueErrorLabel.insets = new Insets(0, 0, 5, 0);
+		gbc_issueErrorLabel.gridx = 0;
+		gbc_issueErrorLabel.gridy = 4;
+		issuePanel.add(issueErrorLabel, gbc_issueErrorLabel);
+
+		issueScrollPane = new JScrollPane();
+		issueScrollPane.setName("issueScrollPane");
+		GridBagConstraints gbc_issueScrollPane = new GridBagConstraints();
+		gbc_issueScrollPane.gridheight = 10;
+		gbc_issueScrollPane.gridwidth = 2;
+		gbc_issueScrollPane.insets = new Insets(0, 0, 5, 0);
+		gbc_issueScrollPane.fill = GridBagConstraints.BOTH;
+		gbc_issueScrollPane.gridx = 0;
+		gbc_issueScrollPane.gridy = 5;
+		issuePanel.add(issueScrollPane, gbc_issueScrollPane);
+
+		issueList = new JList();
+		issueList.setName("issueList");
+		issueScrollPane.setViewportView(issueList);
+
+		issueButtonsPanel = new JPanel();
+		issueButtonsPanel.setName("issueButtonsPanel");
+		GridBagConstraints gbc_issueButtonsPanel = new GridBagConstraints();
+		gbc_issueButtonsPanel.gridwidth = 2;
+		gbc_issueButtonsPanel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_issueButtonsPanel.gridx = 0;
+		gbc_issueButtonsPanel.gridy = 15;
+		issuePanel.add(issueButtonsPanel, gbc_issueButtonsPanel);
+
+		addIssueButton = new JButton("ADD");
+		addIssueButton.setEnabled(false);
+		addIssueButton.setName("addIssueButton");
+		issueButtonsPanel.add(addIssueButton);
+
+		deleteIssueButton = new JButton("DELETE");
+		deleteIssueButton.setEnabled(false);
+		deleteIssueButton.setName("deleteIssueButton");
+		issueButtonsPanel.add(deleteIssueButton);
 
 	}
 

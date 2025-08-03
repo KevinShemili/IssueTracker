@@ -20,9 +20,25 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	private static final String PROJECT_ID_FIELD = "projectIdField";
 	private static final String PROJECT_NAME_FIELD = "projectNameField";
 	private static final String PROJECT_DESCRIPTION_FIELD = "projectDescriptionField";
-	private static final String ADD_BUTTON = "addProjectButton";
-	private static final String DELETE_BUTTON = "deleteProjectButton";
+	private static final String PROJECT_ADD_BUTTON = "addProjectButton";
+	private static final String PROJECT_DELETE_BUTTON = "deleteProjectButton";
 	private static final String PROJECT_LIST = "projectList";
+	private static final String PROJECT_ERROR_LABEL = "projectErrorLabel";
+	private static final String PROJECT_ID_LABEL = "projectIdLabel";
+	private static final String PROJECT_NAME_LABEL = "projectNameLabel";
+	private static final String PROJECT_DESCRIPTION_LABEL = "projectDescriptionLabel";
+	private static final String ISSUE_ID_LABEL = "issueIdLabel";
+	private static final String ISSUE_ID_FIELD = "issueIdField";
+	private static final String ISSUE_NAME_LABEL = "issueNameLabel";
+	private static final String ISSUE_NAME_FIELD = "issueNameField";
+	private static final String ISSUE_DESCRIPTION_LABEL = "issueDescriptionLabel";
+	private static final String ISSUE_DESCRIPTION_FIELD = "issueDescriptionField";
+	private static final String ISSUE_PRIORITY_LABEL = "issuePriorityLabel";
+	private static final String ISSUE_PRIORITY_COMBO = "issuePriorityComboBox";
+	private static final String ISSUE_ERROR_LABEL = "issueErrorLabel";
+	private static final String ISSUE_LIST = "issueList";
+	private static final String ISSUE_ADD_BUTTON = "addIssueButton";
+	private static final String ISSUE_DELETE_BUTTON = "deleteIssueButton";
 
 	private FrameFixture frameFixture;
 	private IssueTrackerSwingView issueTrackerView;
@@ -45,16 +61,16 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		frameFixture.tabbedPane(TABBED_PANE).requireEnabled(Index.atIndex(TAB_PROJECTS));
 		frameFixture.tabbedPane(TABBED_PANE).requireDisabled(Index.atIndex(TAB_ISSUES));
-		frameFixture.label("projectIdLabel");
+		frameFixture.label(PROJECT_ID_LABEL);
 		frameFixture.textBox(PROJECT_ID_FIELD).requireEnabled();
-		frameFixture.label("projectNameLabel");
+		frameFixture.label(PROJECT_NAME_LABEL);
 		frameFixture.textBox(PROJECT_NAME_FIELD).requireEnabled();
-		frameFixture.label("projectDescriptionLabel");
+		frameFixture.label(PROJECT_DESCRIPTION_LABEL);
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).requireEnabled();
-		frameFixture.label("errorLabel").requireText(" ");
+		frameFixture.label(PROJECT_ERROR_LABEL).requireText(" ");
 		frameFixture.list(PROJECT_LIST);
-		frameFixture.button(ADD_BUTTON).requireDisabled();
-		frameFixture.button(DELETE_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_DELETE_BUTTON).requireDisabled();
 	}
 
 	@Test
@@ -64,7 +80,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
-		frameFixture.button(ADD_BUTTON).requireEnabled();
+		frameFixture.button(PROJECT_ADD_BUTTON).requireEnabled();
 	}
 
 	@Test
@@ -75,35 +91,35 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(" ");
 
-		frameFixture.button(ADD_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
 		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText("1");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
-		frameFixture.button(ADD_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
 		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
-		frameFixture.button(ADD_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
 		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
-		frameFixture.button(ADD_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
 		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(" ");
 
-		frameFixture.button(ADD_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
 		clearInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText("1");
@@ -125,10 +141,10 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		});
 
 		frameFixture.list(PROJECT_LIST).selectItem(0);
-		frameFixture.button(DELETE_BUTTON).requireEnabled();
+		frameFixture.button(PROJECT_DELETE_BUTTON).requireEnabled();
 
 		clearInput();
-		frameFixture.button(DELETE_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_DELETE_BUTTON).requireDisabled();
 	}
 
 	@Test
@@ -144,6 +160,31 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		clearInput();
 		frameFixture.tabbedPane(TABBED_PANE).requireDisabled(Index.atIndex(TAB_ISSUES));
+	}
+
+	@Test
+	@GUITest
+	public void testIssueTab_InitialState() {
+
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(new Project("1", "Project Name", "Project Description"));
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+
+		frameFixture.label(ISSUE_ID_LABEL);
+		frameFixture.textBox(ISSUE_ID_FIELD).requireEnabled();
+		frameFixture.label(ISSUE_NAME_LABEL);
+		frameFixture.textBox(ISSUE_NAME_FIELD).requireEnabled();
+		frameFixture.label(ISSUE_DESCRIPTION_LABEL);
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).requireEnabled();
+		frameFixture.label(ISSUE_PRIORITY_LABEL);
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).requireEnabled();
+		frameFixture.label(ISSUE_ERROR_LABEL).requireText(" ");
+		frameFixture.list(ISSUE_LIST);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		frameFixture.button(ISSUE_DELETE_BUTTON).requireDisabled();
 	}
 
 	private void clearInput() {
