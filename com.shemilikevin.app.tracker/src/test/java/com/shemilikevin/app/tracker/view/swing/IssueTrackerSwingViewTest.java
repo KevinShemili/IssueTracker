@@ -92,40 +92,40 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(" ");
 
 		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
-		clearInput();
+		clearProjectInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText("1");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
 		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
-		clearInput();
+		clearProjectInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
 		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
-		clearInput();
+		clearProjectInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
 		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
-		clearInput();
+		clearProjectInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(" ");
 
 		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
-		clearInput();
+		clearProjectInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText("1");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(" ");
-		clearInput();
+		clearProjectInput();
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(" ");
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(" ");
@@ -143,7 +143,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.list(PROJECT_LIST).selectItem(0);
 		frameFixture.button(PROJECT_DELETE_BUTTON).requireEnabled();
 
-		clearInput();
+		clearProjectInput();
 		frameFixture.button(PROJECT_DELETE_BUTTON).requireDisabled();
 	}
 
@@ -158,7 +158,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.list(PROJECT_LIST).selectItem(0);
 		frameFixture.tabbedPane(TABBED_PANE).requireEnabled(Index.atIndex(TAB_ISSUES));
 
-		clearInput();
+		clearProjectInput();
 		frameFixture.tabbedPane(TABBED_PANE).requireDisabled(Index.atIndex(TAB_ISSUES));
 	}
 
@@ -187,10 +187,118 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.button(ISSUE_DELETE_BUTTON).requireDisabled();
 	}
 
-	private void clearInput() {
+	@Test
+	@GUITest
+	public void testIssueTab_WhenProvidedValidIdAndNameAndDescriptionAndPriority_AddButtonIsEnabled() {
+
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(new Project("1", "Project Name", "Project Description"));
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireEnabled();
+		clearIssueInput();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(1);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireEnabled();
+		clearIssueInput();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(2);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireEnabled();
+	}
+
+	@Test
+	@GUITest
+	public void testIssueTab_WhenOneOrMoreFieldsAreEmpty_AddButtonRemainsDisabled() {
+
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(new Project("1", "Project Name", "Project Description"));
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText(" ");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(" ");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText(" ");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		clearIssueInput();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText(" ");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(" ");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		clearIssueInput();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText(" ");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText(" ");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		clearIssueInput();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText(" ");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		clearIssueInput();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(" ");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText(" ");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		clearIssueInput();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(" ");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		clearIssueInput();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText(" ");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		clearIssueInput();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).clearSelection();
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+	}
+
+	private void clearProjectInput() {
 		frameFixture.textBox(PROJECT_ID_FIELD).setText("");
 		frameFixture.textBox(PROJECT_NAME_FIELD).setText("");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).setText("");
 		frameFixture.list(PROJECT_LIST).clearSelection();
 	}
+
+	private void clearIssueInput() {
+		frameFixture.textBox(ISSUE_ID_FIELD).setText("");
+		frameFixture.textBox(ISSUE_NAME_FIELD).setText("");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).setText("");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).clearSelection();
+		frameFixture.list(ISSUE_LIST).clearSelection();
+	}
+
 }

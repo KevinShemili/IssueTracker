@@ -49,7 +49,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private JLabel issueDescriptionLabel;
 	private JTextField issueDescriptionField;
 	private JLabel issuePriorityLabel;
-	private JComboBox issuePriorityComboBox;
+	private JComboBox<String> issuePriorityComboBox;
 	private JLabel issueErrorLabel;
 	private JScrollPane issueScrollPane;
 	private JPanel issueButtonsPanel;
@@ -102,12 +102,22 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbl_projectPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		projectPanel.setLayout(gbl_projectPanel);
 
-		KeyAdapter addButtonEnabler = new KeyAdapter() {
+		KeyAdapter projectAddButtonEnabler = new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				addProjectButton.setEnabled(
 						!projectIdField.getText().trim().isEmpty() && !projectNameField.getText().trim().isEmpty()
 								&& !projectDescriptionField.getText().trim().isEmpty());
+			}
+		};
+
+		KeyAdapter issueAddButtonEnabler = new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				addIssueButton.setEnabled(
+						!issueIdField.getText().trim().isEmpty() && !issueNameField.getText().trim().isEmpty()
+								&& !issueDescriptionField.getText().trim().isEmpty()
+								&& issuePriorityComboBox.getSelectedIndex() != -1);
 			}
 		};
 
@@ -120,7 +130,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectPanel.add(projectIdLabel, gbc_projectIdLabel);
 
 		projectIdField = new JTextField();
-		projectIdField.addKeyListener(addButtonEnabler);
+		projectIdField.addKeyListener(projectAddButtonEnabler);
 		projectIdField.setName("projectIdField");
 		GridBagConstraints gbc_projectIdField = new GridBagConstraints();
 		gbc_projectIdField.insets = new Insets(0, 0, 5, 0);
@@ -139,7 +149,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectPanel.add(projectNameLabel, gbc_projectNameLabel);
 
 		projectNameField = new JTextField();
-		projectNameField.addKeyListener(addButtonEnabler);
+		projectNameField.addKeyListener(projectAddButtonEnabler);
 		projectNameField.setName("projectNameField");
 		GridBagConstraints gbc_projectNameField = new GridBagConstraints();
 		gbc_projectNameField.insets = new Insets(0, 0, 5, 0);
@@ -158,7 +168,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectPanel.add(projectDescriptionLabel, gbc_projectDescriptionLabel);
 
 		projectDescriptionField = new JTextField();
-		projectDescriptionField.addKeyListener(addButtonEnabler);
+		projectDescriptionField.addKeyListener(projectAddButtonEnabler);
 		projectDescriptionField.setName("projectDescriptionField");
 		GridBagConstraints gbc_projectDescriptionField = new GridBagConstraints();
 		gbc_projectDescriptionField.insets = new Insets(0, 0, 5, 0);
@@ -240,6 +250,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 
 		issueIdField = new JTextField();
 		issueIdField.setName("issueIdField");
+		issueIdField.addKeyListener(issueAddButtonEnabler);
 		GridBagConstraints gbc_issueIdField = new GridBagConstraints();
 		gbc_issueIdField.insets = new Insets(0, 0, 5, 0);
 		gbc_issueIdField.fill = GridBagConstraints.HORIZONTAL;
@@ -258,6 +269,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 
 		issueNameField = new JTextField();
 		issueNameField.setName("issueNameField");
+		issueNameField.addKeyListener(issueAddButtonEnabler);
 		GridBagConstraints gbc_issueNameField = new GridBagConstraints();
 		gbc_issueNameField.insets = new Insets(0, 0, 5, 0);
 		gbc_issueNameField.fill = GridBagConstraints.HORIZONTAL;
@@ -276,6 +288,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 
 		issueDescriptionField = new JTextField();
 		issueDescriptionField.setName("issueDescriptionField");
+		issueDescriptionField.addKeyListener(issueAddButtonEnabler);
 		GridBagConstraints gbc_issueDescriptionField = new GridBagConstraints();
 		gbc_issueDescriptionField.insets = new Insets(0, 0, 5, 0);
 		gbc_issueDescriptionField.fill = GridBagConstraints.HORIZONTAL;
@@ -292,8 +305,17 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbc_issuePriorityLabel.gridy = 3;
 		issuePanel.add(issuePriorityLabel, gbc_issuePriorityLabel);
 
-		issuePriorityComboBox = new JComboBox();
+		issuePriorityComboBox = new JComboBox<String>();
 		issuePriorityComboBox.setName("issuePriorityComboBox");
+		issuePriorityComboBox.addItem("Low");
+		issuePriorityComboBox.addItem("Medium");
+		issuePriorityComboBox.addItem("High");
+		issuePriorityComboBox.setSelectedItem(null);
+		issuePriorityComboBox.addActionListener(e -> {
+			addIssueButton.setEnabled(!issueIdField.getText().trim().isEmpty()
+					&& !issueNameField.getText().trim().isEmpty() && !issueDescriptionField.getText().trim().isEmpty()
+					&& issuePriorityComboBox.getSelectedIndex() != -1);
+		});
 		GridBagConstraints gbc_issuePriorityComboBox = new GridBagConstraints();
 		gbc_issuePriorityComboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_issuePriorityComboBox.fill = GridBagConstraints.HORIZONTAL;
@@ -367,5 +389,9 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 
 	public DefaultListModel<Project> getProjectListModel() {
 		return projectListModel;
+	}
+
+	public JComboBox<String> getIssuePriorityComboBox() {
+		return issuePriorityComboBox;
 	}
 }
