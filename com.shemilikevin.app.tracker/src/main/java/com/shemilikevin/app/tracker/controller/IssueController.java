@@ -33,15 +33,30 @@ public class IssueController {
 	public void addIssue(String issueId, String issueName, String issueDescription, String issuePriority,
 			String projectId) {
 
-		Validators.validateIssueId(issueId);
+		Validators.validateNullOrEmptyIssueId(issueId);
 		Validators.validateIssueName(issueName);
 		Validators.validateIssueDescription(issueDescription);
 		Validators.validatePriority(issuePriority);
-		Validators.validateProjectId(projectId);
+		Validators.validateNullOrEmptyProjectId(projectId);
+
+		try {
+			Integer.parseInt(issueId);
+		} catch (NumberFormatException e) {
+			issueTrackerView.showIssueError("Issue ID must be numerical.");
+			return;
+		}
+
+		try {
+			Integer.parseInt(projectId);
+		} catch (NumberFormatException e) {
+			issueTrackerView.showIssueError("Project ID must be numerical.");
+			return;
+		}
+
 		validateProjectExists(projectId);
 
 		if (issueRepository.exists(issueId) == true) {
-			issueTrackerView.showError("Issue with ID: " + issueId + ", already exists.");
+			issueTrackerView.showIssueError("Issue with ID: " + issueId + ", already exists.");
 			return;
 		}
 

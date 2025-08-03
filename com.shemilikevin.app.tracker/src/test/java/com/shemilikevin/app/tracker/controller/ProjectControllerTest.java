@@ -123,10 +123,12 @@ public class ProjectControllerTest {
 
 	@Test
 	public void testAddProject_WhenProvidedProjectIdIsNonNumeric_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.addProject(NON_NUMERIC_ID, NAME, DESCRIPTION))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must be numerical.");
-		verifyNoInteractions(projectRepository, issueTrackerView);
+		// Act
+		projectController.addProject(NON_NUMERIC_ID, NAME, DESCRIPTION);
+
+		// Assert
+		verify(issueTrackerView).showProjectError("Project ID must be numerical.");
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
@@ -174,7 +176,7 @@ public class ProjectControllerTest {
 		// Assert
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(ID);
-		inOrder.verify(issueTrackerView).showError("Project with ID: " + ID + ", already exists.");
+		inOrder.verify(issueTrackerView).showProjectError("Project with ID: " + ID + ", already exists.");
 		verifyNoMoreInteractions(issueTrackerView, projectRepository);
 	}
 
@@ -211,7 +213,7 @@ public class ProjectControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(ID);
 		inOrder.verify(issueRepository).hasAssociatedIssues(ID);
-		inOrder.verify(issueTrackerView).showError("Selected project has associated issues.");
+		inOrder.verify(issueTrackerView).showProjectError("Selected project has associated issues.");
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 

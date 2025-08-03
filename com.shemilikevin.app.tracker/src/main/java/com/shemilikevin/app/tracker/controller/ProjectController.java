@@ -28,12 +28,19 @@ public class ProjectController {
 
 	public void addProject(String id, String name, String description) {
 
-		Validators.validateProjectId(id);
+		Validators.validateNullOrEmptyProjectId(id);
 		Validators.validateProjectName(name);
 		Validators.validateProjectDescription(description);
 
+		try {
+			Integer.parseInt(id);
+		} catch (NumberFormatException e) {
+			issueTrackerView.showProjectError("Project ID must be numerical.");
+			return;
+		}
+
 		if (projectRepository.exists(id) == true) {
-			issueTrackerView.showError("Project with ID: " + id + ", already exists.");
+			issueTrackerView.showProjectError("Project with ID: " + id + ", already exists.");
 			return;
 		}
 
@@ -50,7 +57,7 @@ public class ProjectController {
 		validateProjectExists(id);
 
 		if (issueRepository.hasAssociatedIssues(id) == true) {
-			issueTrackerView.showError("Selected project has associated issues.");
+			issueTrackerView.showProjectError("Selected project has associated issues.");
 			return;
 		}
 
