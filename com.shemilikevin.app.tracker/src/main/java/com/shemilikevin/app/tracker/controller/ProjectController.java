@@ -15,6 +15,7 @@ public class ProjectController {
 
 	public ProjectController(ProjectRepository projectRepository, IssueRepository issueRepository,
 			IssueTrackerView issueTrackerView) {
+
 		this.projectRepository = projectRepository;
 		this.issueRepository = issueRepository;
 		this.issueTrackerView = issueTrackerView;
@@ -27,9 +28,9 @@ public class ProjectController {
 
 	public void addProject(String id, String name, String description) {
 
-		validateId(id, "Project ID");
-		validateIsNullOrEmpty(name, "Project name");
-		validateIsNullOrEmpty(description, "Project description");
+		Validators.validateProjectId(id);
+		Validators.validateProjectName(name);
+		Validators.validateProjectDescription(description);
 
 		if (projectRepository.exists(id) == true) {
 			issueTrackerView.showError("Project with ID: " + id + ", already exists.");
@@ -43,32 +44,10 @@ public class ProjectController {
 		issueTrackerView.showProjects(projectList);
 	}
 
-	private void validateIsNullOrEmpty(String string, String fieldName) {
-		if ((string == null) || (string.trim().isEmpty() == true)) {
-			throw new IllegalArgumentException(fieldName + " must not be null or empty.");
-		}
-	}
-
-	private void validateIsNumeric(String string, String fieldName) {
-		try {
-			Integer.parseInt(string);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException(fieldName + " must be numerical.");
-		}
-	}
-
-	private void validateId(String projectId, String fieldName) {
-		validateIsNullOrEmpty(projectId, fieldName);
-		validateIsNumeric(projectId, fieldName);
-	}
-
 	public void deleteProject(String id) {
 
-		validateId(id, "Project ID");
-
-		if (projectRepository.exists(id) == false) {
-			throw new IllegalArgumentException("Project ID does not exist in the database.");
-		}
+		Validators.validateProjectId(id);
+		validateProjectExists(id);
 
 		if (issueRepository.hasAssociatedIssues(id) == true) {
 			issueTrackerView.showError("Selected project has associated issues.");
@@ -76,7 +55,14 @@ public class ProjectController {
 		}
 
 		projectRepository.delete(id);
+
 		List<Project> projectList = projectRepository.findAll();
 		issueTrackerView.showProjects(projectList);
+	}
+
+	private void validateProjectExists(String projectId) {
+		if (projectRepository.exists(projectId) == false) {
+			throw new IllegalArgumentException("Project ID does not exist in the database.");
+		}
 	}
 }
