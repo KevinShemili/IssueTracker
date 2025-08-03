@@ -396,7 +396,11 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 
 	@Override
 	public void showProjects(List<Project> projectList) {
-		// TODO Auto-generated method stub
+		projectListModel.clear();
+
+		for (Project project : projectList) {
+			projectListModel.addElement(project);
+		}
 
 	}
 

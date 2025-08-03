@@ -1,5 +1,10 @@
 package com.shemilikevin.app.tracker.view.swing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.data.Index;
 import org.assertj.swing.edt.GuiActionRunner;
@@ -348,6 +353,34 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.list(ISSUE_LIST).requireNoSelection();
 		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
 		frameFixture.button(ISSUE_DELETE_BUTTON).requireDisabled();
+	}
+
+	@Test
+	public void testShowProjects_WhenProvidedWithProjects_AddsAllProjectsToTheList() {
+		// Arrange
+		Project project1 = new Project("1", "Project1", "Description1");
+		Project project2 = new Project("2", "Project2", "Description2");
+
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.showProjects(Arrays.asList(project1, project2));
+		});
+
+		// Assert
+		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
+		assertThat(listContents).containsExactly(project1.toString(), project2.toString());
+	}
+
+	@Test
+	public void testShowProjects_WhenProvidedWithEmptyList_ShowsEmptyList() {
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.showProjects(Collections.emptyList());
+		});
+
+		// Assert
+		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
+		assertThat(listContents).isEmpty();
 	}
 
 	private void clearProjectInput() {
