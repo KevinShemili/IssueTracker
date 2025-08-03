@@ -9,6 +9,7 @@ import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.shemilikevin.app.tracker.model.Issue;
 import com.shemilikevin.app.tracker.model.Project;
 
 @RunWith(GUITestRunner.class)
@@ -166,12 +167,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testIssueTab_InitialState() {
 
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectListModel().addElement(new Project("1", "Project Name", "Project Description"));
-		});
-
-		frameFixture.list(PROJECT_LIST).selectItem(0);
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+		switchToIssueTab();
 
 		frameFixture.label(ISSUE_ID_LABEL);
 		frameFixture.textBox(ISSUE_ID_FIELD).requireEnabled();
@@ -191,12 +187,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testIssueTab_WhenProvidedValidIdAndNameAndDescriptionAndPriority_AddButtonIsEnabled() {
 
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectListModel().addElement(new Project("1", "Project Name", "Project Description"));
-		});
-
-		frameFixture.list(PROJECT_LIST).selectItem(0);
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+		switchToIssueTab();
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
@@ -223,12 +214,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testIssueTab_WhenOneOrMoreFieldsAreEmpty_AddButtonRemainsDisabled() {
 
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectListModel().addElement(new Project("1", "Project Name", "Project Description"));
-		});
-
-		frameFixture.list(PROJECT_LIST).selectItem(0);
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+		switchToIssueTab();
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText(" ");
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(" ");
@@ -284,6 +270,24 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
 		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).clearSelection();
 		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+	}
+
+	@Test
+	@GUITest
+	public void testIssueTab_WhenIssueIsSelectedFromList_DeleteButtonIsEnabled() {
+
+		switchToIssueTab();
+
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getIssueListModel()
+					.addElement(new Issue("1", "Project Name", "Project Description", "Medium", "1"));
+		});
+
+		frameFixture.list(ISSUE_LIST).selectItem(0);
+		frameFixture.button(ISSUE_DELETE_BUTTON).requireEnabled();
+
+		clearIssueInput();
+		frameFixture.button(ISSUE_DELETE_BUTTON).requireDisabled();
 	}
 
 	private void clearProjectInput() {
@@ -299,6 +303,15 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).setText("");
 		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).clearSelection();
 		frameFixture.list(ISSUE_LIST).clearSelection();
+	}
+
+	private void switchToIssueTab() {
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(new Project("1", "Project Name", "Project Description"));
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 	}
 
 }

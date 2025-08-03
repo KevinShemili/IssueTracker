@@ -55,7 +55,8 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private JPanel issueButtonsPanel;
 	private JButton addIssueButton;
 	private JButton deleteIssueButton;
-	private JList issueList;
+	private DefaultListModel<Issue> issueListModel;
+	private JList<Issue> issueJList;
 
 	/**
 	 * Launch the application.
@@ -344,9 +345,14 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbc_issueScrollPane.gridy = 5;
 		issuePanel.add(issueScrollPane, gbc_issueScrollPane);
 
-		issueList = new JList();
-		issueList.setName("issueList");
-		issueScrollPane.setViewportView(issueList);
+		issueListModel = new DefaultListModel<Issue>();
+		issueJList = new JList<Issue>(issueListModel);
+		issueJList.addListSelectionListener(e -> {
+			boolean isSelectionEmpty = issueJList.isSelectionEmpty();
+			deleteIssueButton.setEnabled(!isSelectionEmpty);
+		});
+		issueJList.setName("issueList");
+		issueScrollPane.setViewportView(issueJList);
 
 		issueButtonsPanel = new JPanel();
 		issueButtonsPanel.setName("issueButtonsPanel");
@@ -391,7 +397,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		return projectListModel;
 	}
 
-	public JComboBox<String> getIssuePriorityComboBox() {
-		return issuePriorityComboBox;
+	public DefaultListModel<Issue> getIssueListModel() {
+		return issueListModel;
 	}
 }
