@@ -9,7 +9,9 @@ public interface IssueTrackerView {
 
 	void showIssues(List<Issue> issueList);
 
-	void showError(String errorMessage);
+	void showProjectError(String errorMessage);
+
+	void showIssueError(String errorMessage);
 
 	void showProjects(List<Project> projectList);
 }

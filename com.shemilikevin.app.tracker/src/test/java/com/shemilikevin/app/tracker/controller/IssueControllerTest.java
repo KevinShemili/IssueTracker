@@ -253,19 +253,22 @@ public class IssueControllerTest {
 
 	@Test
 	public void testAddIssue_WhenProvidedProjectIdIsNonNumeric_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(
-				() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, NON_NUMERIC_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must be numerical.");
-		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+		// Act
+		issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, NON_NUMERIC_ID);
+
+		// Assert
+		verify(issueTrackerView).showIssueError("Project ID must be numerical.");
+		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
 	}
 
 	@Test
 	public void testAddIssue_WhenProvidedIssueIdIsNonNumeric_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> issueController.addIssue(NON_NUMERIC_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY,
-				PROJECT_ID)).isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must be numerical.");
-		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+		// Act
+		issueController.addIssue(NON_NUMERIC_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID);
+
+		// Assert
+		verify(issueTrackerView).showIssueError("Issue ID must be numerical.");
+		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
 	}
 
 	@Test
@@ -294,7 +297,7 @@ public class IssueControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(PROJECT_ID);
 		inOrder.verify(issueRepository).exists(ISSUE_ID);
-		inOrder.verify(issueTrackerView).showError("Issue with ID: " + ISSUE_ID + ", already exists.");
+		inOrder.verify(issueTrackerView).showIssueError("Issue with ID: " + ISSUE_ID + ", already exists.");
 		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
 	}
 

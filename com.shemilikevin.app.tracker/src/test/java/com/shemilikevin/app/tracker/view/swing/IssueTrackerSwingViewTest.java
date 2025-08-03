@@ -210,8 +210,8 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
-		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
 		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(2);
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
 		frameFixture.button(ISSUE_ADD_BUTTON).requireEnabled();
 	}
 
@@ -413,6 +413,35 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
+	}
+
+	@Test
+	public void testShowProjectError_WhenProvidedWithMessage_ShowsMessageInErrorLabel() {
+		// Arrange
+		String errorMessage = "Some arbitrary error.";
+
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.showProjectError(errorMessage);
+		});
+
+		// Assert
+		frameFixture.label(PROJECT_ERROR_LABEL).requireText(errorMessage);
+	}
+
+	@Test
+	public void testShowIssueError_WhenProvidedWithMessage_ShowsMessageInErrorLabel() {
+		// Arrange
+		String errorMessage = "Some arbitrary error.";
+		switchToIssueTab();
+
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.showIssueError(errorMessage);
+		});
+
+		// Assert
+		frameFixture.label(ISSUE_ERROR_LABEL).requireText(errorMessage);
 	}
 
 	private void clearProjectInput() {

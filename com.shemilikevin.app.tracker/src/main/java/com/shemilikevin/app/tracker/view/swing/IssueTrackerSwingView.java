@@ -3,7 +3,6 @@ package com.shemilikevin.app.tracker.view.swing;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -57,27 +56,8 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private JButton deleteIssueButton;
 	private DefaultListModel<Issue> issueListModel;
 	private JList<Issue> issueJList;
+	private JLabel projectErrorLabel;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					IssueTrackerSwingView frame = new IssueTrackerSwingView();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
-	 */
 	public IssueTrackerSwingView() {
 		setMinimumSize(new Dimension(450, 300));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -179,7 +159,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectPanel.add(projectDescriptionField, gbc_projectDescriptionField);
 		projectDescriptionField.setColumns(10);
 
-		JLabel projectErrorLabel = new JLabel(" ");
+		projectErrorLabel = new JLabel(" ");
 		projectErrorLabel.setForeground(new Color(255, 0, 0));
 		projectErrorLabel.setName("projectErrorLabel");
 		GridBagConstraints gbc_projectErrorLabel = new GridBagConstraints();
@@ -392,12 +372,6 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	}
 
 	@Override
-	public void showError(String errorMessage) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void showProjects(List<Project> projectList) {
 		projectListModel.clear();
 
@@ -430,5 +404,15 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		deleteProjectButton.setEnabled(false);
 		addIssueButton.setEnabled(false);
 		deleteIssueButton.setEnabled(false);
+	}
+
+	@Override
+	public void showProjectError(String errorMessage) {
+		projectErrorLabel.setText(errorMessage);
+	}
+
+	@Override
+	public void showIssueError(String errorMessage) {
+		issueErrorLabel.setText(errorMessage);
 	}
 }

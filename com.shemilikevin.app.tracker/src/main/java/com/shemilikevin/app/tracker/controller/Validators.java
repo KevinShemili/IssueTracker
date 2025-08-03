@@ -30,6 +30,14 @@ public class Validators {
 		validateIsNumeric(id, ISSUE_ID_NUMERICAL_ERROR);
 	}
 
+	static void validateNullOrEmptyProjectId(String id) {
+		validateIsNotNullOrEmpty(id, PROJECT_ID_NULL_ERROR);
+	}
+
+	static void validateNullOrEmptyIssueId(String id) {
+		validateIsNotNullOrEmpty(id, ISSUE_ID_NULL_ERROR);
+	}
+
 	static void validateProjectName(String name) {
 		validateIsNotNullOrEmpty(name, PROJECT_NAME_NULL_ERROR);
 	}
