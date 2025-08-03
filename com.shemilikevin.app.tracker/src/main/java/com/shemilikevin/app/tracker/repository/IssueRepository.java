@@ -15,4 +15,6 @@ public interface IssueRepository {
 	Issue findById(String issueId);
 
 	void delete(String issueId);
+
+	boolean hasAssociatedIssues(String projectId);
 }
