@@ -373,6 +373,13 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		deleteIssueButton.setName("deleteIssueButton");
 		issueButtonsPanel.add(deleteIssueButton);
 
+		tabbedPane.addChangeListener(e -> {
+			if (tabbedPane.getSelectedIndex() == TAB_PROJECTS) {
+				clearAllUserInput();
+				tabbedPane.setEnabledAt(TAB_ISSUES, false);
+			}
+		});
+
 	}
 
 	@Override
@@ -399,5 +406,17 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 
 	public DefaultListModel<Issue> getIssueListModel() {
 		return issueListModel;
+	}
+
+	private void clearAllUserInput() {
+		projectIdField.setText("");
+		issueIdField.setText("");
+		projectNameField.setText("");
+		issueNameField.setText("");
+		projectDescriptionField.setText("");
+		issueDescriptionField.setText("");
+		issuePriorityComboBox.setSelectedItem(null);
+		issueListModel.clear();
+		projectJList.clearSelection();
 	}
 }
