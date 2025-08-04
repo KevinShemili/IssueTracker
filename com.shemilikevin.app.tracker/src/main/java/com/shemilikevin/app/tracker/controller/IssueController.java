@@ -7,24 +7,22 @@ import com.shemilikevin.app.tracker.repository.IssueRepository;
 import com.shemilikevin.app.tracker.repository.ProjectRepository;
 import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
-public class IssueController {
-
-	private ProjectRepository projectRepository;
-	private IssueRepository issueRepository;
-	private IssueTrackerView issueTrackerView;
+public class IssueController extends BaseController {
 
 	public IssueController(ProjectRepository projectRepository, IssueRepository issueRepository,
 			IssueTrackerView issueTrackerView) {
 
-		this.issueRepository = issueRepository;
-		this.projectRepository = projectRepository;
-		this.issueTrackerView = issueTrackerView;
+		super(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	public void listIssues(String projectId) {
 
-		Validators.validateProjectId(projectId);
-		validateProjectExists(projectId);
+		Validators.validateId(projectId);
+		Validators.validateIsNumeric(projectId);
+
+		if (isProjectStoredInDatabase(projectId) == false) {
+			throw new IllegalArgumentException(Validators.PROJECT_DOESNT_EXIST);
+		}
 
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 		issueTrackerView.showIssues(issueList);
@@ -33,30 +31,23 @@ public class IssueController {
 	public void addIssue(String issueId, String issueName, String issueDescription, String issuePriority,
 			String projectId) {
 
-		Validators.validateNullOrEmptyIssueId(issueId);
-		Validators.validateIssueName(issueName);
-		Validators.validateIssueDescription(issueDescription);
-		Validators.validatePriority(issuePriority);
-		Validators.validateNullOrEmptyProjectId(projectId);
+		Validators.validateIssueFields(issueId, issueName, issueDescription, issuePriority, projectId);
 
-		try {
-			Integer.parseInt(issueId);
-		} catch (NumberFormatException e) {
-			issueTrackerView.showIssueError("Issue ID must be numerical.");
+		if (isNumeric(issueId) == false) {
+			issueTrackerView.showIssueError(Validators.NON_NUMERICAL_ID);
 			return;
 		}
 
-		try {
-			Integer.parseInt(projectId);
-		} catch (NumberFormatException e) {
-			issueTrackerView.showIssueError("Project ID must be numerical.");
-			return;
+		if (isNumeric(projectId) == false) {
+			throw new IllegalArgumentException(Validators.NON_NUMERICAL_ID);
 		}
 
-		validateProjectExists(projectId);
+		if (isProjectStoredInDatabase(projectId) == false) {
+			throw new IllegalArgumentException(Validators.PROJECT_DOESNT_EXIST);
+		}
 
-		if (issueRepository.exists(issueId) == true) {
-			issueTrackerView.showIssueError("Issue with ID: " + issueId + ", already exists.");
+		if (isIssueStoredInDatabase(issueId) == true) {
+			issueTrackerView.showIssueError(String.format(Validators.DUPLICATE_ISSUE, issueId));
 			return;
 		}
 
@@ -69,8 +60,12 @@ public class IssueController {
 
 	public void deleteIssue(String issueId) {
 
-		Validators.validateIssueId(issueId);
-		validateIssueExists(issueId);
+		Validators.validateId(issueId);
+		Validators.validateIsNumeric(issueId);
+
+		if (isIssueStoredInDatabase(issueId) == false) {
+			throw new IllegalArgumentException(Validators.ISSUE_DOESNT_EXIST);
+		}
 
 		Issue toBeDeleted = issueRepository.findById(issueId);
 		issueRepository.delete(issueId);
@@ -79,15 +74,7 @@ public class IssueController {
 		issueTrackerView.showIssues(issueList);
 	}
 
-	private void validateProjectExists(String projectId) {
-		if (projectRepository.exists(projectId) == false) {
-			throw new IllegalArgumentException("Project ID does not exist in the database.");
-		}
-	}
-
-	private void validateIssueExists(String issueId) {
-		if (issueRepository.exists(issueId) == false) {
-			throw new IllegalArgumentException("Issue ID does not exist in the database.");
-		}
+	private boolean isIssueStoredInDatabase(String id) {
+		return issueRepository.exists(id) == true ? true : false;
 	}
 }
