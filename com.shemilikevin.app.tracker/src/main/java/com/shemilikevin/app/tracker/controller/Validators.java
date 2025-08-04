@@ -3,62 +3,53 @@ package com.shemilikevin.app.tracker.controller;
 import java.util.Arrays;
 import java.util.List;
 
-public class Validators {
+class Validators {
 
 	private Validators() {
 	}
 
-	private static final List<String> ALLOWED_PRIORITIES = Arrays.asList("Low", "Medium", "High");
-	private static final String PROJECT_ID_NULL_ERROR = "Project ID must not be null or empty.";
-	private static final String ISSUE_ID_NULL_ERROR = "Issue ID must not be null or empty.";
-	private static final String PROJECT_NAME_NULL_ERROR = "Project name must not be null or empty.";
-	private static final String ISSUE_NAME_NULL_ERROR = "Issue name must not be null or empty.";
-	private static final String PROJECT_DESCRIPTION_NULL_ERROR = "Project description must not be null or empty.";
-	private static final String ISSUE_DESCRIPTION_NULL_ERROR = "Issue description must not be null or empty.";
-	private static final String ISSUE_PRIORITY_NULL_ERROR = "Issue priority must not be null or empty.";
-	private static final String ISSUE_PRIORITY_NOT_ALLOWED_ERROR = "Issue priority must be either Low, Medium or High.";
-	private static final String PROJECT_ID_NUMERICAL_ERROR = "Project ID must be numerical.";
-	private static final String ISSUE_ID_NUMERICAL_ERROR = "Issue ID must be numerical.";
+	static final List<String> ALLOWED_PRIORITIES = Arrays.asList("Low", "Medium", "High");
+	static final String NULL_EMPTY_ID = "ID must not be null or empty.";
+	static final String NULL_EMPTY_NAME = "Name must not be null or empty.";
+	static final String NULL_EMPTY_DESCRIPTION = "Description must not be null or empty.";
+	static final String NULL_EMPTY_PRIORITY = "Priority must not be null or empty.";
+	static final String NOT_ALLOWED_PRIORITY = "Issue priority must be either Low, Medium or High.";
+	static final String NON_NUMERICAL_ID = "ID must be numerical.";
+	static final String PROJECT_HAS_ISSUES = "Selected project has associated issues.";
+	static final String DUPLICATE_PROJECT = "Project with ID: %s, already exists.";
+	static final String DUPLICATE_ISSUE = "Issue with ID: %s, already exists.";
+	static final String PROJECT_DOESNT_EXIST = "Project ID does not exist in the database.";
+	static final String ISSUE_DOESNT_EXIST = "Issue ID does not exist in the database.";
 
-	static void validateProjectId(String id) {
-		validateIsNotNullOrEmpty(id, PROJECT_ID_NULL_ERROR);
-		validateIsNumeric(id, PROJECT_ID_NUMERICAL_ERROR);
+	static void validateProjectFields(String id, String name, String description) {
+		validateIsNotNullOrEmpty(id, NULL_EMPTY_ID);
+		validateIsNotNullOrEmpty(name, NULL_EMPTY_NAME);
+		validateIsNotNullOrEmpty(description, NULL_EMPTY_DESCRIPTION);
 	}
 
-	static void validateIssueId(String id) {
-		validateIsNotNullOrEmpty(id, ISSUE_ID_NULL_ERROR);
-		validateIsNumeric(id, ISSUE_ID_NUMERICAL_ERROR);
+	static void validateId(String id) {
+		validateIsNotNullOrEmpty(id, NULL_EMPTY_ID);
 	}
 
-	static void validateNullOrEmptyProjectId(String id) {
-		validateIsNotNullOrEmpty(id, PROJECT_ID_NULL_ERROR);
-	}
-
-	static void validateNullOrEmptyIssueId(String id) {
-		validateIsNotNullOrEmpty(id, ISSUE_ID_NULL_ERROR);
-	}
-
-	static void validateProjectName(String name) {
-		validateIsNotNullOrEmpty(name, PROJECT_NAME_NULL_ERROR);
-	}
-
-	static void validateIssueName(String name) {
-		validateIsNotNullOrEmpty(name, ISSUE_NAME_NULL_ERROR);
-	}
-
-	static void validateProjectDescription(String description) {
-		validateIsNotNullOrEmpty(description, PROJECT_DESCRIPTION_NULL_ERROR);
-	}
-
-	static void validateIssueDescription(String description) {
-		validateIsNotNullOrEmpty(description, ISSUE_DESCRIPTION_NULL_ERROR);
-	}
-
-	static void validatePriority(String priority) {
-		validateIsNotNullOrEmpty(priority, ISSUE_PRIORITY_NULL_ERROR);
+	static void validateIssueFields(String issueId, String name, String description, String priority,
+			String projectId) {
+		validateId(issueId);
+		validateIsNotNullOrEmpty(name, NULL_EMPTY_NAME);
+		validateIsNotNullOrEmpty(description, NULL_EMPTY_DESCRIPTION);
+		validateIsNotNullOrEmpty(priority, NULL_EMPTY_PRIORITY);
 
 		if (ALLOWED_PRIORITIES.contains(priority) == false) {
-			throw new IllegalArgumentException(ISSUE_PRIORITY_NOT_ALLOWED_ERROR);
+			throw new IllegalArgumentException(NOT_ALLOWED_PRIORITY);
+		}
+
+		validateId(projectId);
+	}
+
+	static void validateIsNumeric(String id) {
+		try {
+			Integer.parseInt(id);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException(NON_NUMERICAL_ID);
 		}
 	}
 
@@ -68,11 +59,4 @@ public class Validators {
 		}
 	}
 
-	private static void validateIsNumeric(String id, String errorMessage) {
-		try {
-			Integer.parseInt(id);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException(errorMessage);
-		}
-	}
 }

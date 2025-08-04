@@ -96,7 +96,7 @@ public class IssueControllerTest {
 	public void testListIssues_WhenProvidedProjectIdIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.listIssues(null)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Project ID must not be null or empty.");
+				.hasMessage(Validators.NULL_EMPTY_ID);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -104,7 +104,7 @@ public class IssueControllerTest {
 	public void testListIssues_WhenProvidedProjectIdIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.listIssues(EMPTY_STRING)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Project ID must not be null or empty.");
+				.hasMessage(Validators.NULL_EMPTY_ID);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -112,7 +112,7 @@ public class IssueControllerTest {
 	public void testListIssues_WhenProvidedProjectIdIsNonNumeric_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.listIssues(NON_NUMERIC_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must be numerical.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NON_NUMERICAL_ID);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -123,7 +123,7 @@ public class IssueControllerTest {
 
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.listIssues(PROJECT_ID)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Project ID does not exist in the database.");
+				.hasMessage(Validators.PROJECT_DOESNT_EXIST);
 		verify(projectRepository).exists(PROJECT_ID);
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -156,7 +156,7 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(
 				() -> issueController.addIssue(null, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_ID);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -165,7 +165,7 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(
 				() -> issueController.addIssue(EMPTY_STRING, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_ID);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -174,7 +174,7 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(
 				() -> issueController.addIssue(ISSUE_ID, null, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue name must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_NAME);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -183,7 +183,7 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(
 				() -> issueController.addIssue(ISSUE_ID, EMPTY_STRING, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue name must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_NAME);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -191,8 +191,7 @@ public class IssueControllerTest {
 	public void testAddIssue_WhenProvidedIssueDescriptionIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, null, ISSUE_PRIORITY, PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Issue description must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_DESCRIPTION);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -201,8 +200,7 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(
 				() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, EMPTY_STRING, ISSUE_PRIORITY, PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Issue description must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_DESCRIPTION);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -210,7 +208,7 @@ public class IssueControllerTest {
 	public void testAddIssue_WhenProvidedIssuePriorityIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, null, PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue priority must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_PRIORITY);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -219,7 +217,7 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(
 				() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, EMPTY_STRING, PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue priority must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_PRIORITY);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -227,9 +225,8 @@ public class IssueControllerTest {
 	public void testAddIssue_WhenProvidedIssuePriorityDoesNotHaveExpectedValue_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(
-				() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, "Something Else", PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Issue priority must be either Low, Medium or High.");
+				() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, "NOT ALLOWED", PROJECT_ID))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NOT_ALLOWED_PRIORITY);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -238,7 +235,7 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(
 				() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, null))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_ID);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -247,27 +244,26 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(
 				() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, EMPTY_STRING))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID must not be null or empty.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_ID);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	@Test
 	public void testAddIssue_WhenProvidedProjectIdIsNonNumeric_ThrowsIllegalArgumentException() {
-		// Act
-		issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, NON_NUMERIC_ID);
-
-		// Assert
-		verify(issueTrackerView).showIssueError("Project ID must be numerical.");
-		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
+		// Act & Assert
+		assertThatThrownBy(
+				() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, NON_NUMERIC_ID))
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NON_NUMERICAL_ID);
+		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testAddIssue_WhenProvidedIssueIdIsNonNumeric_ThrowsIllegalArgumentException() {
+	public void testAddIssue_WhenProvidedIssueIdIsNonNumeric_ShowsErrorMessage() {
 		// Act
 		issueController.addIssue(NON_NUMERIC_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID);
 
 		// Assert
-		verify(issueTrackerView).showIssueError("Issue ID must be numerical.");
+		verify(issueTrackerView).showIssueError(Validators.NON_NUMERICAL_ID);
 		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
 	}
 
@@ -279,7 +275,7 @@ public class IssueControllerTest {
 		// Act & Assert
 		assertThatThrownBy(
 				() -> issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Project ID does not exist in the database.");
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.PROJECT_DOESNT_EXIST);
 		verify(projectRepository).exists(PROJECT_ID);
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -297,7 +293,7 @@ public class IssueControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(PROJECT_ID);
 		inOrder.verify(issueRepository).exists(ISSUE_ID);
-		inOrder.verify(issueTrackerView).showIssueError("Issue with ID: " + ISSUE_ID + ", already exists.");
+		inOrder.verify(issueTrackerView).showIssueError(String.format(Validators.DUPLICATE_ISSUE, ISSUE_ID));
 		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
 	}
 
@@ -319,22 +315,22 @@ public class IssueControllerTest {
 		inOrder.verify(issueRepository).delete(ISSUE_ID);
 		inOrder.verify(issueRepository).findByProjectId(PROJECT_ID);
 		inOrder.verify(issueTrackerView).showIssues(Collections.emptyList());
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
+		verifyNoMoreInteractions(issueRepository, issueTrackerView);
 	}
 
 	@Test
 	public void testDeleteIssue_WhenProvidedIssueIdIsNull_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.deleteIssue(null)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Issue ID must not be null or empty.");
-		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+				.hasMessage(Validators.NULL_EMPTY_ID);
+		verifyNoInteractions(issueRepository, issueTrackerView);
 	}
 
 	@Test
 	public void testDeleteIssue_WhenProvidedIssueIdIsEmpty_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.deleteIssue(EMPTY_STRING)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Issue ID must not be null or empty.");
+				.hasMessage(Validators.NULL_EMPTY_ID);
 		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -342,8 +338,8 @@ public class IssueControllerTest {
 	public void testDeleteIssue_WhenProvidedIssueIdIsNonNumeric_ThrowsIllegalArgumentException() {
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.deleteIssue(NON_NUMERIC_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage("Issue ID must be numerical.");
-		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NON_NUMERICAL_ID);
+		verifyNoInteractions(issueRepository, issueTrackerView);
 	}
 
 	@Test
@@ -353,8 +349,8 @@ public class IssueControllerTest {
 
 		// Act & Assert
 		assertThatThrownBy(() -> issueController.deleteIssue(ISSUE_ID)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Issue ID does not exist in the database.");
+				.hasMessage(Validators.ISSUE_DOESNT_EXIST);
 		verify(issueRepository).exists(ISSUE_ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
+		verifyNoMoreInteractions(issueRepository, issueTrackerView);
 	}
 }
