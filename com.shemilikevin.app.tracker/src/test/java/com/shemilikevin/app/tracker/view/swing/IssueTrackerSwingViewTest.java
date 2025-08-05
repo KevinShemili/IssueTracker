@@ -1,6 +1,7 @@
 package com.shemilikevin.app.tracker.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,7 +14,11 @@ import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
+import com.shemilikevin.app.tracker.controller.IssueController;
+import com.shemilikevin.app.tracker.controller.ProjectController;
 import com.shemilikevin.app.tracker.model.Issue;
 import com.shemilikevin.app.tracker.model.Project;
 
@@ -46,19 +51,34 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	private static final String ISSUE_ADD_BUTTON = "addIssueButton";
 	private static final String ISSUE_DELETE_BUTTON = "deleteIssueButton";
 
+	@Mock
+	private ProjectController projectController;
+
+	@Mock
+	private IssueController issueController;
+
 	private FrameFixture frameFixture;
 	private IssueTrackerSwingView issueTrackerView;
+	private AutoCloseable autoCloseable;
 
 	@Override
 	protected void onSetUp() throws Exception {
+		autoCloseable = MockitoAnnotations.openMocks(this);
 		GuiActionRunner.execute(() -> {
 			issueTrackerView = new IssueTrackerSwingView();
+			issueTrackerView.setProjectController(projectController);
+			issueTrackerView.setIssueController(issueController);
 
 			return issueTrackerView;
 		});
 
 		frameFixture = new FrameFixture(robot(), issueTrackerView);
 		frameFixture.show();
+	}
+
+	@Override
+	protected void onTearDown() throws Exception {
+		autoCloseable.close();
 	}
 
 	@Test
@@ -442,6 +462,27 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		// Assert
 		frameFixture.label(ISSUE_ERROR_LABEL).requireText(errorMessage);
+	}
+
+	@Test
+	public void testAddProjectButton_DelegatesToProjectControllerAddProject() {
+		// Arrange
+		String id = "1";
+		String name = "Project Name";
+		String description = "Project Description";
+
+		frameFixture.textBox(PROJECT_ID_FIELD).enterText(id);
+		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(name);
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText(description);
+
+		// Act
+		frameFixture.button(PROJECT_ADD_BUTTON).click();
+
+		// Assert
+		verify(projectController).addProject(id, name, description);
+		frameFixture.textBox(PROJECT_ID_FIELD).requireText("");
+		frameFixture.textBox(PROJECT_NAME_FIELD).requireText("");
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).requireText("");
 	}
 
 	private void clearProjectInput() {
