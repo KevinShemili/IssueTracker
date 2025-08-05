@@ -7,33 +7,31 @@ import com.shemilikevin.app.tracker.repository.IssueRepository;
 import com.shemilikevin.app.tracker.repository.ProjectRepository;
 import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
-public class ProjectController {
-
-	private ProjectRepository projectRepository;
-	private IssueRepository issueRepository;
-	private IssueTrackerView issueTrackerView;
+public class ProjectController extends BaseController {
 
 	public ProjectController(ProjectRepository projectRepository, IssueRepository issueRepository,
 			IssueTrackerView issueTrackerView) {
 
-		this.projectRepository = projectRepository;
-		this.issueRepository = issueRepository;
-		this.issueTrackerView = issueTrackerView;
+		super(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	public void listProjects() {
 		List<Project> projectList = projectRepository.findAll();
+
 		issueTrackerView.showProjects(projectList);
 	}
 
 	public void addProject(String id, String name, String description) {
 
-		Validators.validateProjectId(id);
-		Validators.validateProjectName(name);
-		Validators.validateProjectDescription(description);
+		Validators.validateProjectFields(id, name, description);
 
-		if (projectRepository.exists(id) == true) {
-			issueTrackerView.showError("Project with ID: " + id + ", already exists.");
+		if (isNumeric(id) == false) {
+			issueTrackerView.showProjectError(Validators.NON_NUMERICAL_ID);
+			return;
+		}
+
+		if (isProjectStoredInDatabase(id) == true) {
+			issueTrackerView.showProjectError(String.format(Validators.DUPLICATE_PROJECT, id));
 			return;
 		}
 
@@ -46,11 +44,15 @@ public class ProjectController {
 
 	public void deleteProject(String id) {
 
-		Validators.validateProjectId(id);
-		validateProjectExists(id);
+		Validators.validateId(id);
+		Validators.validateIsNumeric(id);
+
+		if (isProjectStoredInDatabase(id) == false) {
+			throw new IllegalArgumentException(Validators.PROJECT_DOESNT_EXIST);
+		}
 
 		if (issueRepository.hasAssociatedIssues(id) == true) {
-			issueTrackerView.showError("Selected project has associated issues.");
+			issueTrackerView.showProjectError(Validators.PROJECT_HAS_ISSUES);
 			return;
 		}
 
@@ -58,11 +60,5 @@ public class ProjectController {
 
 		List<Project> projectList = projectRepository.findAll();
 		issueTrackerView.showProjects(projectList);
-	}
-
-	private void validateProjectExists(String projectId) {
-		if (projectRepository.exists(projectId) == false) {
-			throw new IllegalArgumentException("Project ID does not exist in the database.");
-		}
 	}
 }

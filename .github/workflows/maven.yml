@@ -33,7 +33,7 @@ jobs:
       run: echo "PROFILE=-Pcoveralls" >> $GITHUB_ENV
 
     - name: Maven Build & Test
-      run: mvn verify $PROFILE
+      run: xvfb-run mvn verify $PROFILE
       working-directory: ${{ env.workdir }}
 
     - name: Generate JUnit Report
