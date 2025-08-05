@@ -527,6 +527,60 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		verify(issueController).listIssues("1");
 	}
 
+	@Test
+	public void testAddIssueButton_DelegatesToIssueControllerAddIssue() {
+		// Arrange
+		String id = "1";
+		String name = "Issue Name";
+		String description = "Issue Description";
+		String projectId = "2";
+
+		Project project = new Project(projectId, "Project Name", "Project Description");
+
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(project);
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText(id);
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(name);
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText(description);
+		frameFixture.comboBox().selectItem(0);
+
+		// Act
+		frameFixture.button(ISSUE_ADD_BUTTON).click();
+
+		// Assert
+		verify(issueController).addIssue(id, name, description, "Low", projectId);
+		frameFixture.textBox(ISSUE_ID_FIELD).requireText("");
+		frameFixture.textBox(ISSUE_NAME_FIELD).requireText("");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).requireText("");
+		frameFixture.comboBox().requireNoSelection();
+	}
+
+	@Test
+	public void testDeleteIssueButton_DelegatesToIssueControllerDeleteIssue() {
+		// Arrange
+		String issueId = "1";
+		switchToIssueTab();
+
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Issue> listModel = issueTrackerView.getIssueListModel();
+			listModel.addElement(new Issue(issueId, "Issue Name", "Issue Description", "Low", "1"));
+		});
+
+		frameFixture.list(ISSUE_LIST).selectItem(0);
+
+		// Act
+		frameFixture.button(ISSUE_DELETE_BUTTON).click();
+
+		// Assert
+		verify(issueController).deleteIssue(issueId);
+		frameFixture.list(ISSUE_LIST).requireNoSelection();
+	}
+
 	private void clearProjectInput() {
 		frameFixture.textBox(PROJECT_ID_FIELD).setText("");
 		frameFixture.textBox(PROJECT_NAME_FIELD).setText("");
