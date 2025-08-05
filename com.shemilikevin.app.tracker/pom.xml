@@ -19,7 +19,7 @@
     <mongo.java.driver.version>3.12.14</mongo.java.driver.version>
     <logback-classic.version>1.2.13</logback-classic.version>
     <junit.version>4.13.2</junit.version>
-    <assertj.core.version>3.27.3</assertj.core.version>
+    <assertj.swing.junit.version>3.17.1</assertj.swing.junit.version>
     <mongo.java.server>1.39.0</mongo.java.server>
 
     <pitest.maven.version>1.5.2</pitest.maven.version>
@@ -69,8 +69,8 @@
 
     <dependency>
       <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <version>${assertj.core.version}</version>
+      <artifactId>assertj-swing-junit</artifactId>
+      <version>${assertj.swing.junit.version}</version>
       <scope>test</scope>
     </dependency>
 
