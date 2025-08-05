@@ -22,6 +22,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import com.shemilikevin.app.tracker.controller.IssueController;
+import com.shemilikevin.app.tracker.controller.ProjectController;
 import com.shemilikevin.app.tracker.model.Issue;
 import com.shemilikevin.app.tracker.model.Project;
 import com.shemilikevin.app.tracker.view.IssueTrackerView;
@@ -31,6 +33,9 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private static final long serialVersionUID = 1L;
 	private static final int TAB_PROJECTS = 0;
 	private static final int TAB_ISSUES = 1;
+
+	private ProjectController projectController;
+	private IssueController issueController;
 
 	private JTabbedPane tabbedPane;
 	private JPanel mainPane;
@@ -200,6 +205,11 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectPanel.add(projectButtonsPanel, gbc_projectButtonsPanel);
 
 		addProjectButton = new JButton("ADD");
+		addProjectButton.addActionListener(e -> {
+			projectController.addProject(projectIdField.getText(), projectNameField.getText(),
+					projectDescriptionField.getText());
+			clearAllUserInput();
+		});
 		addProjectButton.setEnabled(false);
 		addProjectButton.setName("addProjectButton");
 		projectButtonsPanel.add(addProjectButton);
@@ -359,7 +369,6 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 				tabbedPane.setEnabledAt(TAB_ISSUES, false);
 			}
 		});
-
 	}
 
 	@Override
@@ -378,15 +387,16 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		for (Project project : projectList) {
 			projectListModel.addElement(project);
 		}
-
 	}
 
-	public DefaultListModel<Project> getProjectListModel() {
-		return projectListModel;
+	@Override
+	public void showProjectError(String errorMessage) {
+		projectErrorLabel.setText(errorMessage);
 	}
 
-	public DefaultListModel<Issue> getIssueListModel() {
-		return issueListModel;
+	@Override
+	public void showIssueError(String errorMessage) {
+		issueErrorLabel.setText(errorMessage);
 	}
 
 	private void clearAllUserInput() {
@@ -406,13 +416,19 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		deleteIssueButton.setEnabled(false);
 	}
 
-	@Override
-	public void showProjectError(String errorMessage) {
-		projectErrorLabel.setText(errorMessage);
+	public void setProjectController(ProjectController projectController) {
+		this.projectController = projectController;
 	}
 
-	@Override
-	public void showIssueError(String errorMessage) {
-		issueErrorLabel.setText(errorMessage);
+	public void setIssueController(IssueController issueController) {
+		this.issueController = issueController;
+	}
+
+	public DefaultListModel<Project> getProjectListModel() {
+		return projectListModel;
+	}
+
+	public DefaultListModel<Issue> getIssueListModel() {
+		return issueListModel;
 	}
 }
