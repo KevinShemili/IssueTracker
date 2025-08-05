@@ -360,11 +360,31 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		issuePanel.add(issueButtonsPanel, gbc_issueButtonsPanel);
 
 		addIssueButton = new JButton("ADD");
+		addIssueButton.addActionListener(e -> {
+			Project selectedProject = projectJList.getSelectedValue();
+
+			String id = issueIdField.getText();
+			String name = issueNameField.getText();
+			String description = issueDescriptionField.getText();
+			String priority = (String) issuePriorityComboBox.getSelectedItem();
+
+			issueController.addIssue(id, name, description, priority, selectedProject.getId());
+			issueIdField.setText("");
+			issueNameField.setText("");
+			issueDescriptionField.setText("");
+			issuePriorityComboBox.setSelectedItem(null);
+		});
 		addIssueButton.setEnabled(false);
 		addIssueButton.setName("addIssueButton");
 		issueButtonsPanel.add(addIssueButton);
 
 		deleteIssueButton = new JButton("DELETE");
+		deleteIssueButton.addActionListener(e -> {
+			Issue selectedIssue = issueJList.getSelectedValue();
+
+			issueController.deleteIssue(selectedIssue.getId());
+			issueJList.clearSelection();
+		});
 		deleteIssueButton.setEnabled(false);
 		deleteIssueButton.setName("deleteIssueButton");
 		issueButtonsPanel.add(deleteIssueButton);
