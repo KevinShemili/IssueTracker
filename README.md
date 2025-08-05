@@ -1,1 +1,9 @@
--
+[![CI Build & Test](https://github.com/KevinShemili/IssueTracker/actions/workflows/maven.yml/badge.svg)](https://github.com/KevinShemili/IssueTracker/actions/workflows/maven.yml)
+[![Mutation Testing](https://github.com/KevinShemili/IssueTracker/actions/workflows/pit.yml/badge.svg)](https://github.com/KevinShemili/IssueTracker/actions/workflows/pit.yml)
+[![SonarCloud Analysis](https://github.com/KevinShemili/IssueTracker/actions/workflows/sonarcloud.yml/badge.svg)](https://github.com/KevinShemili/IssueTracker/actions/workflows/sonarcloud.yml)
+[![Coverage Status](https://coveralls.io/repos/github/KevinShemili/IssueTracker/badge.svg?branch=master)](https://coveralls.io/github/KevinShemili/IssueTracker?branch=master)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=KevinShemili_IssueTracker&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=KevinShemili_IssueTracker)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=KevinShemili_IssueTracker&metric=bugs)](https://sonarcloud.io/summary/new_code?id=KevinShemili_IssueTracker)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=KevinShemili_IssueTracker&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=KevinShemili_IssueTracker)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=KevinShemili_IssueTracker&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=KevinShemili_IssueTracker)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=KevinShemili_IssueTracker&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=KevinShemili_IssueTracker)
