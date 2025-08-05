@@ -64,6 +64,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private JLabel projectErrorLabel;
 
 	public IssueTrackerSwingView() {
+		setTitle("Issue Tracker");
 		setMinimumSize(new Dimension(450, 300));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 725, 480);
@@ -74,6 +75,22 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		mainPane.setLayout(new BorderLayout(0, 0));
 
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.addChangeListener(e -> {
+			if (tabbedPane.getSelectedIndex() == TAB_PROJECTS) {
+				if (projectController != null) {
+					clearProjectTab();
+					projectController.listProjects();
+					tabbedPane.setEnabledAt(TAB_ISSUES, false);
+				}
+			} else { // Else the other tab, the Issues Tab
+				clearIssueTab();
+
+				Project selectedProject = projectJList.getSelectedValue();
+				if (selectedProject != null) {
+					issueController.listIssues(selectedProject.getId());
+				}
+			}
+		});
 		tabbedPane.setName("tabbedPane");
 		mainPane.add(tabbedPane);
 
@@ -208,7 +225,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		addProjectButton.addActionListener(e -> {
 			projectController.addProject(projectIdField.getText(), projectNameField.getText(),
 					projectDescriptionField.getText());
-			clearAllUserInput();
+			clearProjectTab();
 		});
 		addProjectButton.setEnabled(false);
 		addProjectButton.setName("addProjectButton");
@@ -217,9 +234,9 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		deleteProjectButton = new JButton("DELETE");
 		deleteProjectButton.addActionListener(e -> {
 			Project selectedProject = projectJList.getSelectedValue();
-
 			projectController.deleteProject(selectedProject.getId());
-			projectJList.clearSelection();
+
+			clearProjectTab();
 		});
 		deleteProjectButton.setEnabled(false);
 		deleteProjectButton.setName("deleteProjectButton");
@@ -369,10 +386,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 			String priority = (String) issuePriorityComboBox.getSelectedItem();
 
 			issueController.addIssue(id, name, description, priority, selectedProject.getId());
-			issueIdField.setText("");
-			issueNameField.setText("");
-			issueDescriptionField.setText("");
-			issuePriorityComboBox.setSelectedItem(null);
+			clearIssueTab();
 		});
 		addIssueButton.setEnabled(false);
 		addIssueButton.setName("addIssueButton");
@@ -383,22 +397,12 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 			Issue selectedIssue = issueJList.getSelectedValue();
 
 			issueController.deleteIssue(selectedIssue.getId());
-			issueJList.clearSelection();
+			clearIssueTab();
 		});
 		deleteIssueButton.setEnabled(false);
 		deleteIssueButton.setName("deleteIssueButton");
 		issueButtonsPanel.add(deleteIssueButton);
 
-		tabbedPane.addChangeListener(e -> {
-			if (tabbedPane.getSelectedIndex() == TAB_PROJECTS) {
-				clearAllUserInput();
-				projectController.listProjects();
-				tabbedPane.setEnabledAt(TAB_ISSUES, false);
-			} else { // Else the other tab, the Issues Tab
-				Project selectedProject = projectJList.getSelectedValue();
-				issueController.listIssues(selectedProject.getId());
-			}
-		});
 	}
 
 	@Override
@@ -429,19 +433,23 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		issueErrorLabel.setText(errorMessage);
 	}
 
-	private void clearAllUserInput() {
+	private void clearProjectTab() {
 		projectIdField.setText("");
-		issueIdField.setText("");
 		projectNameField.setText("");
-		issueNameField.setText("");
 		projectDescriptionField.setText("");
-		issueDescriptionField.setText("");
-		issuePriorityComboBox.setSelectedItem(null);
-		issueListModel.clear();
+		projectErrorLabel.setText(" ");
 		projectJList.clearSelection();
-
 		addProjectButton.setEnabled(false);
 		deleteProjectButton.setEnabled(false);
+	}
+
+	private void clearIssueTab() {
+		issueIdField.setText("");
+		issueNameField.setText("");
+		issueDescriptionField.setText("");
+		issueErrorLabel.setText(" ");
+		issuePriorityComboBox.setSelectedItem(null);
+		issueJList.clearSelection();
 		addIssueButton.setEnabled(false);
 		deleteIssueButton.setEnabled(false);
 	}
@@ -460,5 +468,17 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 
 	public DefaultListModel<Issue> getIssueListModel() {
 		return issueListModel;
+	}
+
+	public JLabel getProjectErrorLabel() {
+		return projectErrorLabel;
+	}
+
+	public JLabel getIssueErrorLabel() {
+		return issueErrorLabel;
+	}
+
+	public JTabbedPane getTabbedPane() {
+		return tabbedPane;
 	}
 }
