@@ -6,6 +6,8 @@ import static org.mockito.Mockito.verify;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.swing.DefaultListModel;
+
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.data.Index;
 import org.assertj.swing.edt.GuiActionRunner;
@@ -483,6 +485,46 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.textBox(PROJECT_ID_FIELD).requireText("");
 		frameFixture.textBox(PROJECT_NAME_FIELD).requireText("");
 		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).requireText("");
+	}
+
+	@Test
+	public void testDeleteProjectButton_DelegatesToProjectControllerDeleteProject() {
+		// Arrange
+		Project project1 = new Project("1", "Project1", "Description1");
+		Project project2 = new Project("2", "Project2", "Description2");
+
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Project> listModel = issueTrackerView.getProjectListModel();
+			listModel.addElement(project1);
+			listModel.addElement(project2);
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(1);
+
+		// Act
+		frameFixture.button(PROJECT_DELETE_BUTTON).click();
+
+		// Assert
+		verify(projectController).deleteProject("2");
+		frameFixture.list(PROJECT_LIST).requireNoSelection();
+	}
+
+	@Test
+	public void testIssueTab_DelegatesToIssueControllerListIssues() {
+		// Arrange
+		Project project = new Project("1", "Project Name", "Project Description");
+
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(project);
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+
+		// Act
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+
+		// Assert
+		verify(issueController).listIssues("1");
 	}
 
 	private void clearProjectInput() {
