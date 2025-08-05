@@ -27,7 +27,7 @@ jobs:
         restore-keys: ${{ runner.os }}-m2-
 
     - name: Maven Build & Test
-      run: mvn verify -Ppit-tests
+      run: xvfb-run mvn verify -Ppit-tests
       working-directory: ${{ env.workdir }}
 
     - name: Archive PIT Report

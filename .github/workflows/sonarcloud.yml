@@ -38,7 +38,7 @@ jobs:
 
     - name: Build & Analyze
       run: >
-        mvn verify -Pjacoco $SONARGOAL
+        xvfb-run mvn verify -Pjacoco $SONARGOAL
         -Dsonar.organization=kevinshemili
         -Dsonar.host.url=https://sonarcloud.io
         -Dsonar.projectKey=KevinShemili_IssueTracker
