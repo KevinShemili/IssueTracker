@@ -528,6 +528,18 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
+	public void testProjectTab_DelegatesToProjectControllerListProjects() {
+		// Arrange
+		switchToIssueTab();
+
+		// Act
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_PROJECTS);
+
+		// Assert
+		verify(projectController).listProjects();
+	}
+
+	@Test
 	public void testAddIssueButton_DelegatesToIssueControllerAddIssue() {
 		// Arrange
 		String id = "1";

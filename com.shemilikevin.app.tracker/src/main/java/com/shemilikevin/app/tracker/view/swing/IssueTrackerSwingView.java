@@ -392,6 +392,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		tabbedPane.addChangeListener(e -> {
 			if (tabbedPane.getSelectedIndex() == TAB_PROJECTS) {
 				clearAllUserInput();
+				projectController.listProjects();
 				tabbedPane.setEnabledAt(TAB_ISSUES, false);
 			} else { // Else the other tab, the Issues Tab
 				Project selectedProject = projectJList.getSelectedValue();
