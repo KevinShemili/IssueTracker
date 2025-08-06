@@ -23,15 +23,12 @@ public class ProjectController extends BaseController {
 
 	public void addProject(String id, String name, String description) {
 
-		Validators.validateProjectFields(id, name, description);
-
-		if (isNumeric(id) == false) {
-			issueTrackerView.showProjectError(Validators.NON_NUMERICAL_ID);
+		if (!validateFields(id, name, description)) {
 			return;
 		}
 
 		if (isProjectStoredInDatabase(id) == true) {
-			issueTrackerView.showProjectError(String.format(Validators.DUPLICATE_PROJECT, id));
+			issueTrackerView.showProjectError(String.format(ErrorMessages.DUPLICATE_PROJECT, id));
 			return;
 		}
 
@@ -44,15 +41,17 @@ public class ProjectController extends BaseController {
 
 	public void deleteProject(String id) {
 
-		Validators.validateId(id);
-		Validators.validateIsNumeric(id);
-
-		if (isProjectStoredInDatabase(id) == false) {
-			throw new IllegalArgumentException(Validators.PROJECT_DOESNT_EXIST);
+		if (!validateFields(id)) {
+			return;
 		}
 
-		if (issueRepository.hasAssociatedIssues(id) == true) {
-			issueTrackerView.showProjectError(Validators.PROJECT_HAS_ISSUES);
+		if (!isProjectStoredInDatabase(id)) {
+			issueTrackerView.showProjectError(ErrorMessages.PROJECT_DOESNT_EXIST);
+			return;
+		}
+
+		if (issueRepository.hasAssociatedIssues(id)) {
+			issueTrackerView.showProjectError(ErrorMessages.PROJECT_HAS_ISSUES);
 			return;
 		}
 
@@ -60,5 +59,43 @@ public class ProjectController extends BaseController {
 
 		List<Project> projectList = projectRepository.findAll();
 		issueTrackerView.showProjects(projectList);
+	}
+
+	private boolean validateFields(String id, String name, String description) {
+
+		if (!validateId(id)) {
+			return false;
+		}
+
+		if (!validateIsNotNullOrEmpty(name)) {
+			issueTrackerView.showProjectError(ErrorMessages.NULL_EMPTY_NAME);
+			return false;
+		}
+
+		if (!validateIsNotNullOrEmpty(description)) {
+			issueTrackerView.showProjectError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean validateFields(String id) {
+		return validateId(id);
+	}
+
+	private boolean validateId(String id) {
+
+		if (!validateIsNotNullOrEmpty(id)) {
+			issueTrackerView.showProjectError(ErrorMessages.NULL_EMPTY_ID);
+			return false;
+		}
+
+		if (!validateIsNumeric(id)) {
+			issueTrackerView.showProjectError(ErrorMessages.NON_NUMERICAL_ID);
+			return false;
+		}
+
+		return true;
 	}
 }

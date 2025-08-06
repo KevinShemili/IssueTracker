@@ -9,7 +9,6 @@
   <packaging>jar</packaging>
 
   <name>Issue Tracker</name>
-  <url>http://maven.apache.org</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,13 +20,16 @@
     <junit.version>4.13.2</junit.version>
     <assertj.swing.junit.version>3.17.1</assertj.swing.junit.version>
     <mongo.java.server>1.39.0</mongo.java.server>
+    <mockito.core.version>4.11.0</mockito.core.version>
+    <testcontainers.version>1.20.4</testcontainers.version>
 
     <pitest.maven.version>1.5.2</pitest.maven.version>
     <jacoco.maven.plugin.version>0.8.12</jacoco.maven.plugin.version>
     <maven.surefire.report.plugin.version>3.5.2</maven.surefire.report.plugin.version>
     <coveralls.maven.plugin>4.5.0-M6</coveralls.maven.plugin>
     <sonar.maven.plugin>5.0.0.4389</sonar.maven.plugin>
-    <mockito.core.version>4.11.0</mockito.core.version>
+    <build.helper.maven.plugin.version>3.6.0</build.helper.maven.plugin.version>
+    <maven.failsafe.plugin.version>3.5.2</maven.failsafe.plugin.version>
 
     <!-- SonarCloud -->
     <sonar.coverage.exclusions>
@@ -36,13 +38,14 @@
     </sonar.coverage.exclusions>
 
     <sonar.tests>
-      ${project.basedir}/src/test/java
-      <!-- TBA - IT & E2E -->
+      ${project.basedir}/src/test/java,
+      ${project.basedir}/src/it/java
+      <!-- TBA - E2E -->
     </sonar.tests>
 
     <sonar.junit.reportPaths>
-      ${project.build.directory}/surefire-reports
-      <!-- TBA - IT -->
+      ${project.build.directory}/surefire-reports,
+      ${project.build.directory}/failsafe-reports
     </sonar.junit.reportPaths>
   </properties>
 
@@ -85,6 +88,13 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <version>${mockito.core.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>mongodb</artifactId>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -174,8 +184,57 @@
           <version>${sonar.maven.plugin}</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>${build.helper.maven.plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${maven.failsafe.plugin.version}</version>
+        </plugin>
+
       </plugins>
     </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/it/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
   </build>
 
   <profiles>
