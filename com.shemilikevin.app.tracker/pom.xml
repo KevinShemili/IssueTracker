@@ -38,13 +38,13 @@
     </sonar.coverage.exclusions>
 
     <sonar.tests>
-      ${project.basedir}/src/test/java
+      ${project.basedir}/src/test/java,
       ${project.basedir}/src/it/java
       <!-- TBA - E2E -->
     </sonar.tests>
 
     <sonar.junit.reportPaths>
-      ${project.build.directory}/surefire-reports
+      ${project.build.directory}/surefire-reports,
       ${project.build.directory}/failsafe-reports
     </sonar.junit.reportPaths>
   </properties>
