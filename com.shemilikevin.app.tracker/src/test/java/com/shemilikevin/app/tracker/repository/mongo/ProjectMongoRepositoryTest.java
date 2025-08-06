@@ -163,6 +163,42 @@ public class ProjectMongoRepositoryTest {
 		assertThat(queryAllProjectsFromDb()).isEmpty();
 	}
 
+	@Test
+	public void testExists_EmptyDatabase_ReturnsFalse() {
+
+		// Act
+		boolean result = projectRepository.exists(ID_1);
+
+		// Assert
+		assertThat(result).isFalse();
+	}
+
+	@Test
+	public void testExists_MatchingIdInDatabase_ReturnsTrue() {
+
+		// Arrange
+		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
+
+		// Act
+		boolean result = projectRepository.exists(ID_1);
+
+		// Assert
+		assertThat(result).isTrue();
+	}
+
+	@Test
+	public void testExists_NoMatchingIdInDatabase_ReturnsFalse() {
+
+		// Arrange
+		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
+
+		// Act
+		boolean result = projectRepository.exists(ID_2);
+
+		// Assert
+		assertThat(result).isFalse();
+	}
+
 	private void addProjectToDb(Project project) {
 		projectCollection.insertOne(project);
 	}

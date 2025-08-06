@@ -243,6 +243,65 @@ public class IssueMongoRepositoryTest {
 		assertThat(queryAllIssuesFromDb()).isEmpty();
 	}
 
+	@Test
+	public void testExists_EmptyDatabase_ReturnsFalse() {
+
+		// Act
+		boolean result = issueRepository.exists(ID_1);
+
+		// Assert
+		assertThat(result).isFalse();
+	}
+
+	@Test
+	public void testExists_MatchingIdInDatabase_ReturnsTrue() {
+
+		// Arrange
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+
+		// Act
+		boolean result = issueRepository.exists(ID_1);
+
+		// Assert
+		assertThat(result).isTrue();
+	}
+
+	@Test
+	public void testExists_NoMatchingIdInDatabase_ReturnsFalse() {
+
+		// Arrange
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+
+		// Act
+		boolean result = issueRepository.exists(ID_2);
+
+		// Assert
+		assertThat(result).isFalse();
+	}
+
+	@Test
+	public void testHasAssociatedIssues_GivenProjectHasNoAssociatedIssues_ReturnsFalse() {
+
+		// Act
+		boolean result = issueRepository.hasAssociatedIssues(PROJECT_ID_1);
+
+		// Assert
+		assertThat(result).isFalse();
+	}
+
+	@Test
+	public void testHasAssociatedIssues_GivenProjectHasAssociatedIssues_ReturnsTrue() {
+
+		// Arrange
+		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+
+		// Act
+		boolean result = issueRepository.hasAssociatedIssues(PROJECT_ID_1);
+
+		// Assert
+		assertThat(result).isTrue();
+	}
+
 	private void AddIssueToDb(Issue issue) {
 		issueCollection.insertOne(issue);
 	}
