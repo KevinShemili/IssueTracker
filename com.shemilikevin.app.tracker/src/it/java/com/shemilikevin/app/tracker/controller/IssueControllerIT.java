@@ -119,7 +119,7 @@ public class IssueControllerIT {
 		issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID);
 
 		// Assert
-		verify(issueTrackerView).showIssueError(String.format(Validators.DUPLICATE_ISSUE, ISSUE_ID));
+		verify(issueTrackerView).showIssueError(String.format(ErrorMessages.DUPLICATE_ISSUE, ISSUE_ID));
 	}
 
 	@Test

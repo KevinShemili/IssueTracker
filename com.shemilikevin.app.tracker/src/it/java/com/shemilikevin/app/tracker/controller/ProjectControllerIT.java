@@ -120,7 +120,6 @@ public class ProjectControllerIT {
 		projectController.deleteProject(ID);
 
 		// Assert
-		verify(issueTrackerView).showProjectError(Validators.PROJECT_HAS_ISSUES);
+		verify(issueTrackerView).showProjectError(ErrorMessages.PROJECT_HAS_ISSUES);
 	}
-
 }

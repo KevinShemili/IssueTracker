@@ -1,5 +1,6 @@
 package com.shemilikevin.app.tracker.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.shemilikevin.app.tracker.model.Issue;
@@ -9,6 +10,8 @@ import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class IssueController extends BaseController {
 
+	public static final List<String> ALLOWED_PRIORITIES = Arrays.asList("Low", "Medium", "High");
+
 	public IssueController(ProjectRepository projectRepository, IssueRepository issueRepository,
 			IssueTrackerView issueTrackerView) {
 
@@ -17,11 +20,13 @@ public class IssueController extends BaseController {
 
 	public void listIssues(String projectId) {
 
-		Validators.validateId(projectId);
-		Validators.validateIsNumeric(projectId);
+		if (!validateFields(projectId)) {
+			return;
+		}
 
 		if (isProjectStoredInDatabase(projectId) == false) {
-			throw new IllegalArgumentException(Validators.PROJECT_DOESNT_EXIST);
+			issueTrackerView.showIssueError(ErrorMessages.PROJECT_DOESNT_EXIST);
+			return;
 		}
 
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
@@ -31,23 +36,17 @@ public class IssueController extends BaseController {
 	public void addIssue(String issueId, String issueName, String issueDescription, String issuePriority,
 			String projectId) {
 
-		Validators.validateIssueFields(issueId, issueName, issueDescription, issuePriority, projectId);
-
-		if (isNumeric(issueId) == false) {
-			issueTrackerView.showIssueError(Validators.NON_NUMERICAL_ID);
+		if (!validateFields(issueId, issueName, issueDescription, issuePriority, projectId)) {
 			return;
 		}
 
-		if (isNumeric(projectId) == false) {
-			throw new IllegalArgumentException(Validators.NON_NUMERICAL_ID);
-		}
-
 		if (isProjectStoredInDatabase(projectId) == false) {
-			throw new IllegalArgumentException(Validators.PROJECT_DOESNT_EXIST);
+			issueTrackerView.showIssueError(ErrorMessages.PROJECT_DOESNT_EXIST);
+			return;
 		}
 
 		if (isIssueStoredInDatabase(issueId) == true) {
-			issueTrackerView.showIssueError(String.format(Validators.DUPLICATE_ISSUE, issueId));
+			issueTrackerView.showIssueError(String.format(ErrorMessages.DUPLICATE_ISSUE, issueId));
 			return;
 		}
 
@@ -60,11 +59,13 @@ public class IssueController extends BaseController {
 
 	public void deleteIssue(String issueId) {
 
-		Validators.validateId(issueId);
-		Validators.validateIsNumeric(issueId);
+		if (!validateFields(issueId)) {
+			return;
+		}
 
 		if (isIssueStoredInDatabase(issueId) == false) {
-			throw new IllegalArgumentException(Validators.ISSUE_DOESNT_EXIST);
+			issueTrackerView.showIssueError(ErrorMessages.ISSUE_DOESNT_EXIST);
+			return;
 		}
 
 		Issue toBeDeleted = issueRepository.findById(issueId);
@@ -76,5 +77,52 @@ public class IssueController extends BaseController {
 
 	private boolean isIssueStoredInDatabase(String id) {
 		return issueRepository.exists(id) == true ? true : false;
+	}
+
+	private boolean validateFields(String id, String name, String description, String priority, String projectId) {
+
+		if (!validateId(id) || !validateId(projectId)) {
+			return false;
+		}
+
+		if (!validateIsNotNullOrEmpty(name)) {
+			issueTrackerView.showIssueError(ErrorMessages.NULL_EMPTY_NAME);
+			return false;
+		}
+
+		if (!validateIsNotNullOrEmpty(description)) {
+			issueTrackerView.showIssueError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
+			return false;
+		}
+
+		if (!validateIsNotNullOrEmpty(priority)) {
+			issueTrackerView.showIssueError(ErrorMessages.NULL_EMPTY_PRIORITY);
+			return false;
+		}
+
+		if (ALLOWED_PRIORITIES.contains(priority) == false) {
+			issueTrackerView.showIssueError(ErrorMessages.NOT_ALLOWED_PRIORITY);
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean validateFields(String id) {
+		return validateId(id);
+	}
+
+	private boolean validateId(String id) {
+		if (!validateIsNotNullOrEmpty(id)) {
+			issueTrackerView.showIssueError(ErrorMessages.NULL_EMPTY_ID);
+			return false;
+		}
+
+		if (!validateIsNumeric(id)) {
+			issueTrackerView.showIssueError(ErrorMessages.NON_NUMERICAL_ID);
+			return false;
+		}
+
+		return true;
 	}
 }
