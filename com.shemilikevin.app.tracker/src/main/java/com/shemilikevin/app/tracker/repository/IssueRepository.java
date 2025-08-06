@@ -6,15 +6,17 @@ import com.shemilikevin.app.tracker.model.Issue;
 
 public interface IssueRepository {
 
+	List<Issue> findAll();
+
 	List<Issue> findByProjectId(String projectId);
 
-	boolean exists(String issueId);
+	boolean exists(String id);
 
 	void save(Issue issue);
 
-	Issue findById(String issueId);
+	Issue findById(String id);
 
-	void delete(String issueId);
+	void delete(String id);
 
 	boolean hasAssociatedIssues(String projectId);
 }

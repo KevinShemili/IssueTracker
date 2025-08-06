@@ -18,13 +18,21 @@ abstract class BaseController {
 		this.issueTrackerView = issueTrackerView;
 	}
 
-	protected boolean isNumeric(String id) {
+	protected boolean validateIsNumeric(String id) {
 		try {
 			Integer.parseInt(id);
 			return true;
 		} catch (NumberFormatException e) {
 			return false;
 		}
+	}
+
+	protected boolean validateIsNotNullOrEmpty(String id) {
+		if ((id == null) || (id.trim().isEmpty() == true)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected boolean isProjectStoredInDatabase(String id) {
