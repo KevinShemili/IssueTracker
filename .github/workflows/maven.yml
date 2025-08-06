@@ -37,7 +37,9 @@ jobs:
       working-directory: ${{ env.workdir }}
 
     - name: Generate JUnit Report
-      run: mvn surefire-report:report-only
+      run: |
+        mvn surefire-report:report-only \
+        surefire-report:failsafe-report-only
       working-directory: ${{ env.workdir }}
 
     - name: Archive JUnit Report

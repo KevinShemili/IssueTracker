@@ -1,8 +1,6 @@
 package com.shemilikevin.app.tracker.controller;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -106,19 +104,23 @@ public class ProjectControllerTest {
 	}
 
 	@Test
-	public void testAddProject_WhenProvidedProjectIdIsNull_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.addProject(null, NAME, DESCRIPTION))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_ID);
-		verifyNoInteractions(projectRepository, issueTrackerView);
+	public void testAddProject_WhenProvidedProjectIdIsNull_ShowsErrorMessage() {
+		// Act
+		projectController.addProject(null, NAME, DESCRIPTION);
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testAddProject_WhenProvidedProjectIdIsEmpty_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.addProject(EMPTY_STRING, NAME, DESCRIPTION))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_ID);
-		verifyNoInteractions(projectRepository, issueTrackerView);
+	public void testAddProject_WhenProvidedProjectIdIsEmpty_ShowsErrorMessage() {
+		// Act
+		projectController.addProject(EMPTY_STRING, NAME, DESCRIPTION);
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
@@ -127,44 +129,52 @@ public class ProjectControllerTest {
 		projectController.addProject(NON_NUMERIC_ID, NAME, DESCRIPTION);
 
 		// Assert
-		verify(issueTrackerView).showProjectError(Validators.NON_NUMERICAL_ID);
+		verify(issueTrackerView).showProjectError(ErrorMessages.NON_NUMERICAL_ID);
 		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testAddProject_WhenProvidedProjectNameIsNull_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.addProject(ID, null, DESCRIPTION))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_NAME);
-		verifyNoInteractions(projectRepository, issueTrackerView);
+	public void testAddProject_WhenProvidedProjectNameIsNull_ShowsErrorMessage() {
+		// Act
+		projectController.addProject(ID, null, DESCRIPTION);
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_NAME);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testAddProject_WhenProvidedProjectNameIsEmpty_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.addProject(ID, EMPTY_STRING, DESCRIPTION))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_NAME);
-		verifyNoInteractions(projectRepository, issueTrackerView);
+	public void testAddProject_WhenProvidedProjectNameIsEmpty_ShowsErrorMessage() {
+		// Act
+		projectController.addProject(ID, EMPTY_STRING, DESCRIPTION);
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_NAME);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testAddProject_WhenProvidedProjectDescriptionIsNull_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.addProject(ID, NAME, null))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_DESCRIPTION);
-		verifyNoInteractions(projectRepository, issueTrackerView);
+	public void testAddProject_WhenProvidedProjectDescriptionIsNull_ShowsErrorMessage() {
+		// Act
+		projectController.addProject(ID, NAME, null);
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testAddProject_WhenProvidedProjectDescriptionIsEmpty_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.addProject(ID, NAME, EMPTY_STRING))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_DESCRIPTION);
-		verifyNoInteractions(projectRepository, issueTrackerView);
+	public void testAddProject_WhenProvidedProjectDescriptionIsEmpty_ShowsErrorMessage() {
+		// Act
+		projectController.addProject(ID, NAME, EMPTY_STRING);
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testAddProject_WhenProvidedProjectIdAlreadyExistsInDatabase_ShowsDuplicationError() {
+	public void testAddProject_WhenProvidedProjectIdAlreadyExistsInDatabase_ShowsErrorMessage() {
 		// Arrange
 		when(projectRepository.exists(ID)).thenReturn(true);
 
@@ -174,7 +184,7 @@ public class ProjectControllerTest {
 		// Assert
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(ID);
-		inOrder.verify(issueTrackerView).showProjectError(String.format(Validators.DUPLICATE_PROJECT, ID));
+		inOrder.verify(issueTrackerView).showProjectError(String.format(ErrorMessages.DUPLICATE_PROJECT, ID));
 		verifyNoMoreInteractions(issueTrackerView, projectRepository);
 	}
 
@@ -199,7 +209,7 @@ public class ProjectControllerTest {
 	}
 
 	@Test
-	public void testDeleteProject_WhenProvidedProjectHasAssociatedIssues_ShowsHasIssuesError() {
+	public void testDeleteProject_WhenProvidedProjectHasAssociatedIssues_ShowsErrorMessage() {
 		// Arrange
 		when(projectRepository.exists(ID)).thenReturn(true);
 		when(issueRepository.hasAssociatedIssues(ID)).thenReturn(true);
@@ -211,43 +221,52 @@ public class ProjectControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(ID);
 		inOrder.verify(issueRepository).hasAssociatedIssues(ID);
-		inOrder.verify(issueTrackerView).showProjectError(Validators.PROJECT_HAS_ISSUES);
+		inOrder.verify(issueTrackerView).showProjectError(ErrorMessages.PROJECT_HAS_ISSUES);
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testDeleteProject_WhenProvidedProjectIdDoesNotExistInDatabase_ThrowsIllegalArgumentException() {
+	public void testDeleteProject_WhenProvidedProjectIdDoesNotExistInDatabase_ShowsErrorMessage() {
 		// Arrange
 		when(projectRepository.exists(ID)).thenReturn(false);
 
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.deleteProject(ID)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage(Validators.PROJECT_DOESNT_EXIST);
-		verify(projectRepository).exists(ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
+		// Act
+		projectController.deleteProject(ID);
+
+		// Assert
+		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
+		inOrder.verify(projectRepository).exists(ID);
+		inOrder.verify(issueTrackerView).showProjectError(ErrorMessages.PROJECT_DOESNT_EXIST);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testDeleteProject_WhenProvidedProjectIdIsNull_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.deleteProject(null)).isInstanceOf(IllegalArgumentException.class)
-				.hasMessage(Validators.NULL_EMPTY_ID);
-		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	public void testDeleteProject_WhenProvidedProjectIdIsNull_ShowsErrorMessage() {
+		// Act
+		projectController.deleteProject(null);
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testDeleteProject_WhenProvidedProjectIdIsEmpty_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.deleteProject(EMPTY_STRING))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NULL_EMPTY_ID);
-		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	public void testDeleteProject_WhenProvidedProjectIdIsEmpty_ShowsErrorMessage() {
+		// Act
+		projectController.deleteProject(EMPTY_STRING);
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
-	public void testDeleteProject_WhenProvidedProjectIdIsNonNumeric_ThrowsIllegalArgumentException() {
-		// Act & Assert
-		assertThatThrownBy(() -> projectController.deleteProject(NON_NUMERIC_ID))
-				.isInstanceOf(IllegalArgumentException.class).hasMessage(Validators.NON_NUMERICAL_ID);
-		verifyNoInteractions(projectRepository, issueRepository, issueTrackerView);
+	public void testDeleteProject_WhenProvidedProjectIdIsNonNumeric_ShowsErrorMessage() {
+		// Act
+		projectController.deleteProject(NON_NUMERIC_ID);
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NON_NUMERICAL_ID);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 }
