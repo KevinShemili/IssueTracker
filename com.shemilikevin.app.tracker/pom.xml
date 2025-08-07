@@ -30,6 +30,7 @@
     <sonar.maven.plugin>5.0.0.4389</sonar.maven.plugin>
     <build.helper.maven.plugin.version>3.6.0</build.helper.maven.plugin.version>
     <maven.failsafe.plugin.version>3.5.2</maven.failsafe.plugin.version>
+    <picoli.version>4.7.6</picoli.version>
 
     <!-- SonarCloud -->
     <sonar.coverage.exclusions>
@@ -40,7 +41,7 @@
     <sonar.tests>
       ${project.basedir}/src/test/java,
       ${project.basedir}/src/it/java
-      <!-- TBA - E2E -->
+      ${project.basedir}/src/e2e/java
     </sonar.tests>
 
     <sonar.junit.reportPaths>
@@ -96,6 +97,12 @@
       <artifactId>mongodb</artifactId>
       <version>${testcontainers.version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>${picoli.version}</version>
     </dependency>
 
   </dependencies>
@@ -214,6 +221,7 @@
             <configuration>
               <sources>
                 <source>src/it/java</source>
+                <source>src/e2e/java</source>
               </sources>
             </configuration>
           </execution>
@@ -225,10 +233,26 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <executions>
           <execution>
+            <id>default-it</id>
             <goals>
               <goal>integration-test</goal>
               <goal>verify</goal>
             </goals>
+          </execution>
+          <execution>
+            <id>e2e-tests</id>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/*IT.java</exclude>
+              </excludes>
+              <includes>
+                <include>**/*E2E.java</include>
+              </includes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
