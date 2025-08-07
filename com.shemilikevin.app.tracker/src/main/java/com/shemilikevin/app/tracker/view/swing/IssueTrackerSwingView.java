@@ -493,4 +493,8 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	public JTabbedPane getTabbedPane() {
 		return tabbedPane;
 	}
+
+	public JList<Project> getProjectJList() {
+		return projectJList;
+	}
 }

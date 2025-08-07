@@ -9,17 +9,17 @@ public class Issue {
 	// Fields
 	@BsonProperty("id")
 	private String id;
-	private String title;
+	private String name;
 	private String description;
 	private String priority;
 
 	// Reference
 	private String projectId;
 
-	public Issue(String id, String title, String description, String priority, String projectId) {
+	public Issue(String id, String name, String description, String priority, String projectId) {
 		super();
 		this.id = id;
-		this.title = title;
+		this.name = name;
 		this.description = description;
 		this.priority = priority;
 		this.projectId = projectId;
@@ -33,8 +33,8 @@ public class Issue {
 		return id;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
 
 	public String getDescription() {
@@ -53,8 +53,8 @@ public class Issue {
 		this.id = id;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setDescription(String description) {
@@ -71,7 +71,7 @@ public class Issue {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(description, id, priority, projectId, title);
+		return Objects.hash(description, id, priority, projectId, name);
 	}
 
 	@Override
@@ -88,12 +88,13 @@ public class Issue {
 		Issue other = (Issue) obj;
 		return Objects.equals(description, other.description) && Objects.equals(id, other.id)
 				&& Objects.equals(priority, other.priority) && Objects.equals(projectId, other.projectId)
-				&& Objects.equals(title, other.title);
+				&& Objects.equals(name, other.name);
 	}
 
 	@Override
 	public String toString() {
-		return "Issue [id=" + id + ", title=" + title + ", description=" + description + ", priority=" + priority
+		return "Issue [id=" + id + ", name=" + name + ", description=" + description + ", priority=" + priority
 				+ ", projectId=" + projectId + "]";
 	}
+
 }
