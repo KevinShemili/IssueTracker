@@ -31,13 +31,6 @@ public class ProjectMongoRepositoryTest {
 	private static final String DATABASE_NAME = "db";
 	private static final String COLLECTION_NAME = "collection";
 
-	private static final String ID_1 = "1";
-	private static final String ID_2 = "2";
-	private static final String NAME_1 = "Desktop Application";
-	private static final String NAME_2 = "Web Application";
-	private static final String DESCRIPTION_1 = "Desktop Application Description";
-	private static final String DESCRIPTION_2 = "Web Application Description";
-
 	private static MongoServer mongoServer;
 	private static InetSocketAddress inetSocketAddress;
 
@@ -64,9 +57,12 @@ public class ProjectMongoRepositoryTest {
 		MongoClientOptions mongoClientOptions = MongoClientOptions.builder().codecRegistry(codecRegistry).build();
 
 		mongoClient = new MongoClient(new ServerAddress(inetSocketAddress), mongoClientOptions);
+
 		projectRepository = new ProjectMongoRepository(mongoClient, DATABASE_NAME, COLLECTION_NAME);
+
 		MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
 		database.drop();
+
 		projectCollection = database.getCollection(COLLECTION_NAME, Project.class);
 	}
 
@@ -77,7 +73,6 @@ public class ProjectMongoRepositoryTest {
 
 	@Test
 	public void testFindAll_EmptyDatabase_ReturnsEmptyList() {
-
 		// Act
 		List<Project> projectList = projectRepository.findAll();
 
@@ -87,25 +82,24 @@ public class ProjectMongoRepositoryTest {
 
 	@Test
 	public void testFindAll_ManyProjectsInTheDatabase_ReturnsAllProjects() {
-
 		// Arrange
-		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
-		addProjectToDb(new Project(ID_2, NAME_2, DESCRIPTION_2));
+		Project project1 = new Project("1", "Name 1", "Description 1");
+		Project project2 = new Project("2", "Name 2", "Description 2");
+		addProjectToDb(project1);
+		addProjectToDb(project2);
 
 		// Act
 		List<Project> projectList = projectRepository.findAll();
 
 		// Assert
 		assertThat(projectList).hasSize(2);
-		assertThat(projectList).containsExactly(new Project(ID_1, NAME_1, DESCRIPTION_1),
-				new Project(ID_2, NAME_2, DESCRIPTION_2));
+		assertThat(projectList).containsExactly(project1, project2);
 	}
 
 	@Test
 	public void testFindById_NoMatchingIdInDatabase_ReturnsNull() {
-
 		// Act
-		Project project = projectRepository.findById(ID_1);
+		Project project = projectRepository.findById("999");
 
 		// Assert
 		assertThat(project).isNull();
@@ -113,51 +107,58 @@ public class ProjectMongoRepositoryTest {
 
 	@Test
 	public void testFindById_OnlyOneProjectInTheDatabase_ReturnsTheProject() {
-
 		// Arrange
-		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
+		String id = "1";
+
+		Project project = new Project(id, "Name", "Description");
+		addProjectToDb(project);
 
 		// Act
-		Project project = projectRepository.findById(ID_1);
+		Project result = projectRepository.findById(id);
 
 		// Assert
-		assertThat(project).isNotNull();
-		assertThat(project).isEqualTo(new Project(ID_1, NAME_1, DESCRIPTION_1));
+		assertThat(result).isNotNull();
+		assertThat(result).isEqualTo(project);
 	}
 
 	@Test
 	public void testFindById_ManyProjectsInTheDatabase_ReturnsTheProject() {
-
 		// Arrange
-		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
-		addProjectToDb(new Project(ID_2, NAME_2, DESCRIPTION_2));
+		String targetId = "1";
+
+		Project project1 = new Project(targetId, "Name 1", "Description 1");
+		Project project2 = new Project("2", "Name 2", "Description 2");
+		addProjectToDb(project1);
+		addProjectToDb(project2);
 
 		// Act
-		Project project = projectRepository.findById(ID_2);
+		Project project = projectRepository.findById(targetId);
 
 		// Assert
 		assertThat(project).isNotNull();
-		assertThat(project).isEqualTo(new Project(ID_2, NAME_2, DESCRIPTION_2));
+		assertThat(project).isEqualTo(project1);
 	}
 
 	@Test
 	public void testSave_SavesProjectInTheDatabase() {
+		// Arrange
+		Project project = new Project("1", "Name", "Description");
 
 		// Act
-		projectRepository.save(new Project(ID_1, NAME_1, DESCRIPTION_1));
+		projectRepository.save(project);
 
 		// Assert
-		assertThat(queryAllProjectsFromDb()).containsExactly(new Project(ID_1, NAME_1, DESCRIPTION_1));
+		assertThat(queryAllProjectsFromDb()).containsExactly(project);
 	}
 
 	@Test
 	public void testDelete_DeletesProjectFromTheDatabase() {
-
 		// Arrange
-		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
+		String id = "1";
+		addProjectToDb(new Project(id, "Name", "Description"));
 
 		// Act
-		projectRepository.delete(ID_1);
+		projectRepository.delete(id);
 
 		// Assert
 		assertThat(queryAllProjectsFromDb()).isEmpty();
@@ -165,9 +166,8 @@ public class ProjectMongoRepositoryTest {
 
 	@Test
 	public void testExists_EmptyDatabase_ReturnsFalse() {
-
 		// Act
-		boolean result = projectRepository.exists(ID_1);
+		boolean result = projectRepository.exists("999");
 
 		// Assert
 		assertThat(result).isFalse();
@@ -175,12 +175,12 @@ public class ProjectMongoRepositoryTest {
 
 	@Test
 	public void testExists_MatchingIdInDatabase_ReturnsTrue() {
-
 		// Arrange
-		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
+		String id = "1";
+		addProjectToDb(new Project(id, "Name", "Description"));
 
 		// Act
-		boolean result = projectRepository.exists(ID_1);
+		boolean result = projectRepository.exists(id);
 
 		// Assert
 		assertThat(result).isTrue();
@@ -188,12 +188,11 @@ public class ProjectMongoRepositoryTest {
 
 	@Test
 	public void testExists_NoMatchingIdInDatabase_ReturnsFalse() {
-
 		// Arrange
-		addProjectToDb(new Project(ID_1, NAME_1, DESCRIPTION_1));
+		addProjectToDb(new Project("1", "Name", "Description"));
 
 		// Act
-		boolean result = projectRepository.exists(ID_2);
+		boolean result = projectRepository.exists("999");
 
 		// Assert
 		assertThat(result).isFalse();
