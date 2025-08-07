@@ -35,12 +35,12 @@
     <!-- SonarCloud -->
     <sonar.coverage.exclusions>
       **/model/*.*,
-      **/App.*
+      **/IssueTrackerSwingApp.*
     </sonar.coverage.exclusions>
 
     <sonar.tests>
       ${project.basedir}/src/test/java,
-      ${project.basedir}/src/it/java
+      ${project.basedir}/src/it/java,
       ${project.basedir}/src/e2e/java
     </sonar.tests>
 
@@ -138,7 +138,7 @@
           <configuration>
             <excludes>
               <exclude>**/model/*.*</exclude>
-              <exclude>**/App.*</exclude>
+              <exclude>**/IssueTrackerSwingApp.*</exclude>
             </excludes>
           </configuration>
           <executions>

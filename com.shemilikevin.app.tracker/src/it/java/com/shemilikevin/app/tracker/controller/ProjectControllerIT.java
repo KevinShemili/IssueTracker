@@ -29,9 +29,6 @@ public class ProjectControllerIT {
 	private static final String DATABASE_NAME = "db";
 	private static final String PROJECT_COLLECTION = "projects";
 	private static final String ISSUE_COLLECTION = "issues";
-	private static final String ID = "1";
-	private static final String NAME = "Desktop Application";
-	private static final String DESCRIPTION = "Desktop Application Description";
 
 	@Mock
 	private IssueTrackerView issueTrackerView;
@@ -66,7 +63,7 @@ public class ProjectControllerIT {
 	@Test
 	public void testListProjects_WhenThereAreProjectsInTheDatabase_ShowsAllProjects() {
 		// Arrange
-		Project project = new Project(ID, NAME, DESCRIPTION);
+		Project project = new Project("1", "Name", "Description");
 		projectRepository.save(project);
 
 		// Act
@@ -79,45 +76,64 @@ public class ProjectControllerIT {
 	@Test
 	public void testAddProject_WhenProvidedFieldsAreValid_CreatesNewProject() {
 		// Arrange
-		String newId = "2";
-		String newName = "Name";
-		String newDescription = "Description";
-
-		Project project = new Project(ID, NAME, DESCRIPTION);
-		projectRepository.save(project);
+		String id = "1";
+		String name = "Name";
+		String description = "Description";
 
 		// Act
-		projectController.addProject(newId, newName, newDescription);
+		projectController.addProject(id, name, description);
 
 		// Assert
 		verify(issueTrackerView).showProjects(
-				Arrays.asList(new Project(ID, NAME, DESCRIPTION), new Project(newId, newName, newDescription)));
+				Arrays.asList(new Project(id, name, description)));
+	}
+
+	@Test
+	public void testAddProject_WhenProvidedProjectIdAlreadyExistInDatabase_ShowsErrorMessage() {
+		// Arrange
+		String id = "1";
+		projectRepository.save(new Project(id, "Name", "Description"));
+
+		// Act
+		projectController.addProject(id, "Name", "Description"); // duplicate id
+
+		// Assert
+		verify(issueTrackerView).showProjectError(String.format(ErrorMessages.DUPLICATE_PROJECT, id));
+	}
+
+	@Test
+	public void testAddProject_WhenProvidedNonNumericId_ShowsErrorMessage() {
+		// Act
+		projectController.addProject("XYZ", "Name", "Description");
+
+		// Assert
+		verify(issueTrackerView).showProjectError(ErrorMessages.NON_NUMERICAL_ID);
 	}
 
 	@Test
 	public void testDeleteProject_WhenProvidedProjectHasNoAssociatedIssues_DeletesProject() {
 		// Arrange
-		Project project = new Project(ID, NAME, DESCRIPTION);
-		projectRepository.save(project);
+		String id = "1";
+		projectRepository.save(new Project(id, "Name", "Description"));
 
 		// Act
-		projectController.deleteProject(ID);
+		projectController.deleteProject(id);
 
 		// Assert
 		verify(issueTrackerView).showProjects(Collections.emptyList());
 	}
 
 	@Test
-	public void testDeleteProject_WhenProvidedProjectHasAssociatedIssues_ShowsHasIssuesError() {
+	public void testDeleteProject_WhenProvidedProjectHasAssociatedIssues_ShowsErrorMessage() {
 		// Arrange
-		Project project = new Project(ID, NAME, DESCRIPTION);
-		projectRepository.save(project);
+		String projectId = "10";
+		String issueId = "1";
 
-		Issue issue = new Issue("1", "Issue Name", "Issue Description", "Low", ID);
-		issueRepository.save(issue);
+		projectRepository.save(new Project(projectId, "Name", "Description"));
+		issueRepository.save(new Issue(issueId, "Name", "Description", "Priority", projectId));
 
 		// Act
-		projectController.deleteProject(ID);
+		projectController.deleteProject(projectId);
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.PROJECT_HAS_ISSUES);

@@ -115,9 +115,9 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testAddProjectButton_CreatesNewProject() {
 		// Arrange
-		String id = "3";
-		String name = "New Project";
-		String description = "XX";
+		String id = "3"; // Last id is 2
+		String name = "Name";
+		String description = "Description";
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(id);
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(name);
@@ -136,8 +136,8 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase {
 	public void testAddProjectButton_ProvidedWithNonNumericId_ShowsErrorMessage() {
 		// Arrange
 		String id = "XYZ";
-		String name = "New Project";
-		String description = "XX";
+		String name = "Name";
+		String description = "Description";
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(id);
 		frameFixture.textBox(PROJECT_NAME_FIELD).enterText(name);
@@ -210,11 +210,31 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase {
 
 	@Test
 	@GUITest
+	public void testProjectTab_WhenInIssueTab_GoingBackToProjectTab_ShowsAllDatabaseProjects() {
+		// Arrange
+		// Go to Issue Tab
+		frameFixture.list(PROJECT_LIST).selectItem(Pattern.compile(".*" + PROJECT_FIXTURE_2_NAME + ".*"));
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(Pattern.compile(".*" + "Issue" + ".*"));
+
+		// Act
+		// Go back to Project Tab
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(Pattern.compile(".*" + "Project" + ".*"));
+
+		// Assert
+		assertThat(frameFixture.list(PROJECT_LIST).contents())
+				.anySatisfy(e -> assertThat(e).contains(PROJECT_FIXTURE_1_ID, PROJECT_FIXTURE_1_NAME,
+						PROJECT_FIXTURE_1_DESCRIPTION))
+				.anySatisfy(e -> assertThat(e).contains(PROJECT_FIXTURE_2_ID, PROJECT_FIXTURE_2_NAME,
+						PROJECT_FIXTURE_2_DESCRIPTION));
+	}
+
+	@Test
+	@GUITest
 	public void testAddIssueButton_CreatesNewIssue() {
 		// Arrange
-		String id = "3";
-		String name = "New Issue";
-		String description = "XX";
+		String id = "3"; // Last id is 2
+		String name = "Name";
+		String description = "Description";
 		String priority = "Low";
 
 		frameFixture.list(PROJECT_LIST).selectItem(Pattern.compile(".*" + PROJECT_FIXTURE_2_NAME + ".*"));
@@ -238,8 +258,8 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase {
 	public void testAddIssueButton_ProvidedWithNonNumericId_ShowsErrorMessage() {
 		// Arrange
 		String id = "XYZ";
-		String name = "New Issue";
-		String description = "XX";
+		String name = "Name";
+		String description = "Description";
 		String priority = "Low";
 
 		frameFixture.list(PROJECT_LIST).selectItem(Pattern.compile(".*" + PROJECT_FIXTURE_2_NAME + ".*"));

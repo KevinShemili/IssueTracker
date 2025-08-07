@@ -23,12 +23,6 @@ import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class ProjectControllerTest {
 
-	private static final String NON_NUMERIC_ID = "XX";
-	private static final String EMPTY_STRING = " ";
-	private static final String ID = "1";
-	private static final String NAME = "Desktop Application";
-	private static final String DESCRIPTION = "Desktop Application Description";
-
 	@Mock
 	private ProjectRepository projectRepository;
 
@@ -56,7 +50,8 @@ public class ProjectControllerTest {
 	@Test
 	public void testListProjects_WhenThereAreProjectsInTheDatabase_ShowsAllProjects() {
 		// Arrange
-		Project project = new Project(ID, NAME, DESCRIPTION);
+		Project project = new Project("1", "Name", "Description");
+
 		when(projectRepository.findAll()).thenReturn(Arrays.asList(project));
 
 		// Act
@@ -87,26 +82,30 @@ public class ProjectControllerTest {
 	@Test
 	public void testAddProject_WhenProvidedFieldsAreValid_CreatesNewProject() {
 		// Arrange
-		Project project = new Project(ID, NAME, DESCRIPTION);
-		when(projectRepository.exists(ID)).thenReturn(false);
+		String id = "1";
+		String name = "Name";
+		String description = "Description";
+		Project project = new Project(id, name, description);
+
+		when(projectRepository.exists(id)).thenReturn(false);
 		when(projectRepository.findAll()).thenReturn(Arrays.asList(project));
 
 		// Act
-		projectController.addProject(ID, NAME, DESCRIPTION);
+		projectController.addProject(id, name, description);
 
 		// Assert
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
-		inOrder.verify(projectRepository).exists(ID);
-		inOrder.verify(projectRepository).save(new Project(ID, NAME, DESCRIPTION));
+		inOrder.verify(projectRepository).exists(id);
+		inOrder.verify(projectRepository).save(project);
 		inOrder.verify(projectRepository).findAll();
-		inOrder.verify(issueTrackerView).showProjects(Arrays.asList(new Project(ID, NAME, DESCRIPTION)));
+		inOrder.verify(issueTrackerView).showProjects(Arrays.asList(project));
 		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
 	public void testAddProject_WhenProvidedProjectIdIsNull_ShowsErrorMessage() {
 		// Act
-		projectController.addProject(null, NAME, DESCRIPTION);
+		projectController.addProject(null, "Name", "Description");
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
@@ -116,7 +115,7 @@ public class ProjectControllerTest {
 	@Test
 	public void testAddProject_WhenProvidedProjectIdIsEmpty_ShowsErrorMessage() {
 		// Act
-		projectController.addProject(EMPTY_STRING, NAME, DESCRIPTION);
+		projectController.addProject(" ", "Name", "Description");
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
@@ -126,7 +125,7 @@ public class ProjectControllerTest {
 	@Test
 	public void testAddProject_WhenProvidedProjectIdIsNonNumeric_ShowsErrorMessage() {
 		// Act
-		projectController.addProject(NON_NUMERIC_ID, NAME, DESCRIPTION);
+		projectController.addProject("XYZ", "Name", "Description");
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.NON_NUMERICAL_ID);
@@ -136,7 +135,7 @@ public class ProjectControllerTest {
 	@Test
 	public void testAddProject_WhenProvidedProjectNameIsNull_ShowsErrorMessage() {
 		// Act
-		projectController.addProject(ID, null, DESCRIPTION);
+		projectController.addProject("1", null, "Description");
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_NAME);
@@ -146,7 +145,7 @@ public class ProjectControllerTest {
 	@Test
 	public void testAddProject_WhenProvidedProjectNameIsEmpty_ShowsErrorMessage() {
 		// Act
-		projectController.addProject(ID, EMPTY_STRING, DESCRIPTION);
+		projectController.addProject("1", " ", "Description");
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_NAME);
@@ -156,7 +155,7 @@ public class ProjectControllerTest {
 	@Test
 	public void testAddProject_WhenProvidedProjectDescriptionIsNull_ShowsErrorMessage() {
 		// Act
-		projectController.addProject(ID, NAME, null);
+		projectController.addProject("1", "Name", null);
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
@@ -166,7 +165,7 @@ public class ProjectControllerTest {
 	@Test
 	public void testAddProject_WhenProvidedProjectDescriptionIsEmpty_ShowsErrorMessage() {
 		// Act
-		projectController.addProject(ID, NAME, EMPTY_STRING);
+		projectController.addProject("1", "Name", " ");
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
@@ -176,33 +175,35 @@ public class ProjectControllerTest {
 	@Test
 	public void testAddProject_WhenProvidedProjectIdAlreadyExistsInDatabase_ShowsErrorMessage() {
 		// Arrange
-		when(projectRepository.exists(ID)).thenReturn(true);
+		String id = "1";
+		when(projectRepository.exists(id)).thenReturn(true);
 
 		// Act
-		projectController.addProject(ID, NAME, DESCRIPTION);
+		projectController.addProject(id, "Name", "Description");
 
 		// Assert
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
-		inOrder.verify(projectRepository).exists(ID);
-		inOrder.verify(issueTrackerView).showProjectError(String.format(ErrorMessages.DUPLICATE_PROJECT, ID));
+		inOrder.verify(projectRepository).exists(id);
+		inOrder.verify(issueTrackerView).showProjectError(String.format(ErrorMessages.DUPLICATE_PROJECT, id));
 		verifyNoMoreInteractions(issueTrackerView, projectRepository);
 	}
 
 	@Test
 	public void testDeleteProject_WhenProvidedProjectHasNoAssociatedIssues_DeletesProject() {
 		// Arrange
-		when(projectRepository.exists(ID)).thenReturn(true);
-		when(issueRepository.hasAssociatedIssues(ID)).thenReturn(false);
+		String id = "1";
+		when(projectRepository.exists(id)).thenReturn(true);
+		when(issueRepository.hasAssociatedIssues(id)).thenReturn(false);
 		when(projectRepository.findAll()).thenReturn(Collections.emptyList());
 
 		// Act
-		projectController.deleteProject(ID);
+		projectController.deleteProject(id);
 
 		// Assert
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
-		inOrder.verify(projectRepository).exists(ID);
-		inOrder.verify(issueRepository).hasAssociatedIssues(ID);
-		inOrder.verify(projectRepository).delete(ID);
+		inOrder.verify(projectRepository).exists(id);
+		inOrder.verify(issueRepository).hasAssociatedIssues(id);
+		inOrder.verify(projectRepository).delete(id);
 		inOrder.verify(projectRepository).findAll();
 		inOrder.verify(issueTrackerView).showProjects(Collections.emptyList());
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
@@ -211,16 +212,18 @@ public class ProjectControllerTest {
 	@Test
 	public void testDeleteProject_WhenProvidedProjectHasAssociatedIssues_ShowsErrorMessage() {
 		// Arrange
-		when(projectRepository.exists(ID)).thenReturn(true);
-		when(issueRepository.hasAssociatedIssues(ID)).thenReturn(true);
+		String id = "1";
+
+		when(projectRepository.exists(id)).thenReturn(true);
+		when(issueRepository.hasAssociatedIssues(id)).thenReturn(true);
 
 		// Act
-		projectController.deleteProject(ID);
+		projectController.deleteProject(id);
 
 		// Assert
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueRepository, issueTrackerView);
-		inOrder.verify(projectRepository).exists(ID);
-		inOrder.verify(issueRepository).hasAssociatedIssues(ID);
+		inOrder.verify(projectRepository).exists(id);
+		inOrder.verify(issueRepository).hasAssociatedIssues(id);
 		inOrder.verify(issueTrackerView).showProjectError(ErrorMessages.PROJECT_HAS_ISSUES);
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
@@ -228,14 +231,16 @@ public class ProjectControllerTest {
 	@Test
 	public void testDeleteProject_WhenProvidedProjectIdDoesNotExistInDatabase_ShowsErrorMessage() {
 		// Arrange
-		when(projectRepository.exists(ID)).thenReturn(false);
+		String id = "1";
+
+		when(projectRepository.exists(id)).thenReturn(false);
 
 		// Act
-		projectController.deleteProject(ID);
+		projectController.deleteProject(id);
 
 		// Assert
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
-		inOrder.verify(projectRepository).exists(ID);
+		inOrder.verify(projectRepository).exists(id);
 		inOrder.verify(issueTrackerView).showProjectError(ErrorMessages.PROJECT_DOESNT_EXIST);
 		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
@@ -253,7 +258,7 @@ public class ProjectControllerTest {
 	@Test
 	public void testDeleteProject_WhenProvidedProjectIdIsEmpty_ShowsErrorMessage() {
 		// Act
-		projectController.deleteProject(EMPTY_STRING);
+		projectController.deleteProject(" ");
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
@@ -263,7 +268,7 @@ public class ProjectControllerTest {
 	@Test
 	public void testDeleteProject_WhenProvidedProjectIdIsNonNumeric_ShowsErrorMessage() {
 		// Act
-		projectController.deleteProject(NON_NUMERIC_ID);
+		projectController.deleteProject("XYZ");
 
 		// Assert
 		verify(issueTrackerView).showProjectError(ErrorMessages.NON_NUMERICAL_ID);
