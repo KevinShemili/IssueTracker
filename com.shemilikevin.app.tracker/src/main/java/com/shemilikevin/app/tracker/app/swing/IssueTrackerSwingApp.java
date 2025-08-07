@@ -2,6 +2,8 @@ package com.shemilikevin.app.tracker.app.swing;
 
 import java.awt.EventQueue;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
@@ -63,7 +65,7 @@ public class IssueTrackerSwingApp implements Callable<Void> {
 				issueTrackerView.setVisible(true);
 				projectController.listProjects();
 			} catch (Exception e) {
-				e.printStackTrace();
+				Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Exception", e);
 			}
 		});
 
