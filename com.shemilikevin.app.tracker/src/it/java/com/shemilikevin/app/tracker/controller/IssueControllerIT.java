@@ -29,11 +29,6 @@ public class IssueControllerIT {
 	private static final String DATABASE_NAME = "db";
 	private static final String PROJECT_COLLECTION = "projects";
 	private static final String ISSUE_COLLECTION = "issues";
-	private static final String ISSUE_NAME = "Broken Button";
-	private static final String ISSUE_DESCRIPTION = "Button is not clickable when...";
-	private static final String ISSUE_PRIORITY = "Low";
-	private static final String PROJECT_ID = "2";
-	private static final String ISSUE_ID = "1";
 
 	@Mock
 	private IssueTrackerView issueTrackerView;
@@ -50,9 +45,12 @@ public class IssueControllerIT {
 	@Before
 	public void setUp() {
 		autoCloseable = MockitoAnnotations.openMocks(this);
+
 		mongoClient = new MongoClient(new ServerAddress(mongoContainer.getHost(), mongoContainer.getFirstMappedPort()));
+
 		projectRepository = new ProjectMongoRepository(mongoClient, DATABASE_NAME, PROJECT_COLLECTION);
 		issueRepository = new IssueMongoRepository(mongoClient, DATABASE_NAME, ISSUE_COLLECTION);
+
 		MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
 		database.drop();
 
@@ -68,16 +66,17 @@ public class IssueControllerIT {
 	@Test
 	public void testListIssues_WhenProjectHasIssues_ShowsAllIssues() {
 		// Arrange
-		Project project = new Project(PROJECT_ID, "Project Name", "Project Description");
+		String projectId = "10";
+		Project project = new Project(projectId, "Name", "Description");
 		projectRepository.save(project);
 
-		Issue issue = new Issue("1", "Issue Name", "Issue Description", "Low", PROJECT_ID);
-		Issue issue2 = new Issue("2", "Issue Name", "Issue Description", "Low", PROJECT_ID);
+		Issue issue = new Issue("1", "Name 1", "Description 1", "Low", projectId);
+		Issue issue2 = new Issue("2", "Name 2", "Description 2", "Low", projectId);
 		issueRepository.save(issue);
 		issueRepository.save(issue2);
 
 		// Act
-		issueController.listIssues(PROJECT_ID);
+		issueController.listIssues(projectId);
 
 		// Assert
 		verify(issueTrackerView).showIssues(Arrays.asList(issue, issue2));
@@ -86,53 +85,63 @@ public class IssueControllerIT {
 	@Test
 	public void testAddIssue_WhenProvidedFieldsAreValid_CreatesNewIssue() {
 		// Arrange
-		String newId = "2";
-		String newName = "Name";
-		String newDescription = "Description";
-		String newPriority = "Low";
+		String id = "2";
+		String name = "Name";
+		String description = "Description";
+		String priority = "Low";
+		String projectId = "10";
 
-		Project project = new Project(PROJECT_ID, "Project Name", "Project Description");
+		Project project = new Project(projectId, "Name", "Description");
 		projectRepository.save(project);
 
-		Issue issue = new Issue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID);
-		issueRepository.save(issue);
-
 		// Act
-		issueController.addIssue(newId, newName, newDescription, newPriority, PROJECT_ID);
+		issueController.addIssue(id, name, description, priority, projectId);
 
 		// Assert
 		verify(issueTrackerView).showIssues(
-				Arrays.asList(new Issue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID),
-						new Issue(newId, newName, newDescription, newPriority, PROJECT_ID)));
+				Arrays.asList(new Issue(id, name, description, priority, projectId)));
 	}
 
 	@Test
-	public void testAddIssue_WhenProvidedIssueIdAlreadyExistInDatabase_ShowsDuplicationError() {
+	public void testAddIssue_WhenProvidedIssueIdAlreadyExistInDatabase_ShowErrorMessage() {
 		// Arrange
-		Project project = new Project(PROJECT_ID, "Project Name", "Project Description");
-		projectRepository.save(project);
+		String id = "2";
+		String projectId = "10";
 
-		Issue issue = new Issue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID);
-		issueRepository.save(issue);
+		projectRepository.save(new Project(projectId, "Name", "Description"));
+		issueRepository.save(new Issue(id, "Name", "Description", "Priority", projectId));
 
 		// Act
-		issueController.addIssue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID);
+		issueController.addIssue(id, "Name", "Description", "Low", projectId); // duplicate id
 
 		// Assert
-		verify(issueTrackerView).showIssueError(String.format(ErrorMessages.DUPLICATE_ISSUE, ISSUE_ID));
+		verify(issueTrackerView).showIssueError(String.format(ErrorMessages.DUPLICATE_ISSUE, id));
+	}
+
+	@Test
+	public void testAddIssue_WhenProvidedNonNumericId_ShowErrorMessage() {
+		// Arrange
+		String projectId = "10";
+		projectRepository.save(new Project(projectId, "Name", "Description"));
+
+		// Act
+		issueController.addIssue("XYZ", "Name", "Description", "Low", projectId);
+
+		// Assert
+		verify(issueTrackerView).showIssueError(ErrorMessages.NON_NUMERICAL_ID);
 	}
 
 	@Test
 	public void testDeleteIssue_WhenProvidedIssueIdIsValid_DeletesIssue() {
 		// Arrange
-		Project project = new Project(PROJECT_ID, "Project Name", "Project Description");
-		projectRepository.save(project);
+		String id = "1";
+		String projectId = "10";
 
-		Issue issue = new Issue(ISSUE_ID, ISSUE_NAME, ISSUE_DESCRIPTION, ISSUE_PRIORITY, PROJECT_ID);
-		issueRepository.save(issue);
+		projectRepository.save(new Project(projectId, "Name", "Description"));
+		issueRepository.save(new Issue(id, "Name", "Description", "Priority", projectId));
 
 		// Act
-		issueController.deleteIssue(ISSUE_ID);
+		issueController.deleteIssue(id);
 
 		// Assert
 		verify(issueTrackerView).showIssues(Collections.emptyList());

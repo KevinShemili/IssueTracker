@@ -31,21 +31,6 @@ public class IssueMongoRepositoryTest {
 	private static final String DATABASE_NAME = "db";
 	private static final String COLLECTION_NAME = "collection";
 
-	private static final String ID_1 = "1";
-	private static final String ID_2 = "2";
-	private static final String ID_3 = "3";
-	private static final String NAME_1 = "Broken Button";
-	private static final String NAME_2 = "Performance Issue";
-	private static final String NAME_3 = "3rd Party Integration Error";
-	private static final String DESCRIPTION_1 = "Button is not clickable when...";
-	private static final String DESCRIPTION_2 = "Retrieval of data is very slow in...";
-	private static final String DESCRIPTION_3 = "Error while communicating with...";
-	private static final String PRIORITY_LOW = "Low";
-	private static final String PRIORITY_MEDIUM = "Medium";
-	private static final String PRIORITY_HIGH = "High";
-	private static final String PROJECT_ID_1 = "1";
-	private static final String PROJECT_ID_2 = "2";
-
 	private static MongoServer mongoServer;
 	private static InetSocketAddress inetSocketAddress;
 
@@ -73,8 +58,10 @@ public class IssueMongoRepositoryTest {
 
 		mongoClient = new MongoClient(new ServerAddress(inetSocketAddress), mongoClientOptions);
 		issueRepository = new IssueMongoRepository(mongoClient, DATABASE_NAME, COLLECTION_NAME);
+
 		MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
 		database.drop();
+
 		issueCollection = database.getCollection(COLLECTION_NAME, Issue.class);
 	}
 
@@ -85,7 +72,6 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testFindAll_EmptyDatabase_ReturnsEmptyList() {
-
 		// Act
 		List<Issue> issueList = issueRepository.findAll();
 
@@ -95,25 +81,24 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testFindAll_ManyIssuesInTheDatabase_ReturnsAllIssues() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
-		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
+		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority 1", "10");
+		Issue issue2 = new Issue("2", "Name 2", "Description 2", "Priority 2", "20");
+		AddIssueToDb(issue1);
+		AddIssueToDb(issue2);
 
 		// Act
 		List<Issue> issueList = issueRepository.findAll();
 
 		// Assert
 		assertThat(issueList).hasSize(2);
-		assertThat(issueList).containsExactly(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1),
-				new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
+		assertThat(issueList).containsExactly(issue1, issue2);
 	}
 
 	@Test
 	public void testFindById_NoMatchingIdInDatabase_ReturnsNull() {
-
 		// Act
-		Issue issue = issueRepository.findById(ID_1);
+		Issue issue = issueRepository.findById("1");
 
 		// Assert
 		assertThat(issue).isNull();
@@ -121,38 +106,42 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testFindById_OnlyOneIssueInTheDatabase_ReturnsTheIssue() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		String id = "1";
+
+		Issue issue = new Issue(id, "Name", "Description", "Priority", "10");
+		AddIssueToDb(issue);
 
 		// Act
-		Issue issue = issueRepository.findById(ID_1);
+		Issue result = issueRepository.findById(id);
 
 		// Assert
-		assertThat(issue).isNotNull();
-		assertThat(issue).isEqualTo(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		assertThat(result).isNotNull();
+		assertThat(result).isEqualTo(issue);
 	}
 
 	@Test
 	public void testFindById_ManyIssuesInTheDatabase_ReturnsTheIssue() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
-		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
+		String targetId = "2";
+
+		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority 1", "10");
+		Issue issue2 = new Issue(targetId, "Name 2", "Description 2", "Priority 2", "20");
+		AddIssueToDb(issue1);
+		AddIssueToDb(issue2);
 
 		// Act
-		Issue issue = issueRepository.findById(ID_2);
+		Issue issue = issueRepository.findById(targetId);
 
 		// Assert
 		assertThat(issue).isNotNull();
-		assertThat(issue).isEqualTo(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
+		assertThat(issue).isEqualTo(issue2);
 	}
 
 	@Test
 	public void testFindByProjectId_NoMatchingIdInDatabase_ReturnsEmptyList() {
-
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_1);
+		List<Issue> issueList = issueRepository.findByProjectId("1");
 
 		// Assert
 		assertThat(issueList).isEmpty();
@@ -160,13 +149,12 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testFindByProjectId_IssuesExistButForDifferentProject_ReturnsEmptyList() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
-		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
+		AddIssueToDb(new Issue("1", "Name 1", "Description 1", "Priority 1", "10"));
+		AddIssueToDb(new Issue("2", "Name 2", "Description 2", "Priority 2", "10"));
 
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_2);
+		List<Issue> issueList = issueRepository.findByProjectId("999");
 
 		// Assert
 		assertThat(issueList).isEmpty();
@@ -174,70 +162,80 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testFindByProjectId_OnlyOneMatchingIssue_ReturnsOneIssue() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		String projectId = "10";
+
+		Issue issue = new Issue("1", "Name", "Description", "Priority", projectId);
+		AddIssueToDb(issue);
 
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_1);
+		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 
 		// Assert
 		assertThat(issueList).hasSize(1);
-		assertThat(issueList).containsExactly(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		assertThat(issueList).containsExactly(issue);
 	}
 
 	@Test
 	public void testFindByProjectId_ManyMatchingIssues_ReturnsTheIssues() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
-		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
+		String projectId = "10";
+
+		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority 1", projectId);
+		Issue issue2 = new Issue("2", "Name 2", "Description 2", "Priority 2", projectId);
+		AddIssueToDb(issue1);
+		AddIssueToDb(issue2);
 
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_1);
+		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 
 		// Assert
 		assertThat(issueList).hasSize(2);
-		assertThat(issueList).containsExactly(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1),
-				new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_1));
+		assertThat(issueList).containsExactly(issue1, issue2);
 	}
 
 	@Test
 	public void testFindByProjectId_ManyIssuesFromDifferentProjects_ReturnsOnlyMatchingIssues() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
-		AddIssueToDb(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_2));
-		AddIssueToDb(new Issue(ID_3, NAME_3, DESCRIPTION_3, PRIORITY_LOW, PROJECT_ID_2));
+		String projectId = "10";
+
+		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority 1", projectId);
+		Issue issue2 = new Issue("2", "Name 2", "Description 2", "Priority 2", projectId);
+		Issue issue3 = new Issue("3", "Name 3", "Description 3", "Priority 3", "20");
+		AddIssueToDb(issue1);
+		AddIssueToDb(issue2);
+		AddIssueToDb(issue3);
 
 		// Act
-		List<Issue> issueList = issueRepository.findByProjectId(PROJECT_ID_2);
+		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 
 		// Assert
 		assertThat(issueList).hasSize(2);
-		assertThat(issueList).containsExactly(new Issue(ID_2, NAME_2, DESCRIPTION_2, PRIORITY_HIGH, PROJECT_ID_2),
-				new Issue(ID_3, NAME_3, DESCRIPTION_3, PRIORITY_LOW, PROJECT_ID_2));
+		assertThat(issueList).containsExactly(issue1, issue2);
 	}
 
 	@Test
 	public void testSave_SavesIssueInTheDatabase() {
+		// Arrange
+		Issue issue = new Issue("1", "Name", "Description", "Priority", "10");
 
 		// Act
-		issueRepository.save(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		issueRepository.save(issue);
 
 		// Assert
-		assertThat(queryAllIssuesFromDb())
-				.containsExactly(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		assertThat(queryAllIssuesFromDb()).containsExactly(issue);
 	}
 
 	@Test
 	public void testDelete_DeletesIssueFromTheDatabase() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		String id = "1";
+
+		Issue issue = new Issue(id, "Name", "Description", "Priority", "10");
+		AddIssueToDb(issue);
 
 		// Act
-		issueRepository.delete(ID_1);
+		issueRepository.delete(id);
 
 		// Assert
 		assertThat(queryAllIssuesFromDb()).isEmpty();
@@ -245,9 +243,8 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testExists_EmptyDatabase_ReturnsFalse() {
-
 		// Act
-		boolean result = issueRepository.exists(ID_1);
+		boolean result = issueRepository.exists("1");
 
 		// Assert
 		assertThat(result).isFalse();
@@ -255,12 +252,14 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testExists_MatchingIdInDatabase_ReturnsTrue() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		String id = "1";
+
+		Issue issue = new Issue(id, "Name", "Description", "Priority", "10");
+		AddIssueToDb(issue);
 
 		// Act
-		boolean result = issueRepository.exists(ID_1);
+		boolean result = issueRepository.exists(id);
 
 		// Assert
 		assertThat(result).isTrue();
@@ -268,12 +267,11 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testExists_NoMatchingIdInDatabase_ReturnsFalse() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		AddIssueToDb(new Issue("1", "Name", "Description", "Priority", "10"));
 
 		// Act
-		boolean result = issueRepository.exists(ID_2);
+		boolean result = issueRepository.exists("999");
 
 		// Assert
 		assertThat(result).isFalse();
@@ -281,9 +279,8 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testHasAssociatedIssues_GivenProjectHasNoAssociatedIssues_ReturnsFalse() {
-
 		// Act
-		boolean result = issueRepository.hasAssociatedIssues(PROJECT_ID_1);
+		boolean result = issueRepository.hasAssociatedIssues("1");
 
 		// Assert
 		assertThat(result).isFalse();
@@ -291,12 +288,13 @@ public class IssueMongoRepositoryTest {
 
 	@Test
 	public void testHasAssociatedIssues_GivenProjectHasAssociatedIssues_ReturnsTrue() {
-
 		// Arrange
-		AddIssueToDb(new Issue(ID_1, NAME_1, DESCRIPTION_1, PRIORITY_MEDIUM, PROJECT_ID_1));
+		String projectId = "10";
+
+		AddIssueToDb(new Issue("1", "Name", "Description", "Priority", projectId));
 
 		// Act
-		boolean result = issueRepository.hasAssociatedIssues(PROJECT_ID_1);
+		boolean result = issueRepository.hasAssociatedIssues(projectId);
 
 		// Assert
 		assertThat(result).isTrue();

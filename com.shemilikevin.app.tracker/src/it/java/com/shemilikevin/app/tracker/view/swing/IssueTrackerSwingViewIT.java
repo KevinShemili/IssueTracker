@@ -31,9 +31,8 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 	private static final String DATABASE_NAME = "db";
 	private static final String PROJECT_COLLECTION = "projects";
 	private static final String ISSUE_COLLECTION = "issues";
-	private static final int TAB_PROJECTS = 0;
+
 	private static final int TAB_ISSUES = 1;
-	private static final String TABBED_PANE = "tabbedPane";
 	private static final String PROJECT_ID_FIELD = "projectIdField";
 	private static final String PROJECT_NAME_FIELD = "projectNameField";
 	private static final String PROJECT_DESCRIPTION_FIELD = "projectDescriptionField";
@@ -64,6 +63,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 	@Override
 	protected void onSetUp() throws Exception {
 		mongoClient = new MongoClient(new ServerAddress(mongoContainer.getHost(), mongoContainer.getFirstMappedPort()));
+
 		projectRepository = new ProjectMongoRepository(mongoClient, DATABASE_NAME, PROJECT_COLLECTION);
 		issueRepository = new IssueMongoRepository(mongoClient, DATABASE_NAME, ISSUE_COLLECTION);
 
@@ -93,10 +93,10 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 	@Test
 	@GUITest
-	public void testListProjects_ShowsAllProjectsToView() {
+	public void testProjectTab_ShowsAllProjectsToView() {
 		// Arrange
-		Project project1 = new Project("1", "Project1", "Description1");
-		Project project2 = new Project("2", "Project2", "Description2");
+		Project project1 = new Project("1", "Name 1", "Description 1");
+		Project project2 = new Project("2", "Name 2", "Description 2");
 		projectRepository.save(project1);
 		projectRepository.save(project2);
 
@@ -128,21 +128,20 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		// Assert
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).containsExactly(new Project(id, name, description).toString());
+		assertThat(projectRepository.findById(id)).isEqualTo(new Project(id, name, description));
 	}
 
 	@Test
 	@GUITest
-	public void testAddProjectButton_DuplicateProjectId_ShowsErrorMessage() {
+	public void testAddProjectButton_GivenDuplicateId_ShowsErrorMessage() {
 		// Arrange
 		String id = "1";
-		String name = "Project";
-		String description = "Description";
 
-		projectRepository.save(new Project(id, name, description));
+		projectRepository.save(new Project(id, "Name", "Description"));
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(id); // duplicate
-		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("XX");
-		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("XX");
+		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
 
 		// Act
 		frameFixture.button(PROJECT_ADD_BUTTON).click();
@@ -151,6 +150,25 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(PROJECT_ERROR_LABEL).requireText(String.format(ErrorMessages.DUPLICATE_PROJECT, id));
+	}
+
+	@Test
+	@GUITest
+	public void testAddProjectButton_GivenNonNumericId_ShowsErrorMessage() {
+		// Arrange
+		String nonNumeric = "XYZ";
+
+		frameFixture.textBox(PROJECT_ID_FIELD).enterText(nonNumeric);
+		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
+
+		// Act
+		frameFixture.button(PROJECT_ADD_BUTTON).click();
+
+		// Assert
+		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
+		assertThat(listContents).isEmpty();
+		frameFixture.label(PROJECT_ERROR_LABEL).requireText(ErrorMessages.NON_NUMERICAL_ID);
 	}
 
 	@Test
@@ -171,21 +189,21 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		// Assert
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).isEmpty();
+		assertThat(projectRepository.exists(id)).isFalse();
 	}
 
 	@Test
 	@GUITest
-	public void testDeleteProjectButton_ProjectHasAssociatedIssues_ShowsErrorMessage() {
+	public void testDeleteProjectButton_WhenProjectHasAssociatedIssues_ShowsErrorMessage() {
 		// Arrange
-		String id = "1";
+		String projectId = "1";
 		String name = "Name";
 		String description = "Description";
 
 		GuiActionRunner.execute(() -> {
-			projectController.addProject(id, name, description);
+			projectController.addProject(projectId, name, description);
 		});
-
-		issueRepository.save(new Issue("1", "Name", "Description", "Low", id));
+		issueRepository.save(new Issue("1", "Name", "Description", "Priority", projectId));
 
 		frameFixture.list(PROJECT_LIST).selectItem(0);
 
@@ -194,19 +212,19 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		// Assert
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
-		assertThat(listContents).containsExactly(new Project(id, name, description).toString());
+		assertThat(listContents).containsExactly(new Project(projectId, name, description).toString());
 		frameFixture.label(PROJECT_ERROR_LABEL).requireText(ErrorMessages.PROJECT_HAS_ISSUES);
 	}
 
 	@Test
 	@GUITest
-	public void testListIssues_ShowsAllIssuesToView() {
+	public void testIssueTab_ShowsAllIssuesOfAProjectToView() {
 		// Arrange
 		String projectId = "10";
-		projectRepository.save(new Project(projectId, "Project", "Description"));
+		projectRepository.save(new Project(projectId, "Name", "Description"));
 
-		Issue issue1 = new Issue("1", "Name1", "Description1", "Low", projectId);
-		Issue issue2 = new Issue("2", "Name2", "Description2", "Low", projectId);
+		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority", projectId);
+		Issue issue2 = new Issue("2", "Name 2", "Description 2", "Priority", projectId);
 		issueRepository.save(issue1);
 		issueRepository.save(issue2);
 
@@ -226,21 +244,20 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 	public void testAddIssueButton_HappyPath_CreatesIssue() {
 		// Arrange
 		String projectId = "10";
-		projectRepository.save(new Project(projectId, "Project", "Description"));
+		projectRepository.save(new Project(projectId, "Name", "Description"));
 
-		String issueId = "1";
-		String name = "Issue";
+		String id = "1";
+		String name = "Name";
 		String description = "Description";
 		String priority = "Low";
 
 		GuiActionRunner.execute(() -> {
 			projectController.listProjects();
+			issueTrackerView.getProjectJList().setSelectedIndex(0);
+			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
 		});
 
-		frameFixture.list(PROJECT_LIST).selectItem(0);
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
-
-		frameFixture.textBox(ISSUE_ID_FIELD).enterText(issueId);
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText(id);
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(name);
 		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText(description);
 		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
@@ -250,32 +267,31 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
-		assertThat(listContents).containsExactly(new Issue(issueId, name, description, priority, projectId).toString());
+		assertThat(listContents).containsExactly(new Issue(id, name, description, priority, projectId).toString());
+		assertThat(issueRepository.findById(id)).isEqualTo(new Issue(id, name, description, priority, projectId));
+
 	}
 
 	@Test
 	@GUITest
-	public void testAddIssueButton_DuplicateIssueId_ShowsErrorMessage() {
+	public void testAddIssueButton_GivenDuplicateId_ShowsErrorMessage() {
 		// Arrange
-		String issueId = "1";
-		String name = "Issue";
-		String description = "Description";
-		String priority = "Low";
+		String id = "1";
 		String projectId = "10";
 
-		projectRepository.save(new Project(projectId, "Project", "Description"));
-		issueRepository.save(new Issue(issueId, name, description, priority, projectId));
+		projectRepository.save(new Project(projectId, "Name", "Description"));
+		Issue issue = new Issue(id, "Name", "Description", "Priority", projectId);
+		issueRepository.save(issue);
 
 		GuiActionRunner.execute(() -> {
 			projectController.listProjects();
+			issueTrackerView.getProjectJList().setSelectedIndex(0);
+			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
 		});
 
-		frameFixture.list(PROJECT_LIST).selectItem(0);
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
-
-		frameFixture.textBox(ISSUE_ID_FIELD).enterText(issueId); // duplicate
-		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("XX");
-		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("XX");
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText(id); // duplicate
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
 		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
 
 		// Act
@@ -283,8 +299,36 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
-		assertThat(listContents).containsExactly(new Issue(issueId, name, description, priority, projectId).toString());
-		frameFixture.label(ISSUE_ERROR_LABEL).requireText(String.format(ErrorMessages.DUPLICATE_ISSUE, issueId));
+		assertThat(listContents).containsExactly(issue.toString());
+		frameFixture.label(ISSUE_ERROR_LABEL).requireText(String.format(ErrorMessages.DUPLICATE_ISSUE, id));
+	}
+
+	@Test
+	@GUITest
+	public void testAddIssueButton_GivenNonNumericId_ShowsErrorMessage() {
+		// Arrange
+		String projectId = "10";
+
+		projectRepository.save(new Project(projectId, "Name", "Description"));
+
+		GuiActionRunner.execute(() -> {
+			projectController.listProjects();
+			issueTrackerView.getProjectJList().setSelectedIndex(0);
+			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
+		});
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("XYZ");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+
+		// Act
+		frameFixture.button(ISSUE_ADD_BUTTON).click();
+
+		// Assert
+		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
+		assertThat(listContents).isEmpty();
+		frameFixture.label(ISSUE_ERROR_LABEL).requireText(ErrorMessages.NON_NUMERICAL_ID);
 	}
 
 	@Test
@@ -292,9 +336,10 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 	public void testDeleteIssueButton_HappyPath_DeletesIssue() {
 		// Arrange
 		String projectId = "10";
-		String issueId = "1";
-		projectRepository.save(new Project(projectId, "Project", "Description"));
-		issueRepository.save(new Issue(issueId, "Name", "Description", "Low", projectId));
+		String id = "1";
+
+		projectRepository.save(new Project(projectId, "Name", "Description"));
+		issueRepository.save(new Issue(id, "Name", "Description", "Priority", projectId));
 
 		GuiActionRunner.execute(() -> {
 			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
@@ -309,52 +354,24 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
+		assertThat(issueRepository.exists(id)).isFalse();
 	}
 
 	@Test
 	@GUITest
-	public void testIssueTab_ShowsIssuesRelatedToProjectToView() {
+	public void testIssueTab_WhenProjectHasNoIssues_ShowsEmptyListToView() {
 		// Arrange
-		String projectId = "10";
-		projectRepository.save(new Project(projectId, "Project", "Description"));
-
-		Issue issue1 = new Issue("1", "Name", "Description", "Low", projectId);
-		Issue issue2 = new Issue("2", "Name", "Description", "Low", projectId);
-		issueRepository.save(issue1);
-		issueRepository.save(issue2);
-
-		GuiActionRunner.execute(() -> {
-			projectController.listProjects();
-		});
-
-		frameFixture.list(PROJECT_LIST).selectItem(0);
+		String projectId = "1";
+		projectRepository.save(new Project(projectId, "Name", "Description"));
 
 		// Act
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
+			issueController.listIssues(projectId);
+		});
 
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
-		assertThat(listContents).containsExactly(issue1.toString(), issue2.toString());
-	}
-
-	@Test
-	@GUITest
-	public void testProjectTab_ShowsAllProjectsToView() {
-		// Arrange
-		Project project1 = new Project("1", "Project", "Description");
-		Project project2 = new Project("2", "Project", "Description");
-		projectRepository.save(project1);
-		projectRepository.save(project2);
-
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-		});
-
-		// Act
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_PROJECTS);
-
-		// Assert
-		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
-		assertThat(listContents).containsExactly(project1.toString(), project2.toString());
+		assertThat(listContents).isEmpty();
 	}
 }
