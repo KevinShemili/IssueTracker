@@ -10,7 +10,7 @@ import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class IssueController extends BaseController {
 
-	public static final List<String> ALLOWED_PRIORITIES = Arrays.asList("Low", "Medium", "High");
+	private static final List<String> ALLOWED_PRIORITIES = Arrays.asList("Low", "Medium", "High");
 
 	public IssueController(ProjectRepository projectRepository, IssueRepository issueRepository,
 			IssueTrackerView issueTrackerView) {
@@ -24,7 +24,7 @@ public class IssueController extends BaseController {
 			return;
 		}
 
-		if (isProjectStoredInDatabase(projectId) == false) {
+		if (!isProjectStoredInDatabase(projectId)) {
 			issueTrackerView.showIssueError(ErrorMessages.PROJECT_DOESNT_EXIST);
 			return;
 		}
@@ -40,12 +40,12 @@ public class IssueController extends BaseController {
 			return;
 		}
 
-		if (isProjectStoredInDatabase(projectId) == false) {
+		if (!isProjectStoredInDatabase(projectId)) {
 			issueTrackerView.showIssueError(ErrorMessages.PROJECT_DOESNT_EXIST);
 			return;
 		}
 
-		if (isIssueStoredInDatabase(issueId) == true) {
+		if (isIssueStoredInDatabase(issueId)) {
 			issueTrackerView.showIssueError(String.format(ErrorMessages.DUPLICATE_ISSUE, issueId));
 			return;
 		}
@@ -63,7 +63,7 @@ public class IssueController extends BaseController {
 			return;
 		}
 
-		if (isIssueStoredInDatabase(issueId) == false) {
+		if (!isIssueStoredInDatabase(issueId)) {
 			issueTrackerView.showIssueError(ErrorMessages.ISSUE_DOESNT_EXIST);
 			return;
 		}
@@ -76,7 +76,7 @@ public class IssueController extends BaseController {
 	}
 
 	private boolean isIssueStoredInDatabase(String id) {
-		return issueRepository.exists(id) == true ? true : false;
+		return issueRepository.exists(id);
 	}
 
 	private boolean validateFields(String id, String name, String description, String priority, String projectId) {
@@ -100,7 +100,7 @@ public class IssueController extends BaseController {
 			return false;
 		}
 
-		if (ALLOWED_PRIORITIES.contains(priority) == false) {
+		if (!ALLOWED_PRIORITIES.contains(priority)) {
 			issueTrackerView.showIssueError(ErrorMessages.NOT_ALLOWED_PRIORITY);
 			return false;
 		}
