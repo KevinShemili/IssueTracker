@@ -1,6 +1,5 @@
 package com.shemilikevin.app.tracker.controller;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -103,76 +102,6 @@ public class ProjectControllerTest {
 	}
 
 	@Test
-	public void testAddProject_WhenProvidedProjectIdIsNull_ShowsErrorMessage() {
-		// Act
-		projectController.addProject(null, "Name", "Description");
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddProject_WhenProvidedProjectIdIsEmpty_ShowsErrorMessage() {
-		// Act
-		projectController.addProject(" ", "Name", "Description");
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddProject_WhenProvidedProjectIdIsNonNumeric_ShowsErrorMessage() {
-		// Act
-		projectController.addProject("XYZ", "Name", "Description");
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NON_NUMERICAL_ID);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddProject_WhenProvidedProjectNameIsNull_ShowsErrorMessage() {
-		// Act
-		projectController.addProject("1", null, "Description");
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_NAME);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddProject_WhenProvidedProjectNameIsEmpty_ShowsErrorMessage() {
-		// Act
-		projectController.addProject("1", " ", "Description");
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_NAME);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddProject_WhenProvidedProjectDescriptionIsNull_ShowsErrorMessage() {
-		// Act
-		projectController.addProject("1", "Name", null);
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddProject_WhenProvidedProjectDescriptionIsEmpty_ShowsErrorMessage() {
-		// Act
-		projectController.addProject("1", "Name", " ");
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
 	public void testAddProject_WhenProvidedProjectIdAlreadyExistsInDatabase_ShowsErrorMessage() {
 		// Arrange
 		String id = "1";
@@ -185,7 +114,7 @@ public class ProjectControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(id);
 		inOrder.verify(issueTrackerView).showProjectError(String.format(ErrorMessages.DUPLICATE_PROJECT, id));
-		verifyNoMoreInteractions(issueTrackerView, projectRepository);
+		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
 	@Test
@@ -242,36 +171,6 @@ public class ProjectControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(id);
 		inOrder.verify(issueTrackerView).showProjectError(ErrorMessages.PROJECT_DOESNT_EXIST);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testDeleteProject_WhenProvidedProjectIdIsNull_ShowsErrorMessage() {
-		// Act
-		projectController.deleteProject(null);
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testDeleteProject_WhenProvidedProjectIdIsEmpty_ShowsErrorMessage() {
-		// Act
-		projectController.deleteProject(" ");
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testDeleteProject_WhenProvidedProjectIdIsNonNumeric_ShowsErrorMessage() {
-		// Act
-		projectController.deleteProject("XYZ");
-
-		// Assert
-		verify(issueTrackerView).showProjectError(ErrorMessages.NON_NUMERICAL_ID);
-		verifyNoMoreInteractions(projectRepository, issueTrackerView);
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 }

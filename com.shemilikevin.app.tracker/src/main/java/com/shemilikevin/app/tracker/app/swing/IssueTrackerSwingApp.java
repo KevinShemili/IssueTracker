@@ -28,9 +28,9 @@ public class IssueTrackerSwingApp implements Callable<Void> {
 	@Option(names = { "--mongo-port" }, description = "MongoDB Host Port")
 	private int mongoPort = 27017;
 
-	private final String databaseName = "database";
-	private final String projectCollectionName = "project";
-	private final String collectionName = "issue";
+	private static final String DATABASE_NAME = "database";
+	private static final String PROJECT_COLLECTION_NAME = "project";
+	private static final String ISSUE_COLLECTION_NAME = "issue";
 
 	public static void main(String[] args) {
 		new CommandLine(new IssueTrackerSwingApp()).execute(args);
@@ -43,9 +43,10 @@ public class IssueTrackerSwingApp implements Callable<Void> {
 				ServerAddress address = new ServerAddress(mongoHost, mongoPort);
 				MongoClient mongoClient = new MongoClient(address);
 
-				ProjectRepository projectRepository = new ProjectMongoRepository(mongoClient, databaseName,
-						projectCollectionName);
-				IssueRepository issueRepository = new IssueMongoRepository(mongoClient, databaseName, collectionName);
+				ProjectRepository projectRepository = new ProjectMongoRepository(mongoClient, DATABASE_NAME,
+						PROJECT_COLLECTION_NAME);
+				IssueRepository issueRepository = new IssueMongoRepository(mongoClient, DATABASE_NAME,
+						ISSUE_COLLECTION_NAME);
 
 				IssueTrackerSwingView issueTrackerView = new IssueTrackerSwingView();
 

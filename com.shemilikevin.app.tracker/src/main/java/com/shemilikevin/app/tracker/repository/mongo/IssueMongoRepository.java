@@ -58,13 +58,13 @@ public class IssueMongoRepository implements IssueRepository {
 
 		Issue issue = issueCollection.find(Filters.eq("id", id)).first();
 
-		return issue == null ? false : true;
+		return issue != null;
 	}
 
 	@Override
 	public boolean hasAssociatedIssues(String projectId) {
 
-		ArrayList<Issue> issueList = new ArrayList<Issue>();
+		ArrayList<Issue> issueList = new ArrayList<>();
 		issueCollection.find(Filters.eq("projectId", projectId)).into(issueList);
 
 		return !issueList.isEmpty();

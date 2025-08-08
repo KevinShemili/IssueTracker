@@ -92,8 +92,8 @@ public class ProjectMongoRepositoryTest {
 		List<Project> projectList = projectRepository.findAll();
 
 		// Assert
-		assertThat(projectList).hasSize(2);
-		assertThat(projectList).containsExactly(project1, project2);
+		assertThat(projectList).hasSize(2)
+				.containsExactly(project1, project2);
 	}
 
 	@Test
@@ -117,8 +117,8 @@ public class ProjectMongoRepositoryTest {
 		Project result = projectRepository.findById(id);
 
 		// Assert
-		assertThat(result).isNotNull();
-		assertThat(result).isEqualTo(project);
+		assertThat(result).isNotNull()
+				.isEqualTo(project);
 	}
 
 	@Test
@@ -135,8 +135,8 @@ public class ProjectMongoRepositoryTest {
 		Project project = projectRepository.findById(targetId);
 
 		// Assert
-		assertThat(project).isNotNull();
-		assertThat(project).isEqualTo(project1);
+		assertThat(project).isNotNull()
+				.isEqualTo(project1);
 	}
 
 	@Test
