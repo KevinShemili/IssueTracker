@@ -22,6 +22,7 @@
     <mongo.java.server>1.39.0</mongo.java.server>
     <mockito.core.version>4.11.0</mockito.core.version>
     <testcontainers.version>1.20.4</testcontainers.version>
+    <picoli.version>4.7.6</picoli.version>
 
     <pitest.maven.version>1.5.2</pitest.maven.version>
     <jacoco.maven.plugin.version>0.8.12</jacoco.maven.plugin.version>
@@ -30,7 +31,7 @@
     <sonar.maven.plugin>5.0.0.4389</sonar.maven.plugin>
     <build.helper.maven.plugin.version>3.6.0</build.helper.maven.plugin.version>
     <maven.failsafe.plugin.version>3.5.2</maven.failsafe.plugin.version>
-    <picoli.version>4.7.6</picoli.version>
+    <maven.assembly.plugin.version>2.2-beta-5</maven.assembly.plugin.version>
 
     <!-- SonarCloud -->
     <sonar.coverage.exclusions>
@@ -203,6 +204,12 @@
           <version>${maven.failsafe.plugin.version}</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${maven.assembly.plugin.version}</version>
+        </plugin>
+
       </plugins>
     </pluginManagement>
 
@@ -252,6 +259,29 @@
               <includes>
                 <include>**/*E2E.java</include>
               </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+              <archive>
+                <manifest>
+                  <mainClass>com.shemilikevin.app.tracker.app.swing.IssueTrackerSwingApp</mainClass>
+                </manifest>
+              </archive>
             </configuration>
           </execution>
         </executions>
