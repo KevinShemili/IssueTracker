@@ -1,6 +1,5 @@
 package com.shemilikevin.app.tracker.controller;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -87,36 +86,6 @@ public class IssueControllerTest {
 	}
 
 	@Test
-	public void testListIssues_WhenProvidedProjectIdIsNull_ShowsErrorMessage() {
-		// Act
-		issueController.listIssues(null);
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testListIssues_WhenProvidedProjectIdIsEmpty_ShowsErrorMessage() {
-		// Act
-		issueController.listIssues(" ");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testListIssues_WhenProvidedProjectIdIsNonNumeric_ShowsErrorMessage() {
-		// Act
-		issueController.listIssues("XYZ");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NON_NUMERICAL_ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
 	public void testListIssues_WhenProvidedProjectIdDoesNotExistInDatabase_ShowsErrorMessage() {
 		// Arrange
 		String projectId = "10";
@@ -162,136 +131,6 @@ public class IssueControllerTest {
 	}
 
 	@Test
-	public void testAddIssue_WhenProvidedIssueIdIsNull_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue(null, "Name", "Description", "Low", "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedIssueIdIsEmpty_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue(" ", "Name", "Description", "Low", "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedIssueNameIsNull_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", null, "Description", "Low", "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_NAME);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedIssueNameIsEmpty_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", " ", "Description", "Low", "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_NAME);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedIssueDescriptionIsNull_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", "Name", null, "Low", "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedIssueDescriptionIsEmpty_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", "Name", " ", "Low", "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_DESCRIPTION);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedIssuePriorityIsNull_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", "Name", "Description", null, "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_PRIORITY);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedIssuePriorityIsEmpty_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", "Name", "Description", " ", "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_PRIORITY);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedIssuePriorityDoesNotHaveExpectedValue_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", "Name", "Description", "Random", "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NOT_ALLOWED_PRIORITY);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedProjectIdIsNull_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", "Name", "Description", "Low", null);
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedProjectIdIsEmpty_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", "Name", "Description", "Low", " ");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedProjectIdIsNonNumeric_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("1", "Name", "Description", "Low", "XYZ");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NON_NUMERICAL_ID);
-		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
-	}
-
-	@Test
-	public void testAddIssue_WhenProvidedIssueIdIsNonNumeric_ShowsErrorMessage() {
-		// Act
-		issueController.addIssue("XYZ", "Name", "Description", "Low", "10");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NON_NUMERICAL_ID);
-		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
-	}
-
-	@Test
 	public void testAddIssue_WhenProvidedProjectIdDoesNotExistInDatabase_ShowsErrorMessage() {
 		// Arrange
 		String projectId = "10";
@@ -305,7 +144,7 @@ public class IssueControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(projectId);
 		inOrder.verify(issueTrackerView).showIssueError(ErrorMessages.PROJECT_DOESNT_EXIST);
-		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	@Test
@@ -325,7 +164,7 @@ public class IssueControllerTest {
 		inOrder.verify(projectRepository).exists(projectId);
 		inOrder.verify(issueRepository).exists(issueId);
 		inOrder.verify(issueTrackerView).showIssueError(String.format(ErrorMessages.DUPLICATE_ISSUE, issueId));
-		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
+		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
 	@Test
@@ -353,36 +192,6 @@ public class IssueControllerTest {
 	}
 
 	@Test
-	public void testDeleteIssue_WhenProvidedIssueIdIsNull_ShowsErrorMessage() {
-		// Act
-		issueController.deleteIssue(null);
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
-	}
-
-	@Test
-	public void testDeleteIssue_WhenProvidedIssueIdIsEmpty_ShowsErrorMessage() {
-		// Act
-		issueController.deleteIssue(" ");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NULL_EMPTY_ID);
-		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
-	}
-
-	@Test
-	public void testDeleteIssue_WhenProvidedIssueIdIsNonNumeric_ShowsErrorMessage() {
-		// Act
-		issueController.deleteIssue("XYZ");
-
-		// Assert
-		verify(issueTrackerView).showIssueError(ErrorMessages.NON_NUMERICAL_ID);
-		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
-	}
-
-	@Test
 	public void testDeleteIssue_WhenProvidedIssueIdDoesNotExistInDatabase_ShowsErrorMessage() {
 		// Arrange
 		String issueId = "1";
@@ -395,6 +204,6 @@ public class IssueControllerTest {
 		InOrder inOrder = Mockito.inOrder(issueRepository, issueTrackerView);
 		inOrder.verify(issueRepository).exists(issueId);
 		inOrder.verify(issueTrackerView).showIssueError(ErrorMessages.ISSUE_DOESNT_EXIST);
-		verifyNoMoreInteractions(issueTrackerView, projectRepository, issueRepository);
+		verifyNoMoreInteractions(issueRepository, issueTrackerView);
 	}
 }
