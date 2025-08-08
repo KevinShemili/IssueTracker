@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.shemilikevin.app.tracker.controller.IssueController;
@@ -34,8 +35,8 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	private static final int TAB_PROJECTS = 0;
 	private static final int TAB_ISSUES = 1;
 
-	private ProjectController projectController;
-	private IssueController issueController;
+	private transient ProjectController projectController;
+	private transient IssueController issueController;
 
 	private JTabbedPane tabbedPane;
 	private JPanel mainPane;
@@ -74,7 +75,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		setContentPane(mainPane);
 		mainPane.setLayout(new BorderLayout(0, 0));
 
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		tabbedPane.addChangeListener(e -> {
 			if (tabbedPane.getSelectedIndex() == TAB_PROJECTS) {
 				if (projectController != null) {
@@ -204,8 +205,8 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbc_projectScrollPane.gridy = 4;
 		projectPanel.add(projectScrollPane, gbc_projectScrollPane);
 
-		projectListModel = new DefaultListModel<Project>();
-		projectJList = new JList<Project>(projectListModel);
+		projectListModel = new DefaultListModel<>();
+		projectJList = new JList<>(projectListModel);
 		projectJList.addListSelectionListener(e -> {
 			boolean isSelectionEmpty = projectJList.isSelectionEmpty();
 			tabbedPane.setEnabledAt(TAB_ISSUES, !isSelectionEmpty);
@@ -321,17 +322,16 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbc_issuePriorityLabel.gridy = 3;
 		issuePanel.add(issuePriorityLabel, gbc_issuePriorityLabel);
 
-		issuePriorityComboBox = new JComboBox<String>();
+		issuePriorityComboBox = new JComboBox<>();
 		issuePriorityComboBox.setName("issuePriorityComboBox");
 		issuePriorityComboBox.addItem("Low");
 		issuePriorityComboBox.addItem("Medium");
 		issuePriorityComboBox.addItem("High");
 		issuePriorityComboBox.setSelectedItem(null);
-		issuePriorityComboBox.addActionListener(e -> {
-			addIssueButton.setEnabled(!issueIdField.getText().trim().isEmpty()
-					&& !issueNameField.getText().trim().isEmpty() && !issueDescriptionField.getText().trim().isEmpty()
-					&& issuePriorityComboBox.getSelectedIndex() != -1);
-		});
+		issuePriorityComboBox.addActionListener(e -> addIssueButton.setEnabled(!issueIdField.getText().trim().isEmpty()
+				&& !issueNameField.getText().trim().isEmpty()
+				&& !issueDescriptionField.getText().trim().isEmpty()
+				&& issuePriorityComboBox.getSelectedIndex() != -1));
 		GridBagConstraints gbc_issuePriorityComboBox = new GridBagConstraints();
 		gbc_issuePriorityComboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_issuePriorityComboBox.fill = GridBagConstraints.HORIZONTAL;
@@ -360,8 +360,8 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		gbc_issueScrollPane.gridy = 5;
 		issuePanel.add(issueScrollPane, gbc_issueScrollPane);
 
-		issueListModel = new DefaultListModel<Issue>();
-		issueJList = new JList<Issue>(issueListModel);
+		issueListModel = new DefaultListModel<>();
+		issueJList = new JList<>(issueListModel);
 		issueJList.addListSelectionListener(e -> {
 			boolean isSelectionEmpty = issueJList.isSelectionEmpty();
 			deleteIssueButton.setEnabled(!isSelectionEmpty);

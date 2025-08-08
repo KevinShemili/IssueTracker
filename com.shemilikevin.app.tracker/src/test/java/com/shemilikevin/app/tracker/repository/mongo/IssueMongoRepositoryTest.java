@@ -91,8 +91,8 @@ public class IssueMongoRepositoryTest {
 		List<Issue> issueList = issueRepository.findAll();
 
 		// Assert
-		assertThat(issueList).hasSize(2);
-		assertThat(issueList).containsExactly(issue1, issue2);
+		assertThat(issueList).hasSize(2)
+				.containsExactly(issue1, issue2);
 	}
 
 	@Test
@@ -116,8 +116,8 @@ public class IssueMongoRepositoryTest {
 		Issue result = issueRepository.findById(id);
 
 		// Assert
-		assertThat(result).isNotNull();
-		assertThat(result).isEqualTo(issue);
+		assertThat(result).isNotNull()
+				.isEqualTo(issue);
 	}
 
 	@Test
@@ -134,8 +134,8 @@ public class IssueMongoRepositoryTest {
 		Issue issue = issueRepository.findById(targetId);
 
 		// Assert
-		assertThat(issue).isNotNull();
-		assertThat(issue).isEqualTo(issue2);
+		assertThat(issue).isNotNull()
+				.isEqualTo(issue2);
 	}
 
 	@Test
@@ -172,8 +172,8 @@ public class IssueMongoRepositoryTest {
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 
 		// Assert
-		assertThat(issueList).hasSize(1);
-		assertThat(issueList).containsExactly(issue);
+		assertThat(issueList).hasSize(1)
+				.containsExactly(issue);
 	}
 
 	@Test
@@ -190,8 +190,8 @@ public class IssueMongoRepositoryTest {
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 
 		// Assert
-		assertThat(issueList).hasSize(2);
-		assertThat(issueList).containsExactly(issue1, issue2);
+		assertThat(issueList).hasSize(2)
+				.containsExactly(issue1, issue2);
 	}
 
 	@Test
@@ -210,8 +210,8 @@ public class IssueMongoRepositoryTest {
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 
 		// Assert
-		assertThat(issueList).hasSize(2);
-		assertThat(issueList).containsExactly(issue1, issue2);
+		assertThat(issueList).hasSize(2)
+				.containsExactly(issue1, issue2);
 	}
 
 	@Test

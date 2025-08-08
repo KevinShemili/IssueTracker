@@ -25,7 +25,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 @RunWith(GUITestRunner.class)
-public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase {
+public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase { // NOSONAR we want this naming convention
 
 	private static final String DATABASE_NAME = "database";
 	private static final String PROJECT_COLLECTION = "project";

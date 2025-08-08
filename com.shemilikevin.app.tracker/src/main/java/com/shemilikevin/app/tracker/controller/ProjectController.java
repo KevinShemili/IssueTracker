@@ -27,7 +27,7 @@ public class ProjectController extends BaseController {
 			return;
 		}
 
-		if (isProjectStoredInDatabase(id) == true) {
+		if (isProjectStoredInDatabase(id)) {
 			issueTrackerView.showProjectError(String.format(ErrorMessages.DUPLICATE_PROJECT, id));
 			return;
 		}
