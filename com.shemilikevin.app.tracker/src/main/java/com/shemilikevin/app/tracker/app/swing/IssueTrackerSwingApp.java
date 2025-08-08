@@ -22,20 +22,15 @@ import picocli.CommandLine.Option;
 @Command(mixinStandardHelpOptions = true)
 public class IssueTrackerSwingApp implements Callable<Void> {
 
-	@Option(names = { "--mongo-host" }, description = "MongoDB host address")
+	@Option(names = { "--mongo-host" }, description = "MongoDB Host Address")
 	private String mongoHost = "localhost";
 
-	@Option(names = { "--mongo-port" }, description = "MongoDB host port")
+	@Option(names = { "--mongo-port" }, description = "MongoDB Host Port")
 	private int mongoPort = 27017;
 
-	@Option(names = { "--db-name" }, description = "Database name")
-	private String databaseName = "database";
-
-	@Option(names = { "--db-project-collection" }, description = "Project Collection Name")
-	private String projectCollectionName = "project";
-
-	@Option(names = { "--db-issue-collection" }, description = "Issue Collection Name")
-	private String collectionName = "issue";
+	private final String databaseName = "database";
+	private final String projectCollectionName = "project";
+	private final String collectionName = "issue";
 
 	public static void main(String[] args) {
 		new CommandLine(new IssueTrackerSwingApp()).execute(args);
