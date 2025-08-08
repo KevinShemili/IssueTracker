@@ -28,14 +28,10 @@ abstract class BaseController {
 	}
 
 	protected boolean validateIsNotNullOrEmpty(String id) {
-		if ((id == null) || (id.trim().isEmpty() == true)) {
-			return false;
-		}
-
-		return true;
+		return id != null && !id.trim().isEmpty();
 	}
 
 	protected boolean isProjectStoredInDatabase(String id) {
-		return projectRepository.exists(id) == true ? true : false;
+		return projectRepository.exists(id);
 	}
 }

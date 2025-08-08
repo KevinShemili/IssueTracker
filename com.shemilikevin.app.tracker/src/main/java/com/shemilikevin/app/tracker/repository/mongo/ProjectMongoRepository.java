@@ -57,6 +57,6 @@ public class ProjectMongoRepository implements ProjectRepository {
 
 		Project project = projectCollection.find(Filters.eq("id", id)).first();
 
-		return project == null ? false : true;
+		return project != null;
 	}
 }
