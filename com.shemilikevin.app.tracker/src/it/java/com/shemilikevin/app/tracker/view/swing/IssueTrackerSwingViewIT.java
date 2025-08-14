@@ -15,9 +15,9 @@ import org.testcontainers.containers.MongoDBContainer;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
-import com.shemilikevin.app.tracker.controller.ErrorMessages;
 import com.shemilikevin.app.tracker.controller.IssueController;
 import com.shemilikevin.app.tracker.controller.ProjectController;
+import com.shemilikevin.app.tracker.helpers.ErrorMessages;
 import com.shemilikevin.app.tracker.model.Issue;
 import com.shemilikevin.app.tracker.model.Project;
 import com.shemilikevin.app.tracker.repository.IssueRepository;
@@ -33,6 +33,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 	private static final String ISSUE_COLLECTION = "issues";
 
 	private static final int TAB_ISSUES = 1;
+	private static final String TABBED_PANE = "tabbedPane";
 	private static final String PROJECT_ID_FIELD = "projectIdField";
 	private static final String PROJECT_NAME_FIELD = "projectNameField";
 	private static final String PROJECT_DESCRIPTION_FIELD = "projectDescriptionField";
@@ -228,11 +229,14 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		issueRepository.save(issue1);
 		issueRepository.save(issue2);
 
-		// Act
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueController.listIssues(projectId);
+			projectController.listProjects();
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+
+		// Act
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
@@ -253,9 +257,10 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> {
 			projectController.listProjects();
-			issueTrackerView.getProjectJList().setSelectedIndex(0);
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText(id);
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(name);
@@ -285,9 +290,10 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> {
 			projectController.listProjects();
-			issueTrackerView.getProjectJList().setSelectedIndex(0);
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText(id); // duplicate
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
@@ -313,9 +319,10 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> {
 			projectController.listProjects();
-			issueTrackerView.getProjectJList().setSelectedIndex(0);
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText("XYZ");
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
@@ -342,9 +349,11 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		issueRepository.save(new Issue(id, "Name", "Description", "Priority", projectId));
 
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueController.listIssues(projectId);
+			projectController.listProjects();
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		frameFixture.list(ISSUE_LIST).selectItem(0);
 
@@ -364,11 +373,14 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String projectId = "1";
 		projectRepository.save(new Project(projectId, "Name", "Description"));
 
-		// Act
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueController.listIssues(projectId);
+			projectController.listProjects();
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+
+		// Act
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
