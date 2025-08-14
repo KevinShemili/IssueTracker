@@ -25,7 +25,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml', '**/*.yml') }}
         restore-keys: ${{ runner.os }}-m2-
 
     - name: Enable Coveralls (Internal PR or Push)
@@ -45,5 +45,5 @@ jobs:
     - name: Archive JUnit Report
       uses: actions/upload-artifact@v4
       with:
-        name: surefire-report
+        name: JUnit-Reports
         path: '**/target/reports'
