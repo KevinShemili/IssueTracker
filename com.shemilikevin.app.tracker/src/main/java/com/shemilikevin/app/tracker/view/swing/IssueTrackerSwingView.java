@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
@@ -207,6 +208,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		};
 	}
 
+	// Java Code for View
 	private void setUpFrame() {
 		setTitle("Issue Tracker");
 		setMinimumSize(new Dimension(450, 300));
@@ -320,6 +322,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		projectJList = new JList<>(projectListModel);
 		projectJList.addListSelectionListener(handleProjectListSelection());
 		projectJList.setName("projectList");
+		projectJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		projectScrollPane.setViewportView(projectJList);
 
 		JPanel projectButtonsPanel = new JPanel();
@@ -461,6 +464,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		issueJList = new JList<>(issueListModel);
 		issueJList.addListSelectionListener(handleIssueListSelection());
 		issueJList.setName("issueList");
+		issueJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		issueScrollPane.setViewportView(issueJList);
 
 		JPanel issueButtonsPanel = new JPanel();
@@ -485,6 +489,7 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		issueButtonsPanel.add(deleteIssueButton);
 	}
 
+	// Some Helper Methods
 	private void clearProjectTabFields() {
 		projectIdField.setText("");
 		projectNameField.setText("");

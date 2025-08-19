@@ -52,7 +52,6 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 	private MongoClient mongoClient;
 	private FrameFixture frameFixture;
-	private IssueTrackerSwingView issueTrackerView;
 	private ProjectController projectController;
 	private IssueController issueController;
 	private IssueRepository issueRepository;
@@ -68,8 +67,11 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		projectRepository = new ProjectMongoRepository(mongoClient, DATABASE_NAME, PROJECT_COLLECTION);
 		issueRepository = new IssueMongoRepository(mongoClient, DATABASE_NAME, ISSUE_COLLECTION);
 
-		GuiActionRunner.execute(() -> {
-			issueTrackerView = new IssueTrackerSwingView();
+		MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
+		database.drop();
+
+		frameFixture = new FrameFixture(robot(), GuiActionRunner.execute(() -> {
+			IssueTrackerSwingView issueTrackerView = new IssueTrackerSwingView();
 
 			projectController = new ProjectController(projectRepository, issueRepository, issueTrackerView);
 			issueController = new IssueController(projectRepository, issueRepository, issueTrackerView);
@@ -78,13 +80,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 			issueTrackerView.setProjectController(projectController);
 
 			return issueTrackerView;
-		});
-
-		MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
-		database.drop();
-
-		frameFixture = new FrameFixture(robot(), issueTrackerView);
-		frameFixture.show();
+		})).show();
 	}
 
 	@Override
@@ -141,8 +137,8 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		projectRepository.save(new Project(id, "Name", "Description"));
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(id); // duplicate
-		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
-		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name 2");
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description 2");
 
 		// Act
 		frameFixture.button(PROJECT_ADD_BUTTON).click();
@@ -151,6 +147,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(PROJECT_ERROR_LABEL).requireText(String.format(ErrorMessages.DUPLICATE_PROJECT, id));
+		assertThat(projectRepository.findAll()).hasSize(1); // verify no new entries
 	}
 
 	@Test
@@ -170,6 +167,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(PROJECT_ERROR_LABEL).requireText(ErrorMessages.NON_NUMERICAL_ID);
+		assertThat(projectRepository.findAll()).isEmpty(); // verify no new entries
 	}
 
 	@Test
@@ -215,6 +213,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).containsExactly(new Project(projectId, name, description).toString());
 		frameFixture.label(PROJECT_ERROR_LABEL).requireText(ErrorMessages.PROJECT_HAS_ISSUES);
+		assertThat(projectRepository.exists(projectId)).isTrue(); // verify not deleted
 	}
 
 	@Test
@@ -307,6 +306,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).containsExactly(issue.toString());
 		frameFixture.label(ISSUE_ERROR_LABEL).requireText(String.format(ErrorMessages.DUPLICATE_ISSUE, id));
+		assertThat(issueRepository.findAll()).hasSize(1); // verify no new entries
 	}
 
 	@Test
@@ -336,6 +336,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(ISSUE_ERROR_LABEL).requireText(ErrorMessages.NON_NUMERICAL_ID);
+		assertThat(issueRepository.findAll()).isEmpty(); // verify no new entries
 	}
 
 	@Test

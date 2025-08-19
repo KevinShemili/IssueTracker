@@ -1,4 +1,4 @@
-package com.shemilikevin.app.tracker;
+package com.shemilikevin.app.tracker.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
@@ -297,13 +297,13 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase { // NOSO
 		MongoCollection<Document> projectCollection = database.getCollection(PROJECT_COLLECTION);
 		MongoCollection<Document> issueCollection = database.getCollection(ISSUE_COLLECTION);
 
-		// Project with 2 Issues
+		// Project 1: Has 2 Issues
 		projectCollection.insertOne(new Document()
 				.append("id", PROJECT_FIXTURE_1_ID)
 				.append("name", PROJECT_FIXTURE_1_NAME)
 				.append("description", PROJECT_FIXTURE_1_DESCRIPTION));
 
-		// Project with 0 Issues
+		// Project 2: Has 0 Issues
 		projectCollection.insertOne(new Document()
 				.append("id", PROJECT_FIXTURE_2_ID)
 				.append("name", PROJECT_FIXTURE_2_NAME)
@@ -314,13 +314,13 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase { // NOSO
 				.append("name", ISSUE_FIXTURE_1_NAME)
 				.append("description", ISSUE_FIXTURE_1_DESCRIPTION)
 				.append("priority", ISSUE_FIXTURE_PRIORITY)
-				.append("projectId", PROJECT_FIXTURE_1_ID));
+				.append("projectId", PROJECT_FIXTURE_1_ID)); // Reference to Project 1
 
 		issueCollection.insertOne(new Document()
 				.append("id", ISSUE_FIXTURE_2_ID)
 				.append("name", ISSUE_FIXTURE_2_NAME)
 				.append("description", ISSUE_FIXTURE_2_DESCRIPTION)
 				.append("priority", ISSUE_FIXTURE_PRIORITY)
-				.append("projectId", PROJECT_FIXTURE_1_ID));
+				.append("projectId", PROJECT_FIXTURE_1_ID)); // Reference to Project 1
 	}
 }
