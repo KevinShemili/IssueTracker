@@ -27,6 +27,9 @@ import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class IssueControllerIT {
 
+	@ClassRule
+	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
+
 	private static final String DATABASE_NAME = "db";
 	private static final String PROJECT_COLLECTION = "projects";
 	private static final String ISSUE_COLLECTION = "issues";
@@ -38,9 +41,6 @@ public class IssueControllerIT {
 	private ProjectRepository projectRepository;
 	private IssueRepository issueRepository;
 	private IssueController issueController;
-
-	@ClassRule
-	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
 	private MongoClient mongoClient;
 
 	@Before
@@ -142,7 +142,7 @@ public class IssueControllerIT {
 		issueRepository.save(new Issue(id, "Name", "Description", "Priority", projectId));
 
 		// Act
-		issueController.deleteIssue(id);
+		issueController.deleteIssue(id, projectId);
 
 		// Assert
 		verify(issueTrackerView).showIssues(Collections.emptyList());

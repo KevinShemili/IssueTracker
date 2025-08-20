@@ -28,6 +28,9 @@ import com.shemilikevin.app.tracker.repository.mongo.ProjectMongoRepository;
 @RunWith(GUITestRunner.class)
 public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
+	@ClassRule
+	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
+
 	private static final String DATABASE_NAME = "db";
 	private static final String PROJECT_COLLECTION = "projects";
 	private static final String ISSUE_COLLECTION = "issues";
@@ -56,9 +59,6 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 	private IssueController issueController;
 	private IssueRepository issueRepository;
 	private ProjectRepository projectRepository;
-
-	@ClassRule
-	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
 
 	@Override
 	protected void onSetUp() throws Exception {
@@ -386,5 +386,58 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
+	}
+
+	@Test
+	@GUITest
+	public void testDeleteProjectButton_SelectedProjectNotInDB_ShowsErrorMessageRefreshesList() {
+		// Arrange
+		String projectId = "1";
+		String name = "Name";
+		String description = "Description";
+
+		GuiActionRunner.execute(() -> {
+			projectController.addProject(projectId, name, description);
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		projectRepository.delete(projectId); // manually delete project -> stale view
+
+		// Act
+		frameFixture.button(PROJECT_DELETE_BUTTON).click();
+
+		// Assert
+		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
+		assertThat(listContents).isEmpty();
+		frameFixture.label(PROJECT_ERROR_LABEL).requireText(ErrorMessages.PROJECT_DOESNT_EXIST);
+	}
+
+	@Test
+	@GUITest
+	public void testDeleteIssueButton_SelectedIssueNotInDB_ShowsErrorMessageRefreshesList() {
+		// Arrange
+		String projectId = "10";
+		String id = "1";
+
+		projectRepository.save(new Project(projectId, "Name", "Description"));
+		issueRepository.save(new Issue(id, "Name", "Description", "Priority", projectId));
+
+		GuiActionRunner.execute(() -> {
+			projectController.listProjects();
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+
+		frameFixture.list(ISSUE_LIST).selectItem(0);
+		issueRepository.delete(id); // manually delete issue -> stale view
+
+		// Act
+		frameFixture.button(ISSUE_DELETE_BUTTON).click();
+
+		// Assert
+		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
+		assertThat(listContents).isEmpty();
+		frameFixture.label(ISSUE_ERROR_LABEL).requireText(ErrorMessages.ISSUE_DOESNT_EXIST);
 	}
 }

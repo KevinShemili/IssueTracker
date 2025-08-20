@@ -14,4 +14,12 @@ public interface IssueTrackerView {
 	void showIssueError(String errorMessage);
 
 	void showProjects(List<Project> projectList);
+
+	void clearProjectFields();
+
+	void clearProjectSelection();
+
+	void clearIssueFields();
+
+	void clearIssueSelection();
 }

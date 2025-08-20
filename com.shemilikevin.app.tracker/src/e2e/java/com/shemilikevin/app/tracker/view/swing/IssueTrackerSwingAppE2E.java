@@ -210,26 +210,6 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase { // NOSO
 
 	@Test
 	@GUITest
-	public void testProjectTab_WhenInIssueTab_GoingBackToProjectTab_ShowsAllDatabaseProjects() {
-		// Arrange
-		// Go to Issue Tab
-		frameFixture.list(PROJECT_LIST).selectItem(Pattern.compile(".*" + PROJECT_FIXTURE_2_NAME + ".*"));
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(Pattern.compile(".*" + "Issue" + ".*"));
-
-		// Act
-		// Go back to Project Tab
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(Pattern.compile(".*" + "Project" + ".*"));
-
-		// Assert
-		assertThat(frameFixture.list(PROJECT_LIST).contents())
-				.anySatisfy(e -> assertThat(e).contains(PROJECT_FIXTURE_1_ID, PROJECT_FIXTURE_1_NAME,
-						PROJECT_FIXTURE_1_DESCRIPTION))
-				.anySatisfy(e -> assertThat(e).contains(PROJECT_FIXTURE_2_ID, PROJECT_FIXTURE_2_NAME,
-						PROJECT_FIXTURE_2_DESCRIPTION));
-	}
-
-	@Test
-	@GUITest
 	public void testAddIssueButton_CreatesNewIssue() {
 		// Arrange
 		String id = "3"; // Last id is 2
@@ -303,12 +283,6 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase { // NOSO
 				.append("name", PROJECT_FIXTURE_1_NAME)
 				.append("description", PROJECT_FIXTURE_1_DESCRIPTION));
 
-		// Project 2: Has 0 Issues
-		projectCollection.insertOne(new Document()
-				.append("id", PROJECT_FIXTURE_2_ID)
-				.append("name", PROJECT_FIXTURE_2_NAME)
-				.append("description", PROJECT_FIXTURE_2_DESCRIPTION));
-
 		issueCollection.insertOne(new Document()
 				.append("id", ISSUE_FIXTURE_1_ID)
 				.append("name", ISSUE_FIXTURE_1_NAME)
@@ -322,5 +296,11 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase { // NOSO
 				.append("description", ISSUE_FIXTURE_2_DESCRIPTION)
 				.append("priority", ISSUE_FIXTURE_PRIORITY)
 				.append("projectId", PROJECT_FIXTURE_1_ID)); // Reference to Project 1
+
+		// Project 2: Has 0 Issues
+		projectCollection.insertOne(new Document()
+				.append("id", PROJECT_FIXTURE_2_ID)
+				.append("name", PROJECT_FIXTURE_2_NAME)
+				.append("description", PROJECT_FIXTURE_2_DESCRIPTION));
 	}
 }

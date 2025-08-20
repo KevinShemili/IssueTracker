@@ -84,8 +84,8 @@ public class IssueMongoRepositoryTest {
 		// Arrange
 		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority 1", "10");
 		Issue issue2 = new Issue("2", "Name 2", "Description 2", "Priority 2", "20");
-		AddIssueToDb(issue1);
-		AddIssueToDb(issue2);
+		addIssueToDb(issue1);
+		addIssueToDb(issue2);
 
 		// Act
 		List<Issue> issueList = issueRepository.findAll();
@@ -110,7 +110,7 @@ public class IssueMongoRepositoryTest {
 		String id = "1";
 
 		Issue issue = new Issue(id, "Name", "Description", "Priority", "10");
-		AddIssueToDb(issue);
+		addIssueToDb(issue);
 
 		// Act
 		Issue result = issueRepository.findById(id);
@@ -121,14 +121,14 @@ public class IssueMongoRepositoryTest {
 	}
 
 	@Test
-	public void testFindById_ManyIssuesInTheDatabase_ReturnsTheIssue() {
+	public void testFindById_ManyIssuesInTheDatabase_ReturnsMatchingIssue() {
 		// Arrange
 		String targetId = "2";
 
 		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority 1", "10");
 		Issue issue2 = new Issue(targetId, "Name 2", "Description 2", "Priority 2", "20");
-		AddIssueToDb(issue1);
-		AddIssueToDb(issue2);
+		addIssueToDb(issue1);
+		addIssueToDb(issue2);
 
 		// Act
 		Issue issue = issueRepository.findById(targetId);
@@ -150,8 +150,8 @@ public class IssueMongoRepositoryTest {
 	@Test
 	public void testFindByProjectId_IssuesExistButForDifferentProject_ReturnsEmptyList() {
 		// Arrange
-		AddIssueToDb(new Issue("1", "Name 1", "Description 1", "Priority 1", "10"));
-		AddIssueToDb(new Issue("2", "Name 2", "Description 2", "Priority 2", "10"));
+		addIssueToDb(new Issue("1", "Name 1", "Description 1", "Priority 1", "10"));
+		addIssueToDb(new Issue("2", "Name 2", "Description 2", "Priority 2", "10"));
 
 		// Act
 		List<Issue> issueList = issueRepository.findByProjectId("999");
@@ -166,7 +166,7 @@ public class IssueMongoRepositoryTest {
 		String projectId = "10";
 
 		Issue issue = new Issue("1", "Name", "Description", "Priority", projectId);
-		AddIssueToDb(issue);
+		addIssueToDb(issue);
 
 		// Act
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
@@ -183,8 +183,8 @@ public class IssueMongoRepositoryTest {
 
 		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority 1", projectId);
 		Issue issue2 = new Issue("2", "Name 2", "Description 2", "Priority 2", projectId);
-		AddIssueToDb(issue1);
-		AddIssueToDb(issue2);
+		addIssueToDb(issue1);
+		addIssueToDb(issue2);
 
 		// Act
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
@@ -202,9 +202,9 @@ public class IssueMongoRepositoryTest {
 		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority 1", projectId);
 		Issue issue2 = new Issue("2", "Name 2", "Description 2", "Priority 2", projectId);
 		Issue issue3 = new Issue("3", "Name 3", "Description 3", "Priority 3", "20");
-		AddIssueToDb(issue1);
-		AddIssueToDb(issue2);
-		AddIssueToDb(issue3);
+		addIssueToDb(issue1);
+		addIssueToDb(issue2);
+		addIssueToDb(issue3);
 
 		// Act
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
@@ -232,7 +232,7 @@ public class IssueMongoRepositoryTest {
 		String id = "1";
 
 		Issue issue = new Issue(id, "Name", "Description", "Priority", "10");
-		AddIssueToDb(issue);
+		addIssueToDb(issue);
 
 		// Act
 		issueRepository.delete(id);
@@ -256,7 +256,7 @@ public class IssueMongoRepositoryTest {
 		String id = "1";
 
 		Issue issue = new Issue(id, "Name", "Description", "Priority", "10");
-		AddIssueToDb(issue);
+		addIssueToDb(issue);
 
 		// Act
 		boolean result = issueRepository.exists(id);
@@ -268,7 +268,7 @@ public class IssueMongoRepositoryTest {
 	@Test
 	public void testExists_NoMatchingIdInDatabase_ReturnsFalse() {
 		// Arrange
-		AddIssueToDb(new Issue("1", "Name", "Description", "Priority", "10"));
+		addIssueToDb(new Issue("1", "Name", "Description", "Priority", "10"));
 
 		// Act
 		boolean result = issueRepository.exists("999");
@@ -291,7 +291,7 @@ public class IssueMongoRepositoryTest {
 		// Arrange
 		String projectId = "10";
 
-		AddIssueToDb(new Issue("1", "Name", "Description", "Priority", projectId));
+		addIssueToDb(new Issue("1", "Name", "Description", "Priority", projectId));
 
 		// Act
 		boolean result = issueRepository.hasAssociatedIssues(projectId);
@@ -300,7 +300,7 @@ public class IssueMongoRepositoryTest {
 		assertThat(result).isTrue();
 	}
 
-	private void AddIssueToDb(Issue issue) {
+	private void addIssueToDb(Issue issue) {
 		issueCollection.insertOne(issue);
 	}
 
