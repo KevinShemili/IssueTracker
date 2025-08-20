@@ -151,6 +151,14 @@
             </mutators>
             <mutationThreshold>100</mutationThreshold>
           </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>mutationCoverage</goal>
+              </goals>
+              <phase>verify</phase>
+            </execution>
+          </executions>
         </plugin>
 
         <plugin>
@@ -166,14 +174,14 @@
           <executions>
             <execution>
               <goals>
-                <goal>prepare-agent</goal>
-                <goal>report</goal>
+                <goal>prepare-agent</goal> <!-- Default Phase: Initialize -->
+                <goal>report</goal> <!-- Default Phase: Verify -->
               </goals>
             </execution>
             <execution>
               <id>jacoco-check</id>
               <goals>
-                <goal>check</goal>
+                <goal>check</goal> <!-- Default Phase: Verify -->
               </goals>
               <configuration>
                 <rules>
@@ -194,6 +202,7 @@
         </plugin>
 
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-report-plugin</artifactId>
           <version>${maven.surefire.report.plugin.version}</version>
         </plugin>
@@ -205,6 +214,14 @@
           <configuration>
             <repoToken>${env.COVERALLS_REPO_TOKEN}</repoToken>
           </configuration>
+          <executions>
+            <execution>
+              <phase>verify</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
         <plugin>
@@ -263,15 +280,15 @@
           <execution>
             <id>default-it</id>
             <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
+              <goal>integration-test</goal> <!-- Default Phase: Integration Test -->
+              <goal>verify</goal> <!-- Default Phase: Verify -->
             </goals>
           </execution>
           <execution>
             <id>e2e-tests</id>
             <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
+              <goal>integration-test</goal> <!-- Default Phase: Integration Test -->
+              <goal>verify</goal> <!-- Default Phase: Verify -->
             </goals>
             <configuration>
               <excludes>
@@ -333,14 +350,6 @@
           <plugin>
             <groupId>org.pitest</groupId>
             <artifactId>pitest-maven</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>mutationCoverage</goal>
-                </goals>
-                <phase>verify</phase>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>
@@ -357,14 +366,6 @@
           <plugin>
             <groupId>com.github.hazendaz.maven</groupId>
             <artifactId>coveralls-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>verify</phase>
-                <goals>
-                  <goal>report</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>

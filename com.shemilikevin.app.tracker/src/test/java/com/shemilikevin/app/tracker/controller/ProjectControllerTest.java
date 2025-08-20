@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.shemilikevin.app.tracker.helpers.ErrorMessages;
 import com.shemilikevin.app.tracker.model.Project;
 import com.shemilikevin.app.tracker.repository.IssueRepository;
 import com.shemilikevin.app.tracker.repository.ProjectRepository;
@@ -60,6 +61,8 @@ public class ProjectControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).findAll();
 		inOrder.verify(issueTrackerView).showProjects(Arrays.asList(project));
+		inOrder.verify(issueTrackerView).clearProjectFields();
+		inOrder.verify(issueTrackerView).clearProjectSelection();
 		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
@@ -75,6 +78,8 @@ public class ProjectControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).findAll();
 		inOrder.verify(issueTrackerView).showProjects(Collections.emptyList());
+		inOrder.verify(issueTrackerView).clearProjectFields();
+		inOrder.verify(issueTrackerView).clearProjectSelection();
 		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
@@ -98,6 +103,7 @@ public class ProjectControllerTest {
 		inOrder.verify(projectRepository).save(project);
 		inOrder.verify(projectRepository).findAll();
 		inOrder.verify(issueTrackerView).showProjects(Arrays.asList(project));
+		inOrder.verify(issueTrackerView).clearProjectFields();
 		verifyNoMoreInteractions(projectRepository, issueTrackerView);
 	}
 
@@ -135,6 +141,7 @@ public class ProjectControllerTest {
 		inOrder.verify(projectRepository).delete(id);
 		inOrder.verify(projectRepository).findAll();
 		inOrder.verify(issueTrackerView).showProjects(Collections.emptyList());
+		inOrder.verify(issueTrackerView).clearProjectSelection();
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -171,6 +178,8 @@ public class ProjectControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(id);
 		inOrder.verify(issueTrackerView).showProjectError(ErrorMessages.PROJECT_DOESNT_EXIST);
+		inOrder.verify(projectRepository).findAll();
+		inOrder.verify(issueTrackerView).showProjects(Collections.emptyList());
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 }

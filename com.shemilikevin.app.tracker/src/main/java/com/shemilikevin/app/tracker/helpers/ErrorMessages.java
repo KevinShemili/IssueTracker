@@ -1,6 +1,6 @@
-package com.shemilikevin.app.tracker.controller;
+package com.shemilikevin.app.tracker.helpers;
 
-public class ErrorMessages {
+public final class ErrorMessages {
 
 	private ErrorMessages() {
 	}

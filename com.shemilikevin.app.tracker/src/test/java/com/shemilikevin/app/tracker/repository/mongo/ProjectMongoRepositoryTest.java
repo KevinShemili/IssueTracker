@@ -122,7 +122,7 @@ public class ProjectMongoRepositoryTest {
 	}
 
 	@Test
-	public void testFindById_ManyProjectsInTheDatabase_ReturnsTheProject() {
+	public void testFindById_ManyProjectsInTheDatabase_ReturnsMatchingProject() {
 		// Arrange
 		String targetId = "1";
 

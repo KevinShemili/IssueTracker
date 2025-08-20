@@ -82,13 +82,18 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		autoCloseable.close();
 	}
 
+	/*
+	 * SECTION 1 - Validate the GUI
+	 */
 	@Test
 	@GUITest
 	public void testProjectTab_InitialState() {
 		// Assert
 		frameFixture.requireTitle("Issue Tracker");
+
 		frameFixture.tabbedPane(TABBED_PANE).requireEnabled(Index.atIndex(TAB_PROJECTS));
 		frameFixture.tabbedPane(TABBED_PANE).requireDisabled(Index.atIndex(TAB_ISSUES));
+
 		frameFixture.label(PROJECT_ID_LABEL);
 		frameFixture.textBox(PROJECT_ID_FIELD).requireEnabled();
 		frameFixture.label(PROJECT_NAME_LABEL);
@@ -190,9 +195,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testProjectTab_WhenProjectIsSelectedFromList_DeleteButtonIsEnabled() {
 		// Arrange
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectListModel().addElement(new Project("1", "Name", "Description"));
-		});
+		addProjectToList();
 
 		// Act
 		frameFixture.list(PROJECT_LIST).selectItem(0);
@@ -209,9 +212,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testProjectTab_WhenProjectIsSelectedFromList_IssuesTabIsEnabled() {
 		// Arrange
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectListModel().addElement(new Project("1", "Name", "Description"));
-		});
+		addProjectToList();
 
 		// Act
 		frameFixture.list(PROJECT_LIST).selectItem(0);
@@ -228,9 +229,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testIssueTab_InitialState() {
 		// Arrange
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-		});
+		goToIssueTab();
 
 		// Assert
 		frameFixture.label(ISSUE_ID_LABEL);
@@ -251,9 +250,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testIssueTab_WhenProvidedValidIdAndNameAndDescriptionAndPriority_AddButtonIsEnabled() {
 		// Arrange
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-		});
+		goToIssueTab();
 
 		// Act
 		// Valid Fields + Low Priority
@@ -289,9 +286,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testIssueTab_WhenOneOrMoreFieldsAreEmpty_AddButtonRemainsDisabled() {
 		// Arrange
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-		});
+		goToIssueTab();
 
 		// Act
 		// Empty Fields
@@ -377,11 +372,8 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testIssueTab_IssueSelectionFromList_EnablesOrDisablesTheDeleteButton() {
 		// Arrange
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueTrackerView.getIssueListModel()
-					.addElement(new Issue("1", "Name", "Description", "Priority", "1"));
-		});
+		goToIssueTab();
+		addIssueToList();
 
 		// Act
 		frameFixture.list(ISSUE_LIST).selectItem(0);
@@ -399,149 +391,76 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	public void testIssueTab_WhenProjectTabIsSelected_IssueTabBecomesDisabled() {
 		// Arrange
 		// Start from Issue Tab
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-		});
+		goToIssueTab();
 
 		// Act
-		// Go to Project Tab
-		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_PROJECTS);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_PROJECTS); // Go to Projects Tab
 
 		// Assert
 		frameFixture.tabbedPane(TABBED_PANE).requireDisabled(Index.atIndex(TAB_ISSUES));
-		frameFixture.textBox(PROJECT_ID_FIELD).requireEmpty();
-		frameFixture.textBox(PROJECT_NAME_FIELD).requireEmpty();
-		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).requireEmpty();
-		frameFixture.list(PROJECT_LIST).requireNoSelection();
-		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
-		frameFixture.button(PROJECT_DELETE_BUTTON).requireDisabled();
 	}
 
+	/*
+	 * SECTION 2 - Validate the Methods
+	 */
 	@Test
-	@GUITest
-	public void testProjectTab_WhenFieldsAreFilledAndIssueTabIsSelected_ReturningAgainToProjectTabClearedFields() {
-		// Arrange
-		// Start from Project Tab & fill fields
-		frameFixture.textBox(PROJECT_ID_FIELD).enterText("1");
-		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
-		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectErrorLabel().setText("Some Error");
-		});
-
-		// Act
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES); // Go to Issue Tab
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_PROJECTS); // Go back again to Project Tab
-		});
-
-		// Assert
-		frameFixture.textBox(PROJECT_ID_FIELD).requireEmpty();
-		frameFixture.textBox(PROJECT_NAME_FIELD).requireEmpty();
-		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).requireEmpty();
-		frameFixture.label(PROJECT_ERROR_LABEL).requireText(" ");
-		frameFixture.list(PROJECT_LIST).requireNoSelection();
-		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
-		frameFixture.button(PROJECT_DELETE_BUTTON).requireDisabled();
-	}
-
-	@Test
-	@GUITest
-	public void testIssueTab_WhenFieldsAreFilledAndProjectTabIsSelected_ReturningAgainToIssueTabClearedFields() {
-		// Arrange
-		// Start from Issue Tab & fill fields
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueTrackerView.getIssueErrorLabel().setText("Some Error");
-		});
-
-		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
-		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
-		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
-		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
-
-		// Act
-		// Issue Tab -> Project Tab -> Issue Tab
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_PROJECTS); // Go to project tab
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES); // Go back again to Issue Tab
-		});
-
-		// Assert
-		frameFixture.textBox(ISSUE_ID_FIELD).requireEmpty();
-		frameFixture.textBox(ISSUE_NAME_FIELD).requireEmpty();
-		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).requireEmpty();
-		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).requireNoSelection();
-		frameFixture.label(ISSUE_ERROR_LABEL).requireText(" ");
-		frameFixture.list(ISSUE_LIST).requireNoSelection();
-		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
-		frameFixture.button(ISSUE_DELETE_BUTTON).requireDisabled();
-	}
-
-	@Test
-	public void testShowProjects_WhenProvidedWithProjects_AddsAllProjectsToTheListAndClearsAnyError() {
+	public void testShowProjects_WhenProvidedWithProjects_AddsAllProjectsToTheList() {
 		// Arrange
 		Project project1 = new Project("1", "Name 1", "Description 1");
 		Project project2 = new Project("2", "Name 2", "Description 2");
 
 		// Act
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectErrorLabel().setText("Some Error");
 			issueTrackerView.showProjects(Arrays.asList(project1, project2));
 		});
 
 		// Assert
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).containsExactly(project1.toString(), project2.toString());
-		frameFixture.label(PROJECT_ERROR_LABEL).requireText(" ");
 	}
 
 	@Test
-	public void testShowProjects_WhenProvidedWithEmptyList_ShowsEmptyListAndClearsAnyError() {
+	public void testShowProjects_WhenProvidedWithEmptyList_ShowsEmptyList() {
 		// Act
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectErrorLabel().setText("Some Error");
 			issueTrackerView.showProjects(Collections.emptyList());
 		});
 
 		// Assert
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).isEmpty();
-		frameFixture.label(PROJECT_ERROR_LABEL).requireText(" ");
 	}
 
 	@Test
-	public void testShowIssues_WhenProvidedWithIssues_AddsAllIssuesToTheListAndClearsAnyError() {
+	public void testShowIssues_WhenProvidedWithIssues_AddsAllIssuesToTheList() {
 		// Arrange
+		goToIssueTab();
 		Issue issue1 = new Issue("1", "Name 1", "Description 1", "Priority 1", "10");
 		Issue issue2 = new Issue("2", "Name 2", "Description 2", "Priority 2", "10");
 
 		// Act
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueTrackerView.getIssueErrorLabel().setText("Some Error");
 			issueTrackerView.showIssues(Arrays.asList(issue1, issue2));
 		});
 
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).containsExactly(issue1.toString(), issue2.toString());
-		frameFixture.label(ISSUE_ERROR_LABEL).requireText(" ");
 	}
 
 	@Test
-	public void testShowIssues_WhenProvidedWithEmptyList_ShowsEmptyListAndClearsAnyError() {
+	public void testShowIssues_WhenProvidedWithEmptyList_ShowsEmptyList() {
+		// Arrange
+		goToIssueTab();
+
 		// Act
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueTrackerView.getIssueErrorLabel().setText("Some Error");
 			issueTrackerView.showIssues(Collections.emptyList());
 		});
 
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
-		frameFixture.label(ISSUE_ERROR_LABEL).requireText(" ");
 	}
 
 	@Test
@@ -561,11 +480,11 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@Test
 	public void testShowIssueError_WhenProvidedWithMessage_ShowsMessageInIssueErrorLabel() {
 		// Arrange
+		goToIssueTab();
 		String errorMessage = "Some Error";
 
 		// Act
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
 			issueTrackerView.showIssueError(errorMessage);
 		});
 
@@ -574,7 +493,90 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testAddProjectButton_DelegatesToProjectController_AddsProjectAndClearsFields() {
+	public void testClearProjectFields_ClearsTextFieldsAndError_InTheProjectsTab() {
+		// Arrange
+		frameFixture.textBox(PROJECT_ID_FIELD).enterText("1");
+		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
+		fillProjectErrorLabel();
+
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.clearProjectFields();
+		});
+
+		// Assert
+		frameFixture.textBox(PROJECT_ID_FIELD).requireEmpty();
+		frameFixture.textBox(PROJECT_NAME_FIELD).requireEmpty();
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).requireEmpty();
+		frameFixture.label(PROJECT_ERROR_LABEL).requireText(" ");
+		frameFixture.button(PROJECT_ADD_BUTTON).requireDisabled();
+		frameFixture.button(PROJECT_DELETE_BUTTON).requireDisabled();
+	}
+
+	@Test
+	public void testClearProjectSelection_ClearsListSelection_InTheProjectsTab() {
+		// Arrange
+		addProjectToList();
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.clearProjectSelection();
+		});
+
+		// Assert
+		frameFixture.list(PROJECT_LIST).requireNoSelection();
+	}
+
+	@Test
+	public void testClearIssueFields_ClearsTextFieldsAndErrorAndComboBox_InTheIssuesTab() {
+		// Arrange
+		goToIssueTab();
+
+		frameFixture.textBox(ISSUE_ID_FIELD).enterText("1");
+		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0);
+		fillIssueErrorLabel();
+
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.clearIssueFields();
+		});
+
+		// Assert
+		frameFixture.textBox(ISSUE_ID_FIELD).requireEmpty();
+		frameFixture.textBox(ISSUE_NAME_FIELD).requireEmpty();
+		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).requireEmpty();
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).requireNoSelection();
+		frameFixture.label(ISSUE_ERROR_LABEL).requireText(" ");
+		frameFixture.button(ISSUE_ADD_BUTTON).requireDisabled();
+		frameFixture.button(ISSUE_DELETE_BUTTON).requireDisabled();
+	}
+
+	@Test
+	public void testClearIssueSelection_ClearsListSelection_InTheIssuesTab() {
+		// Arrange
+		goToIssueTab();
+
+		addIssueToList();
+		frameFixture.list(ISSUE_LIST).selectItem(0);
+
+		// Act
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.clearIssueSelection();
+		});
+
+		// Assert
+		frameFixture.list(ISSUE_LIST).requireNoSelection();
+	}
+
+	/*
+	 * SECTION 3 - Validate GUI correctly calling the Controller
+	 */
+	@Test
+	public void testAddProjectButton_DelegatesToProjectController_AddsProject() {
 		// Arrange
 		String id = "1";
 		String name = "Name";
@@ -589,20 +591,13 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		// Assert
 		verify(projectController).addProject(id, name, description);
-		frameFixture.textBox(PROJECT_ID_FIELD).requireText("");
-		frameFixture.textBox(PROJECT_NAME_FIELD).requireText("");
-		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).requireText("");
 	}
 
 	@Test
-	public void testDeleteProjectButton_DelegatesToProjectController_DeletesProjectAndClearsSelection() {
+	public void testDeleteProjectButton_DelegatesToProjectController_DeletesProject() {
 		// Arrange
 		String id = "1";
-		Project project = new Project(id, "Name", "Description");
-
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectListModel().addElement(project);
-		});
+		addProjectToList(id);
 
 		frameFixture.list(PROJECT_LIST).selectItem(0);
 
@@ -611,18 +606,13 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 
 		// Assert
 		verify(projectController).deleteProject(id);
-		frameFixture.list(PROJECT_LIST).requireNoSelection();
 	}
 
 	@Test
 	public void testIssueTab_DelegatesToIssueController_ListIssues() {
 		// Arrange
 		String id = "1";
-		Project project = new Project(id, "Name", "Description");
-
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectListModel().addElement(project);
-		});
+		addProjectToList(id);
 
 		frameFixture.list(PROJECT_LIST).selectItem(0);
 
@@ -636,9 +626,7 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	@Test
 	public void testProjectTab_DelegatesToProjectController_ListProjects() {
 		// Arrange
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-		});
+		goToIssueTab();
 
 		// Act
 		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_PROJECTS);
@@ -648,47 +636,33 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testAddIssueButton_DelegatesToIssueController_AddsIssueAndClearsFields() {
+	public void testAddIssueButton_DelegatesToIssueController_AddsIssue() {
 		// Arrange
 		String id = "1";
 		String name = "Name";
 		String description = "Description";
 		String projectId = "10";
-		Project project = new Project(projectId, "Name", "Description");
-
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getProjectListModel().addElement(project);
-			issueTrackerView.getProjectJList().setSelectedIndex(0);
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-		});
+		goToIssueTab(projectId);
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText(id);
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(name);
 		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).enterText(description);
-		frameFixture.comboBox().selectItem(0); // Low
+		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).selectItem(0); // Low
 
 		// Act
 		frameFixture.button(ISSUE_ADD_BUTTON).click();
 
 		// Assert
 		verify(issueController).addIssue(id, name, description, "Low", projectId);
-		frameFixture.textBox(ISSUE_ID_FIELD).requireText("");
-		frameFixture.textBox(ISSUE_NAME_FIELD).requireText("");
-		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).requireText("");
-		frameFixture.comboBox().requireNoSelection();
-		frameFixture.label(ISSUE_ERROR_LABEL).requireText(" ");
 	}
 
 	@Test
-	public void testDeleteIssueButton_DelegatesToIssueController_DeletesIssueAndClearsSelection() {
+	public void testDeleteIssueButton_DelegatesToIssueController_DeletesIssue() {
 		// Arrange
 		String issueId = "1";
-		Issue issue = new Issue(issueId, "Issue Name", "Issue Description", "Low", "1");
-
-		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueTrackerView.getIssueListModel().addElement(issue);
-		});
+		String projectId = "10";
+		goToIssueTab(projectId);
+		addIssueToList(issueId);
 
 		frameFixture.list(ISSUE_LIST).selectItem(0);
 
@@ -696,11 +670,12 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.button(ISSUE_DELETE_BUTTON).click();
 
 		// Assert
-		verify(issueController).deleteIssue(issueId);
-		frameFixture.list(ISSUE_LIST).requireNoSelection();
-		frameFixture.label(ISSUE_ERROR_LABEL).requireText(" ");
+		verify(issueController).deleteIssue(issueId, projectId);
 	}
 
+	/*
+	 * Some Helper Methods
+	 */
 	private void clearProjectInput() {
 		frameFixture.textBox(PROJECT_ID_FIELD).setText("");
 		frameFixture.textBox(PROJECT_NAME_FIELD).setText("");
@@ -714,5 +689,49 @@ public class IssueTrackerSwingViewTest extends AssertJSwingJUnitTestCase {
 		frameFixture.textBox(ISSUE_DESCRIPTION_FIELD).setText("");
 		frameFixture.comboBox(ISSUE_PRIORITY_COMBO).clearSelection();
 		frameFixture.list(ISSUE_LIST).clearSelection();
+	}
+
+	private void goToIssueTab() {
+		goToIssueTab("1");
+	}
+
+	private void goToIssueTab(String projectReferenceId) {
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(new Project(projectReferenceId, "Name", "Description"));
+			issueTrackerView.getProjectJList().setSelectedIndex(0);
+			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
+		});
+	}
+
+	private void addProjectToList() {
+		addProjectToList("1");
+	}
+
+	private void addProjectToList(String id) {
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectListModel().addElement(new Project(id, "Name", "Description"));
+		});
+	}
+
+	private void addIssueToList() {
+		addIssueToList("1");
+	}
+
+	private void addIssueToList(String id) {
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getIssueListModel().addElement(new Issue(id, "Name", "Description", "Priority", "1"));
+		});
+	}
+
+	private void fillProjectErrorLabel() {
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getProjectErrorLabel().setText("Some Error");
+		});
+	}
+
+	private void fillIssueErrorLabel() {
+		GuiActionRunner.execute(() -> {
+			issueTrackerView.getIssueErrorLabel().setText("Some Error");
+		});
 	}
 }
