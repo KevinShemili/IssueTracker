@@ -1,8 +1,10 @@
 package com.shemilikevin.app.tracker.controller;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import com.shemilikevin.app.tracker.helpers.ErrorMessages;
 import com.shemilikevin.app.tracker.model.Issue;
 import com.shemilikevin.app.tracker.repository.IssueRepository;
 import com.shemilikevin.app.tracker.repository.ProjectRepository;
@@ -26,11 +28,14 @@ public class IssueController extends BaseController {
 
 		if (!isProjectStoredInDatabase(projectId)) {
 			issueTrackerView.showIssueError(ErrorMessages.PROJECT_DOESNT_EXIST);
+			issueTrackerView.showIssues(Collections.emptyList());
 			return;
 		}
 
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 		issueTrackerView.showIssues(issueList);
+		issueTrackerView.clearIssueFields();
+		issueTrackerView.clearIssueSelection();
 	}
 
 	public void addIssue(String issueId, String issueName, String issueDescription, String issuePriority,
@@ -55,9 +60,10 @@ public class IssueController extends BaseController {
 
 		List<Issue> issueList = issueRepository.findByProjectId(projectId);
 		issueTrackerView.showIssues(issueList);
+		issueTrackerView.clearIssueFields();
 	}
 
-	public void deleteIssue(String issueId) {
+	public void deleteIssue(String issueId, String projectId) {
 
 		if (!validateFields(issueId)) {
 			return;
@@ -65,6 +71,7 @@ public class IssueController extends BaseController {
 
 		if (!isIssueStoredInDatabase(issueId)) {
 			issueTrackerView.showIssueError(ErrorMessages.ISSUE_DOESNT_EXIST);
+			issueTrackerView.showIssues(issueRepository.findByProjectId(projectId));
 			return;
 		}
 
@@ -73,6 +80,7 @@ public class IssueController extends BaseController {
 
 		List<Issue> issueList = issueRepository.findByProjectId(toBeDeleted.getProjectId());
 		issueTrackerView.showIssues(issueList);
+		issueTrackerView.clearIssueSelection();
 	}
 
 	private boolean isIssueStoredInDatabase(String id) {

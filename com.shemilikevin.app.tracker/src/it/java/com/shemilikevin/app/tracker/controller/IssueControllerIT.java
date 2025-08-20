@@ -16,6 +16,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
+import com.shemilikevin.app.tracker.helpers.ErrorMessages;
 import com.shemilikevin.app.tracker.model.Issue;
 import com.shemilikevin.app.tracker.model.Project;
 import com.shemilikevin.app.tracker.repository.IssueRepository;
@@ -25,6 +26,9 @@ import com.shemilikevin.app.tracker.repository.mongo.ProjectMongoRepository;
 import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class IssueControllerIT {
+
+	@ClassRule
+	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
 
 	private static final String DATABASE_NAME = "db";
 	private static final String PROJECT_COLLECTION = "projects";
@@ -37,9 +41,6 @@ public class IssueControllerIT {
 	private ProjectRepository projectRepository;
 	private IssueRepository issueRepository;
 	private IssueController issueController;
-
-	@ClassRule
-	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
 	private MongoClient mongoClient;
 
 	@Before
@@ -141,7 +142,7 @@ public class IssueControllerIT {
 		issueRepository.save(new Issue(id, "Name", "Description", "Priority", projectId));
 
 		// Act
-		issueController.deleteIssue(id);
+		issueController.deleteIssue(id, projectId);
 
 		// Assert
 		verify(issueTrackerView).showIssues(Collections.emptyList());

@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.shemilikevin.app.tracker.helpers.ErrorMessages;
 import com.shemilikevin.app.tracker.model.Issue;
 import com.shemilikevin.app.tracker.repository.IssueRepository;
 import com.shemilikevin.app.tracker.repository.ProjectRepository;
@@ -63,6 +64,8 @@ public class IssueControllerTest {
 		inOrder.verify(projectRepository).exists(projectId);
 		inOrder.verify(issueRepository).findByProjectId(projectId);
 		inOrder.verify(issueTrackerView).showIssues(Arrays.asList(issue));
+		inOrder.verify(issueTrackerView).clearIssueFields();
+		inOrder.verify(issueTrackerView).clearIssueSelection();
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -82,6 +85,8 @@ public class IssueControllerTest {
 		inOrder.verify(projectRepository).exists(projectId);
 		inOrder.verify(issueRepository).findByProjectId(projectId);
 		inOrder.verify(issueTrackerView).showIssues(Collections.emptyList());
+		inOrder.verify(issueTrackerView).clearIssueFields();
+		inOrder.verify(issueTrackerView).clearIssueSelection();
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -99,6 +104,7 @@ public class IssueControllerTest {
 		InOrder inOrder = Mockito.inOrder(projectRepository, issueTrackerView);
 		inOrder.verify(projectRepository).exists(projectId);
 		inOrder.verify(issueTrackerView).showIssueError(ErrorMessages.PROJECT_DOESNT_EXIST);
+		inOrder.verify(issueTrackerView).showIssues(Collections.emptyList());
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -127,6 +133,7 @@ public class IssueControllerTest {
 		inOrder.verify(issueRepository).save(issue);
 		inOrder.verify(issueRepository).findByProjectId(projectId);
 		inOrder.verify(issueTrackerView).showIssues(Arrays.asList(issue));
+		inOrder.verify(issueTrackerView).clearIssueFields();
 		verifyNoMoreInteractions(projectRepository, issueRepository, issueTrackerView);
 	}
 
@@ -179,7 +186,7 @@ public class IssueControllerTest {
 		when(issueRepository.findByProjectId(projectId)).thenReturn(Collections.emptyList());
 
 		// Act
-		issueController.deleteIssue(issueId);
+		issueController.deleteIssue(issueId, projectId);
 
 		// Assert
 		InOrder inOrder = Mockito.inOrder(issueRepository, issueTrackerView);
@@ -188,6 +195,7 @@ public class IssueControllerTest {
 		inOrder.verify(issueRepository).delete(issueId);
 		inOrder.verify(issueRepository).findByProjectId(projectId);
 		inOrder.verify(issueTrackerView).showIssues(Collections.emptyList());
+		inOrder.verify(issueTrackerView).clearIssueSelection();
 		verifyNoMoreInteractions(issueRepository, issueTrackerView);
 	}
 
@@ -195,15 +203,18 @@ public class IssueControllerTest {
 	public void testDeleteIssue_WhenProvidedIssueIdDoesNotExistInDatabase_ShowsErrorMessage() {
 		// Arrange
 		String issueId = "1";
+		String projectId = "10";
 		when(issueRepository.exists(issueId)).thenReturn(false);
 
 		// Act
-		issueController.deleteIssue(issueId);
+		issueController.deleteIssue(issueId, projectId);
 
 		// Assert
 		InOrder inOrder = Mockito.inOrder(issueRepository, issueTrackerView);
 		inOrder.verify(issueRepository).exists(issueId);
 		inOrder.verify(issueTrackerView).showIssueError(ErrorMessages.ISSUE_DOESNT_EXIST);
+		inOrder.verify(issueRepository).findByProjectId(projectId);
+		inOrder.verify(issueTrackerView).showIssues(Collections.emptyList());
 		verifyNoMoreInteractions(issueRepository, issueTrackerView);
 	}
 }

@@ -16,6 +16,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
+import com.shemilikevin.app.tracker.helpers.ErrorMessages;
 import com.shemilikevin.app.tracker.model.Issue;
 import com.shemilikevin.app.tracker.model.Project;
 import com.shemilikevin.app.tracker.repository.IssueRepository;
@@ -25,6 +26,9 @@ import com.shemilikevin.app.tracker.repository.mongo.ProjectMongoRepository;
 import com.shemilikevin.app.tracker.view.IssueTrackerView;
 
 public class ProjectControllerIT {
+
+	@ClassRule
+	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
 
 	private static final String DATABASE_NAME = "db";
 	private static final String PROJECT_COLLECTION = "projects";
@@ -37,17 +41,17 @@ public class ProjectControllerIT {
 	private ProjectRepository projectRepository;
 	private IssueRepository issueRepository;
 	private ProjectController projectController;
-
-	@ClassRule
-	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
 	private MongoClient mongoClient;
 
 	@Before
 	public void setUp() {
 		autoCloseable = MockitoAnnotations.openMocks(this);
+
 		mongoClient = new MongoClient(new ServerAddress(mongoContainer.getHost(), mongoContainer.getFirstMappedPort()));
+
 		projectRepository = new ProjectMongoRepository(mongoClient, DATABASE_NAME, PROJECT_COLLECTION);
 		issueRepository = new IssueMongoRepository(mongoClient, DATABASE_NAME, ISSUE_COLLECTION);
+
 		MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
 		database.drop();
 

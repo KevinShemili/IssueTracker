@@ -15,9 +15,9 @@ import org.testcontainers.containers.MongoDBContainer;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
-import com.shemilikevin.app.tracker.controller.ErrorMessages;
 import com.shemilikevin.app.tracker.controller.IssueController;
 import com.shemilikevin.app.tracker.controller.ProjectController;
+import com.shemilikevin.app.tracker.helpers.ErrorMessages;
 import com.shemilikevin.app.tracker.model.Issue;
 import com.shemilikevin.app.tracker.model.Project;
 import com.shemilikevin.app.tracker.repository.IssueRepository;
@@ -28,11 +28,15 @@ import com.shemilikevin.app.tracker.repository.mongo.ProjectMongoRepository;
 @RunWith(GUITestRunner.class)
 public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
+	@ClassRule
+	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
+
 	private static final String DATABASE_NAME = "db";
 	private static final String PROJECT_COLLECTION = "projects";
 	private static final String ISSUE_COLLECTION = "issues";
 
 	private static final int TAB_ISSUES = 1;
+	private static final String TABBED_PANE = "tabbedPane";
 	private static final String PROJECT_ID_FIELD = "projectIdField";
 	private static final String PROJECT_NAME_FIELD = "projectNameField";
 	private static final String PROJECT_DESCRIPTION_FIELD = "projectDescriptionField";
@@ -51,14 +55,10 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 	private MongoClient mongoClient;
 	private FrameFixture frameFixture;
-	private IssueTrackerSwingView issueTrackerView;
 	private ProjectController projectController;
 	private IssueController issueController;
 	private IssueRepository issueRepository;
 	private ProjectRepository projectRepository;
-
-	@ClassRule
-	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
 
 	@Override
 	protected void onSetUp() throws Exception {
@@ -67,8 +67,11 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		projectRepository = new ProjectMongoRepository(mongoClient, DATABASE_NAME, PROJECT_COLLECTION);
 		issueRepository = new IssueMongoRepository(mongoClient, DATABASE_NAME, ISSUE_COLLECTION);
 
-		GuiActionRunner.execute(() -> {
-			issueTrackerView = new IssueTrackerSwingView();
+		MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
+		database.drop();
+
+		frameFixture = new FrameFixture(robot(), GuiActionRunner.execute(() -> {
+			IssueTrackerSwingView issueTrackerView = new IssueTrackerSwingView();
 
 			projectController = new ProjectController(projectRepository, issueRepository, issueTrackerView);
 			issueController = new IssueController(projectRepository, issueRepository, issueTrackerView);
@@ -77,13 +80,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 			issueTrackerView.setProjectController(projectController);
 
 			return issueTrackerView;
-		});
-
-		MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
-		database.drop();
-
-		frameFixture = new FrameFixture(robot(), issueTrackerView);
-		frameFixture.show();
+		})).show();
 	}
 
 	@Override
@@ -140,8 +137,8 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		projectRepository.save(new Project(id, "Name", "Description"));
 
 		frameFixture.textBox(PROJECT_ID_FIELD).enterText(id); // duplicate
-		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name");
-		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description");
+		frameFixture.textBox(PROJECT_NAME_FIELD).enterText("Name 2");
+		frameFixture.textBox(PROJECT_DESCRIPTION_FIELD).enterText("Description 2");
 
 		// Act
 		frameFixture.button(PROJECT_ADD_BUTTON).click();
@@ -150,6 +147,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(PROJECT_ERROR_LABEL).requireText(String.format(ErrorMessages.DUPLICATE_PROJECT, id));
+		assertThat(projectRepository.findAll()).hasSize(1); // verify no new entries
 	}
 
 	@Test
@@ -169,6 +167,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(PROJECT_ERROR_LABEL).requireText(ErrorMessages.NON_NUMERICAL_ID);
+		assertThat(projectRepository.findAll()).isEmpty(); // verify no new entries
 	}
 
 	@Test
@@ -214,6 +213,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).containsExactly(new Project(projectId, name, description).toString());
 		frameFixture.label(PROJECT_ERROR_LABEL).requireText(ErrorMessages.PROJECT_HAS_ISSUES);
+		assertThat(projectRepository.exists(projectId)).isTrue(); // verify not deleted
 	}
 
 	@Test
@@ -228,11 +228,14 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		issueRepository.save(issue1);
 		issueRepository.save(issue2);
 
-		// Act
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueController.listIssues(projectId);
+			projectController.listProjects();
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+
+		// Act
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
@@ -253,9 +256,10 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> {
 			projectController.listProjects();
-			issueTrackerView.getProjectJList().setSelectedIndex(0);
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText(id);
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText(name);
@@ -285,9 +289,10 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> {
 			projectController.listProjects();
-			issueTrackerView.getProjectJList().setSelectedIndex(0);
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText(id); // duplicate
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
@@ -301,6 +306,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).containsExactly(issue.toString());
 		frameFixture.label(ISSUE_ERROR_LABEL).requireText(String.format(ErrorMessages.DUPLICATE_ISSUE, id));
+		assertThat(issueRepository.findAll()).hasSize(1); // verify no new entries
 	}
 
 	@Test
@@ -313,9 +319,10 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> {
 			projectController.listProjects();
-			issueTrackerView.getProjectJList().setSelectedIndex(0);
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		frameFixture.textBox(ISSUE_ID_FIELD).enterText("XYZ");
 		frameFixture.textBox(ISSUE_NAME_FIELD).enterText("Name");
@@ -329,6 +336,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(ISSUE_ERROR_LABEL).requireText(ErrorMessages.NON_NUMERICAL_ID);
+		assertThat(issueRepository.findAll()).isEmpty(); // verify no new entries
 	}
 
 	@Test
@@ -342,9 +350,11 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		issueRepository.save(new Issue(id, "Name", "Description", "Priority", projectId));
 
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueController.listIssues(projectId);
+			projectController.listProjects();
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		frameFixture.list(ISSUE_LIST).selectItem(0);
 
@@ -364,14 +374,70 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String projectId = "1";
 		projectRepository.save(new Project(projectId, "Name", "Description"));
 
-		// Act
 		GuiActionRunner.execute(() -> {
-			issueTrackerView.getTabbedPane().setSelectedIndex(TAB_ISSUES);
-			issueController.listIssues(projectId);
+			projectController.listProjects();
 		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+
+		// Act
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
 
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
+	}
+
+	@Test
+	@GUITest
+	public void testDeleteProjectButton_SelectedProjectNotInDB_ShowsErrorMessageRefreshesList() {
+		// Arrange
+		String projectId = "1";
+		String name = "Name";
+		String description = "Description";
+
+		GuiActionRunner.execute(() -> {
+			projectController.addProject(projectId, name, description);
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		projectRepository.delete(projectId); // manually delete project -> stale view
+
+		// Act
+		frameFixture.button(PROJECT_DELETE_BUTTON).click();
+
+		// Assert
+		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
+		assertThat(listContents).isEmpty();
+		frameFixture.label(PROJECT_ERROR_LABEL).requireText(ErrorMessages.PROJECT_DOESNT_EXIST);
+	}
+
+	@Test
+	@GUITest
+	public void testDeleteIssueButton_SelectedIssueNotInDB_ShowsErrorMessageRefreshesList() {
+		// Arrange
+		String projectId = "10";
+		String id = "1";
+
+		projectRepository.save(new Project(projectId, "Name", "Description"));
+		issueRepository.save(new Issue(id, "Name", "Description", "Priority", projectId));
+
+		GuiActionRunner.execute(() -> {
+			projectController.listProjects();
+		});
+
+		frameFixture.list(PROJECT_LIST).selectItem(0);
+		frameFixture.tabbedPane(TABBED_PANE).selectTab(TAB_ISSUES);
+
+		frameFixture.list(ISSUE_LIST).selectItem(0);
+		issueRepository.delete(id); // manually delete issue -> stale view
+
+		// Act
+		frameFixture.button(ISSUE_DELETE_BUTTON).click();
+
+		// Assert
+		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
+		assertThat(listContents).isEmpty();
+		frameFixture.label(ISSUE_ERROR_LABEL).requireText(ErrorMessages.ISSUE_DOESNT_EXIST);
 	}
 }
