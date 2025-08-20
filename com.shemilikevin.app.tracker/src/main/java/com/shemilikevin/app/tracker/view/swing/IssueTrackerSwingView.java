@@ -76,8 +76,6 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		for (Issue issue : issueList) {
 			issueListModel.addElement(issue);
 		}
-
-		clearIssueTabError();
 	}
 
 	@Override
@@ -87,8 +85,6 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		for (Project project : projectList) {
 			projectListModel.addElement(project);
 		}
-
-		clearProjectTabError();
 	}
 
 	@Override
@@ -101,22 +97,65 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		issueErrorLabel.setText(errorMessage);
 	}
 
+	@Override
+	public void clearProjectFields() {
+		projectIdField.setText("");
+		projectNameField.setText("");
+		projectDescriptionField.setText("");
+
+		projectErrorLabel.setText(" ");
+
+		// Setting text fields to " " through SetText()
+		// Will not disable the buttons
+		// As they depend on a key released event
+		// Therefore disable manually
+		addProjectButton.setEnabled(false);
+		deleteProjectButton.setEnabled(false);
+	}
+
+	@Override
+	public void clearProjectSelection() {
+		projectJList.clearSelection();
+	}
+
+	@Override
+	public void clearIssueFields() {
+		issueIdField.setText("");
+		issueNameField.setText("");
+		issueDescriptionField.setText("");
+		issuePriorityComboBox.setSelectedItem(null);
+
+		issueErrorLabel.setText(" ");
+
+		// Setting text fields to " " through SetText()
+		// Will not disable the buttons
+		// As they depend on a key released event
+		// Therefore disable manually
+		addIssueButton.setEnabled(false);
+		deleteIssueButton.setEnabled(false);
+	}
+
+	@Override
+	public void clearIssueSelection() {
+		issueJList.clearSelection();
+	}
+
 	// Listeners
 	private void handleTabChange() {
 		if (tabbedPane.getSelectedIndex() == TAB_PROJECTS) {
-			if (projectController != null) {
-				clearProjectTab();
 
+			// Tabbed pane by default causes an event on the 1st tab
+			// As soon as the class is created, but
+			// The dependencies are given after class creation
+			// Through setters
+			if (projectController != null) {
 				projectController.listProjects();
 				tabbedPane.setEnabledAt(TAB_ISSUES, false);
 			}
 		} else { // Else the other tab, the Issues Tab
-			clearIssueTab();
 
 			Project selectedProject = projectJList.getSelectedValue();
-			if (selectedProject != null) {
-				issueController.listIssues(selectedProject.getId());
-			}
+			issueController.listIssues(selectedProject.getId());
 		}
 	}
 
@@ -153,20 +192,15 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 	}
 
 	private ActionListener handleAddProjectButtonClick() {
-		return e -> {
-			projectController.addProject(projectIdField.getText(), projectNameField.getText(),
-					projectDescriptionField.getText());
+		return e -> projectController.addProject(projectIdField.getText(), projectNameField.getText(),
+				projectDescriptionField.getText());
 
-			clearProjectTabFields();
-		};
 	}
 
 	private ActionListener handleDeleteProjectButtonClick() {
 		return e -> {
 			Project selectedProject = projectJList.getSelectedValue();
 			projectController.deleteProject(selectedProject.getId());
-
-			clearProjectListSelection();
 		};
 	}
 
@@ -194,17 +228,15 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 			String priority = (String) issuePriorityComboBox.getSelectedItem();
 
 			issueController.addIssue(id, name, description, priority, selectedProject.getId());
-
-			clearIssueTabFields();
 		};
 	}
 
 	private ActionListener handleDeleteIssueButtonClick() {
 		return e -> {
 			Issue selectedIssue = issueJList.getSelectedValue();
-			issueController.deleteIssue(selectedIssue.getId());
+			Project selectedProject = projectJList.getSelectedValue();
 
-			clearIssueListSelection();
+			issueController.deleteIssue(selectedIssue.getId(), selectedProject.getId());
 		};
 	}
 
@@ -487,61 +519,6 @@ public class IssueTrackerSwingView extends JFrame implements IssueTrackerView {
 		deleteIssueButton.setEnabled(false);
 		deleteIssueButton.setName("deleteIssueButton");
 		issueButtonsPanel.add(deleteIssueButton);
-	}
-
-	// Some Helper Methods
-	private void clearProjectTabFields() {
-		projectIdField.setText("");
-		projectNameField.setText("");
-		projectDescriptionField.setText("");
-
-		// Setting fields to null will not disable them
-		// as they depend on a key released event
-		// Therefore disable manually
-		addProjectButton.setEnabled(false);
-		deleteProjectButton.setEnabled(false);
-	}
-
-	private void clearProjectTabError() {
-		projectErrorLabel.setText(" ");
-	}
-
-	private void clearProjectListSelection() {
-		projectJList.clearSelection();
-	}
-
-	private void clearProjectTab() {
-		clearProjectTabFields();
-		clearProjectTabError();
-		clearProjectListSelection();
-	}
-
-	private void clearIssueTabFields() {
-		issueIdField.setText("");
-		issueNameField.setText("");
-		issueDescriptionField.setText("");
-		issuePriorityComboBox.setSelectedItem(null);
-		issueJList.clearSelection();
-
-		// Setting fields to null will not disable them
-		// as they depend on a key released event
-		// Therefore disable manually
-		addIssueButton.setEnabled(false);
-		deleteIssueButton.setEnabled(false);
-	}
-
-	private void clearIssueTabError() {
-		issueErrorLabel.setText(" ");
-	}
-
-	private void clearIssueListSelection() {
-		issueJList.clearSelection();
-	}
-
-	private void clearIssueTab() {
-		clearIssueTabFields();
-		clearIssueTabError();
-		clearIssueListSelection();
 	}
 
 	// Provide Required Dependencies

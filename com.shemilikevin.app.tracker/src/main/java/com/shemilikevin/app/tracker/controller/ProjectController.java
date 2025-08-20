@@ -20,6 +20,8 @@ public class ProjectController extends BaseController {
 		List<Project> projectList = projectRepository.findAll();
 
 		issueTrackerView.showProjects(projectList);
+		issueTrackerView.clearProjectFields();
+		issueTrackerView.clearProjectSelection();
 	}
 
 	public void addProject(String id, String name, String description) {
@@ -38,6 +40,7 @@ public class ProjectController extends BaseController {
 
 		List<Project> projectList = projectRepository.findAll();
 		issueTrackerView.showProjects(projectList);
+		issueTrackerView.clearProjectFields();
 	}
 
 	public void deleteProject(String id) {
@@ -48,6 +51,7 @@ public class ProjectController extends BaseController {
 
 		if (!isProjectStoredInDatabase(id)) {
 			issueTrackerView.showProjectError(ErrorMessages.PROJECT_DOESNT_EXIST);
+			issueTrackerView.showProjects(projectRepository.findAll()); // refreshes view to remove any stale data
 			return;
 		}
 
@@ -60,6 +64,7 @@ public class ProjectController extends BaseController {
 
 		List<Project> projectList = projectRepository.findAll();
 		issueTrackerView.showProjects(projectList);
+		issueTrackerView.clearProjectSelection();
 	}
 
 	private boolean validateFields(String id, String name, String description) {

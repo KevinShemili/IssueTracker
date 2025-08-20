@@ -68,7 +68,7 @@ public class IssueControllerDeleteIssueParameterizedTest {
 	@Test
 	public void testDeleteIssue_WhenProvidedWithInvalidIssueId_ShowsCorrespondingErrorMessage() {
 		// Act
-		issueController.deleteIssue(issueId);
+		issueController.deleteIssue(issueId, "999");
 
 		// Assert
 		verify(issueTrackerView).showIssueError(errorMessage);
