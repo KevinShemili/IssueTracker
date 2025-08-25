@@ -105,6 +105,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		// Assert
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).containsExactly(project1.toString(), project2.toString());
+		assertThat(projectRepository.findAll()).containsExactly(project1, project2);
 	}
 
 	@Test
@@ -240,6 +241,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).containsExactly(issue1.toString(), issue2.toString());
+		assertThat(issueRepository.findByProjectId(projectId)).containsExactly(issue1, issue2);
 	}
 
 	@Test
@@ -306,7 +308,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).containsExactly(issue.toString());
 		frameFixture.label(ISSUE_ERROR_LABEL).requireText(String.format(ErrorMessages.DUPLICATE_ISSUE, id));
-		assertThat(issueRepository.findAll()).hasSize(1); // verify no new entries
+		assertThat(issueRepository.findByProjectId(projectId)).hasSize(1); // verify no new entries
 	}
 
 	@Test
@@ -336,7 +338,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(ISSUE_ERROR_LABEL).requireText(ErrorMessages.NON_NUMERICAL_ID);
-		assertThat(issueRepository.findAll()).isEmpty(); // verify no new entries
+		assertThat(issueRepository.findByProjectId(projectId)).isEmpty(); // verify no new entries
 	}
 
 	@Test
@@ -386,6 +388,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		// Assert
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
+		assertThat(issueRepository.findByProjectId(projectId)).isEmpty();
 	}
 
 	@Test
@@ -410,6 +413,7 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(PROJECT_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(PROJECT_ERROR_LABEL).requireText(ErrorMessages.PROJECT_DOESNT_EXIST);
+		assertThat(projectRepository.findAll()).isEmpty();
 	}
 
 	@Test
@@ -439,5 +443,6 @@ public class IssueTrackerSwingViewIT extends AssertJSwingJUnitTestCase {
 		String[] listContents = frameFixture.list(ISSUE_LIST).contents();
 		assertThat(listContents).isEmpty();
 		frameFixture.label(ISSUE_ERROR_LABEL).requireText(ErrorMessages.ISSUE_DOESNT_EXIST);
+		assertThat(issueRepository.findByProjectId(projectId)).isEmpty();
 	}
 }
