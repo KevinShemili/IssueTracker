@@ -27,6 +27,9 @@ import com.mongodb.client.MongoDatabase;
 @RunWith(GUITestRunner.class)
 public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase { // NOSONAR we want this naming convention
 
+	@ClassRule
+	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
+
 	private static final String DATABASE_NAME = "database";
 	private static final String PROJECT_COLLECTION = "project";
 	private static final String ISSUE_COLLECTION = "issue";
@@ -65,9 +68,6 @@ public class IssueTrackerSwingAppE2E extends AssertJSwingJUnitTestCase { // NOSO
 
 	private MongoClient mongoClient;
 	private FrameFixture frameFixture;
-
-	@ClassRule
-	public static final MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5");
 
 	@Override
 	protected void onSetUp() throws Exception {
